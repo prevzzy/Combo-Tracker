@@ -1,0 +1,3 @@
+export const TOASTS_CONFIG = {
+  CLOSE_TIMEOUT: 15000,
+}
