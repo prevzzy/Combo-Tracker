@@ -27,7 +27,8 @@ let activeCategoryElement = document.getElementById('hs-all-maps-category');
 let activeMapData = {
   categoryIcon: null,
   mapIcon: null,
-  mapName: null
+  mapName: null,
+  categoryName: null,
 }
 
 const highscoreStatElementsConfig = {
@@ -156,6 +157,10 @@ function populateMapCategory(mapsListElement, mapCategory, maps) {
   for (let mapScriptName in maps) {
     mapsListElement.appendChild(createMapCategoryElement(mapCategory, mapScriptName, maps[mapScriptName].name))
   }
+
+  const gapElement = document.createElement('li')
+  gapElement.className = 'list-group-item map-menu-item border-0 py-1'
+  mapsListElement.appendChild(gapElement)
 
   return mapsListElement
 }
@@ -462,20 +467,21 @@ function changeSideDrawerVisibility() {
 
 function watchActiveMap() {
   const activeMapName = SavedCombosService.getMapName(MemoryController.getCurrentMapScript())
+  const activeCategoryName = SavedCombosService.getMapCategory(MemoryController.getCurrentMapScript())
 
-  if (activeMapData.mapName !== activeMapName) {
+  if (activeMapData.mapName !== activeMapName || activeMapData.categoryName !== activeCategoryName) {
     setActiveMapData()
-    if (activeMapName) {
-      setupActiveMapIcons(activeMapName)
+    if (activeMapName && activeCategoryName) {
+      setupActiveMapIcons(activeMapName, activeCategoryName)
     }
   }
 }
 
-function setupActiveMapIcons(activeMapName) {
+function setupActiveMapIcons(activeMapName, activeCategoryName) {
   for (const mapCategoryElement of Array.from(mapCategoriesMenu.children)) {
     const mapCategoryTextElement = mapCategoryElement.querySelector('.category-name')
 
-    if (mapCategoryTextElement) {
+    if (mapCategoryTextElement && mapCategoryTextElement.textContent === activeCategoryName) {
       const allMapElements = Array.from(mapCategoryElement.querySelector('.hs-map-acc-collapse').children)
       const mapElement = allMapElements.find((map) => map.textContent === activeMapName)
 
@@ -486,7 +492,7 @@ function setupActiveMapIcons(activeMapName) {
         mapCategoryTextElement.insertAdjacentElement('afterend', categoryIcon)
         mapElement.firstElementChild.appendChild(mapIcon)
         
-        setActiveMapData(categoryIcon, mapIcon, activeMapName)
+        setActiveMapData(categoryIcon, mapIcon, activeMapName, activeCategoryName)
         
         return
       }
@@ -502,14 +508,15 @@ function createActiveMapIcon() {
   return activeMapIcon
 }
 
-function setActiveMapData(categoryIcon, mapIcon, mapName) {
+function setActiveMapData(categoryIcon, mapIcon, mapName, categoryName) {
   activeMapData.categoryIcon && activeMapData.categoryIcon.remove()
   activeMapData.mapIcon && activeMapData.mapIcon.remove()
 
   activeMapData = {
     categoryIcon,
     mapIcon,
-    mapName
+    mapName,
+    categoryName,
   }
 }
 
