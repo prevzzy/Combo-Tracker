@@ -63,10 +63,14 @@ export const maps = {
     SE2: 'THE TRIANGLE'
   },
   THAW: {
+    z_ho: 'HOLLYWOOD',
     z_bh: 'BEVERLY HILLS',
+    z_dt: 'DOWNTOWN',
     z_el: 'EAST LA',
     z_sm: 'SANTA MONICA',
+    z_oi: 'OIL RIG',
     vans: 'VANS PARK',
+    z_lv: 'CASINO',
     z_sr: 'SKATE RANCH',
     z_sv2: 'THE RUINS',
     sz: 'SANTA CRUZ',
