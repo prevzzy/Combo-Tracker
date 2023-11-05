@@ -1,7 +1,7 @@
 {
   "name": "combo-tracker",
   "productName": "Combo Tracker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "THUGPRO Combo Tracker",
   "main": "./.webpack/main",
   "keywords": [],
