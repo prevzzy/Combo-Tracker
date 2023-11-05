@@ -91,3 +91,4 @@ out/
 # Other
 src/renderer/js/game/offsets.js
 combos/
+highscores.json
