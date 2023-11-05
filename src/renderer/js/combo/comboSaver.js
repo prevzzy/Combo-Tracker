@@ -65,7 +65,6 @@ async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondit
       mapName,
     )
   }
-  
 
   LastComboUI.setLastComboPageInfo(true, 'Saving last combo...', 2, false)
   if (fullDataFileName) {
