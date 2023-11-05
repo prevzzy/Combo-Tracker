@@ -5,7 +5,7 @@ export const mainWindowConfig = {
       height: 768,
       minWidth: 600,
       minHeight: 500,
-      frame: false,
+      frame: process.env.APP_MODE === 'DEBUG',
       webPreferences: {
         nodeIntegration: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY

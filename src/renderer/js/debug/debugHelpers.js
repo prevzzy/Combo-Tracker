@@ -4,9 +4,9 @@ export function isAppInDebugMode() {
   return process.env.APP_MODE === 'DEBUG'
 }
 
-export function log(message) {
+export function log(...message) {
   if (isAppInDebugMode()) {
-    console.log(message)
+    console.log(...message)
   }
 }
 

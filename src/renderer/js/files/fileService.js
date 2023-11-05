@@ -3,6 +3,8 @@ const path = require('path')
 import rimraf from 'rimraf'
 import { ALL_MAPS } from '../utils/constants'
 import { maps } from '../utils/maps'
+import { correctHighscoresFile } from './highscoresFileValidation'
+import { log } from '../debug/debugHelpers'
 import * as OverlayUI from '../ui/uiOverlay'
 import * as SavedCombosService from '../combo/savedCombosService'
 
@@ -15,8 +17,10 @@ function setSavingPaths(paths) {
     appFolderPath
   } = paths
 
-  highscoresJsonPath = path.join(appDataPath, 'highscores.json')
-  savedCombosFolderPath = path.join(appDataPath, 'combos')
+  const folderPathToUse = process.env.APP_MODE === 'DEBUG' ? appFolderPath : appDataPath;
+
+  highscoresJsonPath = path.join(folderPathToUse, 'highscores.json')
+  savedCombosFolderPath = path.join(folderPathToUse, 'combos')
 }
 
 function readHighscoresJson() {
@@ -33,9 +37,22 @@ function readHighscoresJson() {
         if (error) {
           reject(error)
         }
+
+        let parsedData = JSON.parse(data);
+        try {
+          const correctedData = correctHighscoresFile(parsedData)
+          if (correctedData) {
+            log('highscore file needed correcting - overriding')
+            parsedData = correctedData;
+            saveHighscoresJson(correctedData);
+          }
+        } catch {
+          // It's hard to predict all scenarios that can result in throwing an error here, but having an uncorrected highscores file isn't the end of the world anyway. There is no reason to stop the entire application from running, so just catch the error and move on.
+          console.error('an error occured when correcting highscores file')
+        }
   
         try {
-          SavedCombosService.setSavedCombos(JSON.parse(data));
+          SavedCombosService.setSavedCombos(parsedData);
           resolve()
         } catch {
           reject(error)
@@ -60,6 +77,15 @@ function saveHighscoresJson(newSavedCombos) {
   })
 }
 
+export function createMapObject(mapCategory, mapScriptName) {
+  return {
+    name: maps[mapCategory][mapScriptName],
+    combosTracked: 0,
+    scores: [],
+    timeSpent: 0,
+  }
+}
+
 function createNewHighscoresJson() {
   return new Promise((resolve, reject) => {
     let mapCategoriesJson = {}
@@ -72,12 +98,7 @@ function createNewHighscoresJson() {
           ...mapCategoriesJson,
           [mapCategory]: {
             ...mapCategoriesJson[mapCategory],
-            [mapScriptName]: {
-              name: maps[mapCategory][mapScriptName],
-              combosTracked: 0,
-              scores: [],
-              timeSpent: 0,
-            }
+            [mapScriptName]: createMapObject(mapCategory, mapScriptName),
           }
         }
       })
