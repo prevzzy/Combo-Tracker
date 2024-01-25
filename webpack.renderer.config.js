@@ -2,6 +2,7 @@ const rules = require('./webpack.rules');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const DotEnv = require('dotenv-webpack')
+const relocateLoader = require('@vercel/webpack-asset-relocator-loader');
 
 rules.push({
   test: /\.css$/,
@@ -25,11 +26,21 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/static' }
+        { from: './src/static' }
       ]
     }),
     new DotEnv({
       path: './.env'
-    })
+    }),
+    {
+      apply(compiler) {
+        compiler.hooks.compilation.tap(
+          'webpack-asset-relocator-loader',
+          (compilation) => {
+            relocateLoader.initAssetCache(compilation, 'native_modules');
+          },
+        );
+      },
+    },
   ]
 };
