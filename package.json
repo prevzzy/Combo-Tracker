@@ -10,50 +10,7 @@
   },
   "license": "MIT",
   "config": {
-    "forge": {
-      "packagerConfig": {
-        "asar": true,
-        "icon": "./src/static/combo-tracker-icon.ico"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip"
-        }
-      ],
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack.main.config.js",
-            "renderer": {
-              "config": "./webpack.renderer.config.js",
-              "entryPoints": [
-                {
-                  "html": "./src/renderer/index.html",
-                  "js": "./src/renderer.js",
-                  "name": "main_window",
-                  "nodeIntegration": true
-                },
-                {
-                  "html": "./src/renderer/toast.html",
-                  "js": "./src/renderer/js/toasts/index.js",
-                  "name": "toast_window",
-                  "nodeIntegration": true
-                }
-              ]
-            }
-          }
-        ]
-      ]
-    }
-  },
-  "watch": {
-    "restart-electron-app": {
-      "patterns": [
-        "src"
-      ],
-      "extensions": "js,css,html"
-    }
+    "forge": "./forge.config.js"
   },
   "scripts": {
     "start": "electron-forge start",
