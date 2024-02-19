@@ -1,7 +1,7 @@
 
 import { ipcRenderer } from 'electron'
 import { ALL_MAPS } from '../utils/constants'
-import { HIGHSCORE_PEEK_TYPES, TOAST_EVENT_TYPES } from '../../../main/events/toastEventTypes'
+import { HIGHSCORE_PEEK_TYPES, TOAST_EVENT_TYPES } from '../../../main/events/eventTypes/toastEventTypes'
 import * as SavedCombosService from '../combo/savedCombosService'
 
 export function requestMapHighscoresToast(mapScriptName) {
@@ -89,4 +89,25 @@ export function requestAppFullscreen() {
 
 export function requestAppExit() {
   ipcRenderer.send('request-app-exit')
+}
+
+export function requestServerHosting(username) {
+  ipcRenderer.send('host-server-request', { username });
+}
+
+export function requestConnectingToServer(username) {
+  ipcRenderer.send('connect-to-server-request', { username });
+}
+
+export function requestServerShutdown() {
+  ipcRenderer.send('shutdown-server-request');
+}
+
+export function requestDisconnectingFromServer() {
+  ipcRenderer.send('disconnect-from-server-request');
+}
+
+export function requestSendingWsMessage(message, isHost) {
+  const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
+  ipcRenderer.send(event, message);
 }

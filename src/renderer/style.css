@@ -509,3 +509,60 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   -webkit-user-select: text;
   user-select: text;
 }
+
+.online-connection-option {
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem 1.50rem 1.25rem;
+  margin: 1rem 0rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+}
+
+.online-connection-option.active {
+  cursor: pointer;
+  background: var(--primary-dark);
+}
+
+.online-connection-option:hover, .online-connection-option.active:hover {
+  cursor: pointer;
+  background: var(--scrollbar-color);
+}
+
+.online-player-container:nth-child(odd) {
+  background: var(--primary-dark)
+}
+
+#online-scoreboard th, #online-scoreboard td {
+  padding: 0.25rem;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: bold;
+}
+
+#online-scoreboard td {
+  padding: 0.7rem 0.25rem;
+}
+
+#online-scoreboard tr {
+  transform: scale(1);
+}
+
+#online-scoreboard th:nth-child(2), #online-scoreboard td:nth-child(2) { width: 250px }
+#online-scoreboard th:nth-child(3), #online-scoreboard td:nth-child(3) { width: 150px }
+#online-scoreboard th:nth-child(4), #online-scoreboard td:nth-child(4) { width: 150px }
+#online-scoreboard th:nth-child(5), #online-scoreboard td:nth-child(5),
+#online-scoreboard th:nth-child(6), #online-scoreboard td:nth-child(6),
+#online-scoreboard th:nth-child(7), #online-scoreboard td:nth-child(7) {
+  width: 100px 
+}
+
+#online-scoreboard tr:nth-child(odd) td {
+  background: var(--dark)
+}
+
+#online-scoreboard tr:nth-child(even) td {
+  background: var(--primary-dark)
+}
+
+.online-player-waiting-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}

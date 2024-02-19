@@ -75,3 +75,7 @@ export function getUniqueComboId(finalScore, mapName, comboStartTime) {
   const score = finalScore || ''
   return `${mapNameCleared} ${score} - ${day} ${time}`
 }
+
+export function testFlag(playerFlags, flagToTest) {
+  return (playerFlags & flagToTest) !== 0;
+}

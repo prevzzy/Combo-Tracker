@@ -2,32 +2,34 @@ import {
   requestAppMinimize, 
   requestAppFullscreen,
   requestAppExit
-} from '../events/mainIpcEvents'
+} from '../events/outgoingIpcEvents'
 
 const lastComboPage = document.getElementById('last-combo-page')
 const highscoresPage = document.getElementById('highscores-page')
+const onlinePage = document.getElementById('online-page')
 const settingsPage = document.getElementById('settings-page')
 const aboutPage = document.getElementById('about-page')
+
 const navLastCombo = document.getElementById('navbar-last-combo')
 const navHighscores = document.getElementById('navbar-highscores')
+const navOnline = document.getElementById('navbar-online')
 const navSettings = document.getElementById('navbar-settings')
 const navAbout = document.getElementById('navbar-about')
 
-const pageElementsArray = [lastComboPage, highscoresPage, settingsPage, aboutPage]
-const navElementsArray = [navLastCombo, navHighscores, navSettings, navAbout]
+const pageElementsArray = [lastComboPage, highscoresPage, onlinePage, settingsPage, aboutPage]
+const navElementsArray = [navLastCombo, navHighscores, navOnline, navSettings, navAbout]
 
 function initNavigation(
   navigationElementsArray,
   contentContainersArray,
 ) {
   navigationElementsArray.forEach((navElement, i) => {
-
     navElement.addEventListener('click', (e) => {
       changePage(
         contentContainersArray[i],
         e.currentTarget,
         contentContainersArray,
-        [...navigationElementsArray]
+        navigationElementsArray
       )
     })
   })
@@ -115,6 +117,12 @@ function setupToolbarListeners() {
   document.getElementById('toolbar-close-button').addEventListener('click', requestAppExit)
 }
 
+
+function createElementFromTemplate(templateId) {
+  const template = document.getElementById(templateId)
+  return document.importNode(template.content, true);
+}
+
 function showApp() {
   const spinner = document.getElementById('initial-spinner')
   const page = document.getElementById('app')
@@ -139,4 +147,6 @@ export {
   initNavigation,
   showApp,
   blockHighscoresPage,
+  setActiveNavigationClasses,
+  createElementFromTemplate,
 }

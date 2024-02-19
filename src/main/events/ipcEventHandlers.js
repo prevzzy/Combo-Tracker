@@ -3,7 +3,10 @@ import { TOASTS_CONFIG } from '../utils/constants'
 import { getSetting, setSetting, restoreDefaultSettings } from '../settings/settings'
 import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
-import { TOAST_EVENT_TYPES } from './toastEventTypes'
+import { TOAST_EVENT_TYPES } from './eventTypes/toastEventTypes'
+import { handleMessageByType, hostServer, shutdownServer } from '../onlineCT/wsServer/wsServer'
+import { connectToServer, sendWsClientMessage, disconnectFromServer } from '../onlineCT/wsClient/wsClient'
+import { WS_CLIENT_MESSAGE_TYPES } from '../onlineCT/wsServer/wsMessageTypes'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -138,4 +141,52 @@ export async function onRestartSettingsRequest(mainWindow) {
       updateKeyboardShortcut(key, settings[key], mainWindow)
     }
   })
+}
+
+export function onHostServerRequest(event, arg, mainWindow) {
+  const message = hostServer(arg.username, (data) => {
+    mainWindow.webContents.send('new-ws-message', data)
+  })
+  mainWindow.webContents.send('host-server-request-response', message)
+}
+
+export function onConnectToServerRequest(event, arg, mainWindow) {
+  const onMessageCallback = (data) => {
+    mainWindow.webContents.send('new-ws-message', data)
+  }
+  const onOpenCallback = () => {
+    onSendWsClientMessageRequest(
+      {},
+      {
+        type: WS_CLIENT_MESSAGE_TYPES.LOGIN,
+        payload: { username: arg.username },
+      },
+      mainWindow,
+    );
+  }
+  
+  const message = connectToServer(
+    onMessageCallback,
+    onOpenCallback,
+  )
+
+  mainWindow.webContents.send('connect-to-server-request-response', message)
+}
+
+export function onShutdownServerRequest() {
+  shutdownServer();
+}
+
+export function onDisconnectFromServerRequest() {
+  disconnectFromServer();
+}
+
+export function onSendWsClientMessageRequest(event, arg, mainWindow) {
+  sendWsClientMessage(arg, (data) => {
+    mainWindow.webContents.send('new-ws-message', data)
+  })
+}
+
+export function onSendWsServerMessageRequest(event, arg, mainWindow) {
+  handleMessageByType(JSON.stringify(arg), undefined, true)
 }

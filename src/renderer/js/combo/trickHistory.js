@@ -1,5 +1,6 @@
 import { log } from '../debug/debugHelpers'
 import { getTrickColorClass } from '../ui/lastCombo/tricks/uiTricks'
+import { testFlag } from '../utils/helpers'
 import * as MemoryController from '../game/memory'
 
 const TRICK_CONSTANTS = {
@@ -31,15 +32,15 @@ class Trick {
   }
 
   isSwitch() {
-    return this.flags & 4
+    return testFlag(this.flags, 4);
   }
 
   isGap() {
-    return this.flags & 16
+    return testFlag(this.flags, 16);
   }
 
   isSpecial() {
-    return this.flags & 32
+    return testFlag(this.flags, 32);
   }
   
   incrementTimesUsedCounter() {

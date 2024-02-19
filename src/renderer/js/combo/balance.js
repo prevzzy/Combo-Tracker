@@ -85,6 +85,8 @@ class Balance {
     this.manualTimeDataset = []
     this.grindTimeDataset = []
     this.lipTimeDataset = []
+    this.manualBalanceArrowPosition = 0
+    this.grindBalanceArrowPosition = 0
   }
 
   assumePenaltyRange(balancePenaltyRangeObject, timeDiff) {
@@ -99,6 +101,8 @@ class Balance {
   update() {
     this.updateGrindTime()
     this.updateManualTime()
+    this.manualBalanceArrowPosition = MemoryController.getManualBalanceArrowPosition()
+    this.grindBalanceArrowPosition = MemoryController.getGrindBalanceArrowPosition()
     this.lipTime = MemoryController.getLipTime()
     this.stateType = MemoryController.getStateType()
   }

@@ -4,6 +4,12 @@ import {
   onGetSettingRequest,
   onSetSettingRequest,
   onRestartSettingsRequest,
+  onHostServerRequest,
+  onConnectToServerRequest,
+  onSendWsClientMessageRequest,
+  onSendWsServerMessageRequest,
+  onShutdownServerRequest,
+  onDisconnectFromServerRequest,
 } from './ipcEventHandlers'
 
 export function initIpcEvents(mainWindow, toastWindow) {
@@ -36,6 +42,32 @@ export function initIpcEvents(mainWindow, toastWindow) {
 
   ipcMain.on('request-app-fullscreen', () => {
     mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
+  })
+
+  ipcMain.on('host-server-request', (event, arg) => {
+    onHostServerRequest(event, arg, mainWindow);
+  });
+
+  ipcMain.on('connect-to-server-request', (event, arg) => {
+    console.log('connecting to server')
+    onConnectToServerRequest(event, arg, mainWindow);
+  });
+
+  ipcMain.on('shutdown-server-request', (event, arg) => {
+    onShutdownServerRequest(event, arg, mainWindow);
+  });
+
+  ipcMain.on('disconnect-from-server-request', (event, arg) => {
+    console.log('disconnecting from server')
+    onDisconnectFromServerRequest(event, arg, mainWindow);
+  });
+
+  ipcMain.on('send-ws-client-message', (event, arg) => {
+    onSendWsClientMessageRequest(event, arg, mainWindow)
+  })
+
+  ipcMain.on('send-ws-server-message', (event, arg) => {
+    onSendWsServerMessageRequest(event, arg, mainWindow)
   })
 
   ipcMain.on('request-app-exit', () => {

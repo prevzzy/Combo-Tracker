@@ -17,6 +17,7 @@ import * as MemoryController from '../game/memory'
 import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
+import { isConnectedToOnlineCT, sendNewComboData } from '../online/connectionService'
 
 let finalScore = null
 let comboStartTime = 0
@@ -77,6 +78,27 @@ function getMiscData() {
     maxRevertPenalty: score.maxRevertPenalty,
     multiplierFromGaps: trickHistory.gapsHit,
     graffitiTags: score.graffitiTags,
+  }
+}
+
+function getOnlineCtComboData() {
+  const {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    manualTime,
+    grindTime,
+  } = balance;
+
+
+  return {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    manualTime,
+    grindTime,
+    multiplier: score.getMultiplier(),
+    basePoints: score.getBasePoints(),
+    score: score.getFinalScore(),
+    comboTime,
   }
 }
 
@@ -197,6 +219,9 @@ async function track() {
   trackingInterval = setInterval(async () => {
     if (isComboInProgress()) {
       updateComboValues()
+      if (isConnectedToOnlineCT() && isComboSuitableToDisplay()) {
+        sendNewComboData(getOnlineCtComboData())
+      }
     } else {
       clearInterval(trackingInterval)
       clearInterval(datasetsUpdatingInterval)
@@ -205,8 +230,12 @@ async function track() {
   }, 16)
 }
 
+function isComboSuitableToDisplay() {
+  return isComboLongEnoughToDisplay() && !isComboTrackingSuspended()
+}
+
 async function finishTrackingCurrentCombo(isIdle) {
-  if (isComboLongEnoughToDisplay() && !isComboTrackingSuspended()) {
+  if (isComboSuitableToDisplay()) {
     await handleComboFinish(isIdle)
   } else {
     restart()

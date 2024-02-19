@@ -1,5 +1,5 @@
 import { remote, ipcRenderer } from 'electron'
-import { initMainWindowIpcEventListeners } from './events/listeners'
+import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
 import * as GlobalUI from './ui/uiGlobal'
 import * as NewMapModalUI from './ui/uiNewMapModal'
@@ -7,6 +7,7 @@ import * as SettingsUI from './ui/uiSettings'
 import * as GameProcessService from './game/gameProcessService'
 import * as LastComboUI from './ui/lastCombo/uiLastCombo'
 import * as FileService from './files/fileService'
+import * as OnlineCTUI from './ui/onlineCT/uiOnlineCT'
 import { setupGlobalError } from './ui/globalError'
 
 let isRunning = false
@@ -18,7 +19,7 @@ function startApp() {
 
   ipcRenderer.send('user-data-path-request')
   ipcRenderer.on('user-data-path-request-response', (event, arg) => {
-    initMainWindowIpcEventListeners()
+    initIncomingIpcEventListeners()
     SettingsUI.initSettings()
     runCoreLogic(arg)
     ipcRenderer.removeAllListeners('user-data-path-request-response')
@@ -44,6 +45,7 @@ function runCoreLogic(paths) {
       HighscoresUI.initMapCategoriesMenu()
       NewMapModalUI.initMapModal()
       GlobalUI.setupToolbarListeners()
+      OnlineCTUI.init()
 
       await GameProcessService.handleHookingToGameProcess()
       await GameProcessService.mainLoop()

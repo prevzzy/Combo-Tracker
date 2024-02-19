@@ -1,7 +1,8 @@
 import { app, globalShortcut } from 'electron'
-import { initIpcEvents } from './main/events/listeners'
+import { initIpcEvents } from './main/events/ipcEvents'
 import { createAppWindows } from './main/browserWindows/browserWindows'
 import { initSettings } from './main/settings/settings'
+import { shutdownServer } from './main/onlineCT/wsServer/wsServer'
 
 let mainWindow
 let toastWindow
@@ -44,6 +45,7 @@ if (!gotTheLock) {
 }
 
 app.on('will-quit', () => {
+  shutdownServer();
   globalShortcut.unregisterAll()
 })
 

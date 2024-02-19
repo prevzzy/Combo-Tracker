@@ -19,6 +19,11 @@ import {
   currentStanceAddressData,
   specialMeterNumericValueAddressData,
   trickHistoryArrayAddressData,
+  grindBalanceArrowPositionAddressData,
+  manualBalanceArrowPositionAddressData,
+  observedPlayerNameAddressData,
+  observedPlayerFlagsAddressData,
+  observedPlayerInfoAddressData,
 } from './offsets'
 
 let gameHandle
@@ -26,6 +31,8 @@ let processBaseAddress
 let grindTimeAddress
 let manualTimeAddress
 let lipTimeAddress
+let grindBalanceArrowPositionAddress
+let manualBalanceArrowPositionAddress
 let currentMapAddress
 let basePointsAddress
 let multiplierAddress
@@ -38,6 +45,9 @@ let trickCountAddress
 let tricksAmountAddress
 let currentStanceAddress
 let specialMeterNumericValueAddress
+let observedPlayerNameAddress
+let observedPlayerFlagsAddress
+let observedPlayerInfoAddress
 
 function initAddresses (_gameHandle, _processBaseAddress) {
   gameHandle = _gameHandle
@@ -46,6 +56,8 @@ function initAddresses (_gameHandle, _processBaseAddress) {
   grindTimeAddress = getAddress(gameHandle, processBaseAddress, grindTimeAddressData)
   manualTimeAddress = getAddress(gameHandle, processBaseAddress, manualTimeAddressData)
   lipTimeAddress = getAddress(gameHandle, processBaseAddress, lipTimeAddressData)
+  grindBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, grindBalanceArrowPositionAddressData)
+  manualBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, manualBalanceArrowPositionAddressData)
   currentMapAddress = getAddress(gameHandle, processBaseAddress, currentMapScriptAddressData)
   basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData)
   multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData)
@@ -58,6 +70,9 @@ function initAddresses (_gameHandle, _processBaseAddress) {
   tricksAmountAddress = getAddress(gameHandle, processBaseAddress, trickAmountAddressData)
   currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData)
   specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData)
+  observedPlayerNameAddress = getAddress(gameHandle, processBaseAddress, observedPlayerNameAddressData)
+  observedPlayerFlagsAddress = getAddress(gameHandle, processBaseAddress, observedPlayerFlagsAddressData)
+  observedPlayerInfoAddress = getAddress(gameHandle, processBaseAddress, observedPlayerInfoAddressData)
 }
 
 // It's hard to predict whether this function will always work. Current checks depend only on relations between incorrectly initialized values that I noticed.
@@ -180,7 +195,7 @@ function getAddress(gameHandle, processBaseAddress, addressData) {
   return address
 }
 
-function getTrickHistoryArrayAddress() {
+function getPointerAddress(addressData) {
   if (!processBaseAddress) {
     throw new Error('Can\'t read memory without processBaseAddress.')
   }
@@ -188,9 +203,9 @@ function getTrickHistoryArrayAddress() {
     throw new Error('Can\'t read memory without gameHandle.')
   }
 
-  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData)
+  const pointerAddress = getAddress(gameHandle, processBaseAddress, addressData)
 
-  return trickHistoryArrayAddress
+  return pointerAddress
 }
 
 function getTrickDataPointer(index) {
@@ -198,7 +213,7 @@ function getTrickDataPointer(index) {
     throw new Error('Can\'t read memory without gameHandle.')
   }
 
-  const activeTrickHistoryAddress = getTrickHistoryArrayAddress()
+  const activeTrickHistoryAddress = getPointerAddress(trickHistoryArrayAddressData)
 
   if (!activeTrickHistoryAddress) {
     throw new Error('Can\'t read trick data without trick history address specified.')
@@ -206,7 +221,6 @@ function getTrickDataPointer(index) {
 
   return memoryjs.readMemory(gameHandle, activeTrickHistoryAddress + 0x4 * (index), memoryjs.PTR);
 }
-
 
 function getTrickValue(trickDataPointer) {
   return memoryjs.readMemory(gameHandle, trickDataPointer + 0x0, memoryjs.INT)
@@ -280,12 +294,34 @@ function getSpecialMeterNumericValue() {
   return memoryjs.readMemory(gameHandle, specialMeterNumericValueAddress, memoryjs.INT)
 }
 
+function getGrindBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, grindBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function getManualBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, manualBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function getObservedPlayerName() {
+  return memoryjs.readMemory(gameHandle, getObservedPlayer() + 0x38, memoryjs.STRING)
+}
+
+function getObservedPlayerFlags() {
+  return memoryjs.readMemory(gameHandle, getObservedPlayer() + 0x1D0, memoryjs.INT)
+}
+
+function getObservedPlayer() {
+  return memoryjs.readMemory(gameHandle, observedPlayerInfoAddress, memoryjs.PTR);
+}
+
 export {
   initAddresses,
   testInitializedAddresses,
   getGrindTime,
   getManualTime,
   getLipTime,
+  getGrindBalanceArrowPosition,
+  getManualBalanceArrowPosition,
   getCurrentMapScript,
   getMultiplier,
   getBasePoints,
@@ -297,10 +333,11 @@ export {
   getTrickCount,
   getTricksAmount,
   getCurrentStance,
-  getTrickHistoryArrayAddress,
   getTrickDataPointer,
   getTrickValue,
   getTrickName,
   getTrickFlags,
   getSpecialMeterNumericValue,
+  getObservedPlayerName,
+  getObservedPlayerFlags,
 }

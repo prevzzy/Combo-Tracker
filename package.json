@@ -49,6 +49,7 @@
     "popper.js": "^1.16.1",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.16",
-    "stream-browserify": "^3.0.0"
+    "stream-browserify": "^3.0.0",
+    "ws": "^8.16.0"
   }
 }

@@ -29,17 +29,6 @@ function isSettingsJsonValid() {
   if (!fs.existsSync(settings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH))) {
     return false
   }
-  // additional naive check for directory permissions - doesn't do it's work anyway
-  // else {
-  //   try {
-  //     const pathToTest = path.join(settings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH), `test.txt`)
-  //     fs.writeFileSync(pathToTest, 'test')
-  //     fs.unlinkSync(pathToTest)
-  //   } catch (error) {
-  //     console.error(error)
-  //     return false
-  //   }
-  // }
 
   return true
 }

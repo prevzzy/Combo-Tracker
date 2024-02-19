@@ -120,13 +120,8 @@ function clearActiveCategoryDisplay(mapCategoryElement, mapElements, activeMapEl
   }
 }
 
-function createElementFromTemplate(templateId) {
-  const template = document.getElementById(templateId)
-  return document.importNode(template.content, true);
-}
-
 function createMapCategory(mapCategory, maps) {
-  const mapCategoryElement = createElementFromTemplate('hs-menu-map-accordion-template')
+  const mapCategoryElement = GlobalUI.createElementFromTemplate('hs-menu-map-accordion-template')
   const mapsListElement = mapCategoryElement.querySelector('.list-group')
 
   const mapCategoryElementId = `${mapCategory.split(' ').shift()}MenuLink`
@@ -296,8 +291,7 @@ function setAdditionalTopInfo(isVisible, data, element) {
 }
 
 function createNewHighscoreElement(comboData, standing) {
-  const template = document.getElementById('hs-accordion-template')
-  const highscoreElement = document.importNode(template.content, true);
+  const highscoreElement = GlobalUI.createElementFromTemplate('hs-accordion-template')
   
   const mapName = comboData.mapName || ERROR_STRINGS.UNKNOWN_MAP
 
@@ -309,20 +303,20 @@ function createNewHighscoreElement(comboData, standing) {
       LastComboUI.displayComboFromFile(comboData.fullDataFileName)
     )
   }
-  
-  const drawAllHighscoreStats = (obj) => {
-    for (const key in obj) {
-      drawSingleHighscoreStat(
-        highscoreElement,
-        key,
-        obj[key]
-      )
-    }
-  }
-    
-  drawAllHighscoreStats(comboData)
+
+  drawHighscoreStats(highscoreElement, comboData)
 
   return highscoreElement;
+}
+
+function drawHighscoreStats(parentElement, stats) {
+  for (const key in stats) {
+    drawSingleHighscoreStat(
+      parentElement,
+      key,
+      stats[key]
+    )
+  }
 }
 
 function updateHighscoresList(scores) {
@@ -334,6 +328,8 @@ function updateHighscoresList(scores) {
 
 function drawSingleHighscoreStat(parentElement, statName, value) {
   const statConfig = highscoreStatElementsConfig[statName]
+
+  console.log(statName, value, statConfig)
   
   if (statConfig && statConfig.selectors) {
     statConfig.selectors.forEach((selector) => {
@@ -527,4 +523,5 @@ export {
   refreshCurrentlyDisplayedHighscores,
   watchActiveMap,
   setActiveMapData,
+  drawHighscoreStats,
 }

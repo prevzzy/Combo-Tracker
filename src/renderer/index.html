@@ -111,6 +111,14 @@
               <small>Highscores</small>
             </a>
           </li>
+          <li id="navbar-online" class="nav-item py-3">
+            <a class="nav-link d-flex flex-column align-items-center justify-content-center p-0" href="#">
+              <span class="material-icons" style="font-size: 2.5rem">
+                public
+              </span>
+              <small>Online</small>
+            </a>
+          </li>
           <li id="navbar-settings" class="nav-item py-3">
             <a class="nav-link d-flex flex-column align-items-center justify-content-center p-0" href="#">
               <span class="material-icons" style="font-size: 2.3rem">
@@ -130,7 +138,7 @@
         </ul>
       </div>
     </nav>
-  
+
     <main id="ui-main" class="text-dark">
       <div id="overlay" class="main text-white display-5">
         <div id="overlay-spinner" class="spinner-border mb-3" role="status" style="display: block; width: 3rem; height: 3rem;">
@@ -423,6 +431,71 @@
         </div>
       </div>
       
+      <div id="online-page" class="main" style="display: none">
+        <div class="w-100 h-100">
+          <div id="online-login-panel" class="h-100" style="display: block">
+            <div class="m-auto h-100 d-flex flex-row justify-content-center align-items-center" style="width: 85%">
+              <div class="w-50 d-flex
+              flex-column justify-content-center align-items-center">
+                <div class="w-100 px-5">
+                  <div id="host-room-option" class="online-connection-option active">
+                    <div class="text-light display-5">Host</div>
+                    <div class="text-muted display-8">Host online combo tracking room. Players will be able to connect to your room by providing room's code.</div>
+                  </div>
+                  <div id="connect-to-room-option"  class="online-connection-option">
+                    <div class="text-light display-5">Connect</div>
+                    <div class="text-muted display-8">Connect to existing online combo tracking room.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="vr h-50 bg-primary-dark" style="width: 1px"></div>
+              <div class="w-50 d-flex
+              flex-column justify-content-center align-items-center">
+                <form class="w-100 px-5 m-1">
+                  <div class="form-group">
+                    <label for="online-username-input" class="text-white">Your username</label>
+                    <input id="online-username-input" type="text" class="rounded-left rounded-right form-control text-light" maxlength="15" />
+                  </div>
+                  <div class="form-group" style="display: none">
+                    <label for="online-room-code-input" class="text-white">Room code</label>
+                    <input id="online-room-code-input" type="text" class="rounded-left rounded-right form-control text-light" maxlength="6" />
+                  </div>
+                  <div class="form-group text-center mt-4">
+                    <button id="online-submit-login-button" type="button" class="btn btn-primary w-100">Host room</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div id="online-room" class="h-100" style="display: none">
+            <div class="m-auto h-100">
+              <div class="text-light d-flex justify-content-between w-100 py-3 px-5">
+                <div class="display-4">
+                  Connected to online <span id="online-connection-type" class="display-4"></span>
+                </div>
+                <button id="online-disconnect-button" type="button" class="btn btn-primary">Disconnect</button>
+              </div>
+              <table id="online-scoreboard" class="w-100 bg-dark-opacity">
+                <thead>
+                  <tr>
+                    <th id="online-player-name" class="text-secondary bg-dark-opacity">Name</th>
+                    <th class="text-secondary bg-dark-opacity">Score</th>
+                    <th class="text-secondary bg-dark-opacity">Base</th>
+                    <th class="text-secondary bg-dark-opacity">Multiplier</th>
+                    <th class="bg-dark-opacity"><span class="material-icons-outlined text-secondary" style="margin-top: 7px">timer</span></th>
+                    <th class="bg-dark-opacity"><img src="../balance_g.svg" alt="Grind" style="margin-bottom: 3px" /></th>
+                    <th class="bg-dark-opacity"><img src="../balance_m.svg" alt="Manual" style="margin-top: 1px" /></th>
+                  </tr>
+                </thead>
+                <tbody id="online-scoreboard-body" class="text-light">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="settings-page" class="main" style="display: none">
         <div id="settings-page-container" class="row m-auto w-100 px-5" style="max-width: 900px; display: none">
           <div class="w-100 mt-5 mb-5">
@@ -725,6 +798,29 @@
           </div>
         </div>
       </div>
+    </template>
+
+    <template id="online-player">
+      <tr>
+        <td style="display: table-cell" class="text-light online-player-name"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-score"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-base"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-multiplier"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-combo-time"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-grind-time"></td>
+        <td style="display: table-cell" class="text-light online-player-data hs-acc-manual-time"></td>
+        <td class="position-absolute online-player-waiting-overlay jusfify-content-center align-items-center" style="
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          display: flex;
+        ">
+          <div class="w-100 d-flex justify-content-center align-items-center">
+            <span class="online-player-waiting-for-combo-icon material-icons-outlined mr-1"></span> Waiting for player's combo
+          </div>
+        </td>
+      </tr>
     </template>
   </div>
 </body>
