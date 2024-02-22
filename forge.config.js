@@ -1,19 +1,21 @@
+const ForgeExternalsPlugin = require("@timfish/forge-externals-plugin");
+
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: "./src/static/combo-tracker-icon.ico"
+    icon: "./src/static/combo-tracker-icon.ico",
   },
   makers: [
     {
-      name: "@electron-forge/maker-zip"
-    }
+      name: "@electron-forge/maker-zip",
+    },
   ],
   plugins: [
-    [
-      "@electron-forge/plugin-webpack",
-      {
+    {
+      name: "@electron-forge/plugin-webpack",
+      config: {
         devServer: {
-          static: './src/static',
+          static: "./src/static",
           hot: true,
           liveReload: false,
         },
@@ -27,16 +29,27 @@ module.exports = {
             {
               html: "./src/renderer/index.html",
               js: "./src/renderer.js",
-              name: "main_window"
+              name: "main_window",
+              preload: {
+                js: './src/main/preload/preload.js'
+              }
             },
             {
               html: "./src/renderer/toast.html",
               js: "./src/renderer/js/toasts/index.js",
-              name: "toast_window"
-            }
-          ]
-        }
-      }
-    ]
-  ]
+              name: "toast_window",
+            },
+            {
+              html: "./src/renderer/overlay.html",
+              js: "./src/renderer/js/overlay/index.js",
+              name: "overlay",
+            },
+          ],
+        },
+      },
+    },
+    new ForgeExternalsPlugin({
+      externals: ['electron-overlay-window'],
+    })
+  ],
 };

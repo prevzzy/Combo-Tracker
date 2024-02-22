@@ -11,8 +11,9 @@ import {
   onShutdownServerRequest,
   onDisconnectFromServerRequest,
 } from './ipcEventHandlers'
+import { OverlayController } from 'electron-overlay-window'
 
-export function initIpcEvents(mainWindow, toastWindow) {
+export function initIpcEvents(mainWindow, toastWindow, overlayWindow) {
   ipcMain.on('user-data-path-request', () => {
     mainWindow.webContents.send('user-data-path-request-response', {
       appDataPath: app.getPath('userData'),
@@ -68,6 +69,14 @@ export function initIpcEvents(mainWindow, toastWindow) {
 
   ipcMain.on('send-ws-server-message', (event, arg) => {
     onSendWsServerMessageRequest(event, arg, mainWindow)
+  })
+
+  ipcMain.on('show-overlay-request', () => {
+    OverlayController.attachByTitle(
+      overlayWindow,
+      process.platform === 'darwin' ? 'Untitled' : 'THUG Pro',
+      { hasTitleBarOnMac: true }
+    )
   })
 
   ipcMain.on('request-app-exit', () => {

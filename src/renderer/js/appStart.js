@@ -1,4 +1,4 @@
-import { remote, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
 import * as GlobalUI from './ui/uiGlobal'
@@ -9,6 +9,7 @@ import * as LastComboUI from './ui/lastCombo/uiLastCombo'
 import * as FileService from './files/fileService'
 import * as OnlineCTUI from './ui/onlineCT/uiOnlineCT'
 import { setupGlobalError } from './ui/globalError'
+import { app } from '@electron/remote'
 
 let isRunning = false
 
@@ -25,7 +26,7 @@ function startApp() {
     ipcRenderer.removeAllListeners('user-data-path-request-response')
   })
 
-  document.getElementById('app-version').textContent = `v${remote.app.getVersion()}`
+  document.getElementById('app-version').textContent = `v${app.getVersion()}`
 }
 
 function runCoreLogic(paths) {

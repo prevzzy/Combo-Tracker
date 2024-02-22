@@ -3,9 +3,13 @@ import { initIpcEvents } from './main/events/ipcEvents'
 import { createAppWindows } from './main/browserWindows/browserWindows'
 import { initSettings } from './main/settings/settings'
 import { shutdownServer } from './main/onlineCT/wsServer/wsServer'
+import { initialize } from '@electron/remote/main';
+
+initialize()
 
 let mainWindow
 let toastWindow
+let overlayWindow
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -33,13 +37,15 @@ if (!gotTheLock) {
     ({
       mainWindow,
       toastWindow,
+      overlayWindow,
     } = createAppWindows())
 
     await initSettings(mainWindow, toastWindow)
-    initIpcEvents(mainWindow, toastWindow)
+    initIpcEvents(mainWindow, toastWindow, overlayWindow)
 
     mainWindow.on('close', () => {
       toastWindow.close()
+      overlayWindow.close()
     })
   })
 }

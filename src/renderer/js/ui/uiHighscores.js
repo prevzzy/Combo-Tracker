@@ -329,8 +329,6 @@ function updateHighscoresList(scores) {
 function drawSingleHighscoreStat(parentElement, statName, value) {
   const statConfig = highscoreStatElementsConfig[statName]
 
-  console.log(statName, value, statConfig)
-  
   if (statConfig && statConfig.selectors) {
     statConfig.selectors.forEach((selector) => {
       const statElement = parentElement.querySelector(selector)

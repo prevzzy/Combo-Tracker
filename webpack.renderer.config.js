@@ -42,5 +42,6 @@ module.exports = {
     //     );
     //   },
     // },
-  ]
+  ],
+  externals: ['electron-overlay-window']
 };

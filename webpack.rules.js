@@ -1,14 +1,27 @@
-module.exports = [
-  // Add support for native node modules for building process (make sure asar: true is set in config.forge.packagerConfig in package.json)
-  // {
-  //   test: /\.node$/,
-  //   loader: 'native-ext-loader',
-  //   options: {
-  //     basePath: ['..']
-  //   }
-  // },
+const generalRules = [
+  {
+    test: /\.(png|jpe?g|gif|svg)$/i,
+    use: [
+      {
+        loader: 'file-loader'
+      }
+    ]
+  },
+]
 
-  // Add support for native node modules for development process (when switching between this config and the one above, a node_modules reinstall might be needed)
+// Add support for native node modules for building process (make sure asar: true is set in config.forge.packagerConfig in package.json)
+const prodPackagingRules = [
+  {
+    test: /\.node$/,
+    loader: 'native-ext-loader',
+    options: {
+      basePath: ['..']
+    }
+  },
+]
+
+// Add support for native node modules for development process
+const devPackagingRules = [
   {
     test: /native_modules\/.+\.node$/,
     use: 'native-ext-loader',
@@ -23,12 +36,10 @@ module.exports = [
       },
     },
   },
-  {
-    test: /\.(png|jpe?g|gif|svg)$/i,
-    use: [
-      {
-        loader: 'file-loader'
-      }
-    ]
-  },
+]
+
+module.exports = [
+  ...generalRules,
+  ...devPackagingRules,
+  // ...prodPackagingRules,
 ];

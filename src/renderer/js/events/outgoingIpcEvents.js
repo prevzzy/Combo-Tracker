@@ -107,6 +107,10 @@ export function requestDisconnectingFromServer() {
   ipcRenderer.send('disconnect-from-server-request');
 }
 
+export function requestShowingOverlay() {
+  ipcRenderer.send('show-overlay-request');
+}
+
 export function requestSendingWsMessage(message, isHost) {
   const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
   ipcRenderer.send(event, message);

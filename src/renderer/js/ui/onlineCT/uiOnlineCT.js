@@ -3,6 +3,7 @@ import { connectToOnlineCT, disconnectFromOnlineCT } from '../../online/connecti
 import { drawHighscoreStats } from '../uiHighscores';
 import { setErrorIconByStatus } from '../globalError';
 import { log } from '../../debug/debugHelpers';
+import { requestShowingOverlay } from '../../events/outgoingIpcEvents';
 
 let isHosting = true;
 let isConnecting = false;
@@ -18,12 +19,14 @@ const onlineRoomView = document.getElementById('online-room')
 const onlineRoomScoreboardBody = document.getElementById('online-scoreboard-body')
 const onlineConnectionType = document.getElementById('online-connection-type')
 const onlineDisconnectButton = document.getElementById('online-disconnect-button')
+const overlayButton = document.getElementById('overlay-window-button')
 
 function init() {
   hostRoomOption.addEventListener('click', (e) => { onLoginTypeChange(e, true) });
   connectToRoomOption.addEventListener('click', (e) => { onLoginTypeChange(e, false) });
   submitLoginButton.addEventListener('click', onSubmitLoginClick);
   onlineDisconnectButton.addEventListener('click', onDisconnectButtonClick)
+  overlayButton.addEventListener('click', requestShowingOverlay)
 }
 
 function restart() {
