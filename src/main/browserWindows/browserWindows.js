@@ -2,6 +2,7 @@
 import url from 'url';
 import electron, { BrowserWindow, globalShortcut } from 'electron';
 import { mainWindowConfig, toastWindowConfig, overlayWindowConfig } from './windowsConfig';
+import { OverlayController } from 'electron-overlay-window';
 
 function createBrowserWindow(config) {
   // needed for relative window position
@@ -44,13 +45,13 @@ function makeDemoInteractive(window) {
   const toggleShowKey = 'CmdOrCtrl + K'
   let isInteractable = false
 
-  function toggleOverlayState () {
+  function toggleOverlayState() {
     if (isInteractable) {
       isInteractable = false
       OverlayController.focusTarget()
       window.webContents.send('focus-change', false)
     } else {
-      isInteractable = true
+      isInteractable = false
       OverlayController.activateOverlay()
       window.webContents.send('focus-change', true)
     }

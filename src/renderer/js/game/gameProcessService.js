@@ -16,8 +16,8 @@ function hasActiveGameInstance() {
 
 function isGameRunning() {
   try {
-    // memoryjs.openProcess(Number(process.env.GAME_PROCESS_NAME))
-    memoryjs.openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
+    memoryjs.openProcess(Number(process.env.GAME_PROCESS_NAME))
+    // memoryjs.openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
     return true
   } catch {
     return false
@@ -31,7 +31,6 @@ function openProcess(name) {
     } else {
       MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr)
       MemoryController.testInitializedAddresses()
-
       gameInstanceExists = true
     }
   })
@@ -40,8 +39,8 @@ function openProcess(name) {
 async function handleHookingToGameProcess() {
   log('...handleHookingToGameProcess')
   try {
-    openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
-    // openProcess(Number(process.env.GAME_PROCESS_NAME))
+    // openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
+    openProcess(Number(process.env.GAME_PROCESS_NAME))
 
     log('openProcess OK')
     await ComboTracker.resumeComboTracking()

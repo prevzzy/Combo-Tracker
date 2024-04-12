@@ -12,7 +12,8 @@ export const mainWindowConfig = {
         nodeIntegration: true,
         contextIsolation: false,
         enableRemoteModule: true,
-        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        backgroundThrottling: false,
       },
     }
   },

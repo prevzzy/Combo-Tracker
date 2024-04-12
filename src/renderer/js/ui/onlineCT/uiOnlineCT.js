@@ -1,4 +1,4 @@
-import { createElementFromTemplate, setActiveNavigationClasses, setItemDisplay } from '../uiGlobal';
+import { createElementFromTemplate, setActiveNavigationClasses, setItemDisplay } from '../uiHelpers';
 import { connectToOnlineCT, disconnectFromOnlineCT } from '../../online/connectionService';
 import { drawHighscoreStats } from '../uiHighscores';
 import { setErrorIconByStatus } from '../globalError';

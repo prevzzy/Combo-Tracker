@@ -1,9 +1,9 @@
 import { APP_CONFIG_VALUES } from '../utils/constants'
 import { formatTimestamp } from '../utils/helpers'
 import { requestNewMapToast } from '../events/outgoingIpcEvents'
+import { adjustTextInputUI } from './uiHelpers'
 import * as FileService from '../files/fileService'
-import * as GlobalUI from '../ui/uiGlobal'
-import * as HighscoresUI from '../ui/uiHighscores'
+import * as HighscoresUI from './uiHighscores'
 import * as SavedCombosService from '../combo/savedCombosService'
 
 const timeToModalClose = document.getElementById('new-map-resume-time-left');
@@ -90,7 +90,7 @@ async function handleNewMapSubmit(mapScriptName, postComboLogicCallback) {
   mapInput.value = mapInput.value.trim().replace(/\s+/g, ' ').toUpperCase()
 
   if (!isMapInputValid()) {
-    GlobalUI.adjustTextInputUI(
+    adjustTextInputUI(
       false,
       mapInput,
       mapInput.parentElement,
@@ -98,7 +98,7 @@ async function handleNewMapSubmit(mapScriptName, postComboLogicCallback) {
       `Map name has to be at least 2 characters long and at most ${APP_CONFIG_VALUES.MAX_MAP_NAME_INPUT_LENGTH} characters long.`
     )
   } else if (!isMapNameUnique(categoryInput.value, mapInput.value)) {
-    GlobalUI.adjustTextInputUI(
+    adjustTextInputUI(
       false,
       mapInput,
       mapInput.parentElement,

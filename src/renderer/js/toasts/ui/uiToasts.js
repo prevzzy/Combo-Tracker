@@ -1,6 +1,5 @@
-import { formatScore } from '../../utils/helpers'
+import { formatScore, getNumberWithOrdinal } from '../../utils/helpers'
 import { APP_CONFIG_VALUES } from '../../utils/constants'
-import { getNumberWithOrdinal } from '../../utils/helpers'
 import { TOAST_EVENT_TYPES } from '../../../../main/events/eventTypes/toastEventTypes'
 
 const containerElement = document.getElementById('toast-container')

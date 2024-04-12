@@ -10,10 +10,13 @@ import {
   formatSecondsToHours,
 } from '../utils/helpers'
 import * as ComboSaver from '../combo/comboSaver'
-import * as GlobalUI from './uiGlobal'
 import * as SavedCombosService from '../combo/savedCombosService'
 import * as LastComboUI from './lastCombo/uiLastCombo'
 import * as MemoryController from '../game/memory'
+import {
+  colorComboPropertyText,
+  createElementFromTemplate,
+} from './uiHelpers';
 
 const mapCategoriesMenu = document.getElementById('hs-map-categories-menu')
 const mapNameElement = document.getElementById('hs-map')
@@ -121,7 +124,7 @@ function clearActiveCategoryDisplay(mapCategoryElement, mapElements, activeMapEl
 }
 
 function createMapCategory(mapCategory, maps) {
-  const mapCategoryElement = GlobalUI.createElementFromTemplate('hs-menu-map-accordion-template')
+  const mapCategoryElement = createElementFromTemplate('hs-menu-map-accordion-template')
   const mapsListElement = mapCategoryElement.querySelector('.list-group')
 
   const mapCategoryElementId = `${mapCategory.split(' ').shift()}MenuLink`
@@ -291,7 +294,7 @@ function setAdditionalTopInfo(isVisible, data, element) {
 }
 
 function createNewHighscoreElement(comboData, standing) {
-  const highscoreElement = GlobalUI.createElementFromTemplate('hs-accordion-template')
+  const highscoreElement = createElementFromTemplate('hs-accordion-template')
   
   const mapName = comboData.mapName || ERROR_STRINGS.UNKNOWN_MAP
 
@@ -337,7 +340,7 @@ function drawSingleHighscoreStat(parentElement, statName, value) {
         let formattedValue = value
         
         if (statConfig.colorPropertyConfig) {
-          GlobalUI.colorComboPropertyText(
+          colorComboPropertyText(
             statElement,
             value,
             statConfig.colorPropertyConfig.dangerThreshold,

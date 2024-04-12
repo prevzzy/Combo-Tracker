@@ -115,3 +115,7 @@ export function requestSendingWsMessage(message, isHost) {
   const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
   ipcRenderer.send(event, message);
 }
+
+export function requestDrawingBalance(balanceData) {
+  ipcRenderer.send('draw-balance-request', balanceData)
+}

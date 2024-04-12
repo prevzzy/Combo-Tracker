@@ -1,11 +1,12 @@
-import * as GlobalUI from '../uiGlobal'
 import * as ComboNumbersUI from './numbers/uiComboNumbers'
 import * as TricksUI from './tricks/uiTricks'
 import * as GraphsUI from './graphs/uiGraphs'
+import * as NavigationUI from '../uiNavigation';
 import { APP_CONFIG_VALUES } from '../../utils/constants'
 import { readSavedComboFile } from '../../files/fileService'
 import { Trick } from '../../combo/trickHistory'
 import { setErrorIconByStatus } from '../globalError'
+import { setItemDisplay } from '../uiHelpers';
 
 const newComboTextElement = document.getElementById('new-combo-text')
 const newComboTextTimerElement = document.getElementById('new-combo-text-timer')
@@ -37,17 +38,17 @@ function setLastComboPageInfo(isVisible, message = 'Something went wrong...', st
   const infoTextElement = document.getElementById('last-combo-error-text')
 
   if (isVisible) {
-    GlobalUI.setItemDisplay(lastComboPageContent, 'none')
-    GlobalUI.setItemDisplay(lastComboPageInfo, 'initial')
+    setItemDisplay(lastComboPageContent, 'none')
+    setItemDisplay(lastComboPageInfo, 'initial')
     setErrorIconByStatus(iconElement, status)
   } else {
-    GlobalUI.setItemDisplay(lastComboPageContent, 'initial')
-    GlobalUI.setItemDisplay(lastComboPageInfo, 'none')
+    setItemDisplay(lastComboPageContent, 'initial')
+    setItemDisplay(lastComboPageInfo, 'none')
   }
 
   isInfoDismissable
-    ? GlobalUI.setItemDisplay(infoDismissButton, 'initial')
-    : GlobalUI.setItemDisplay(infoDismissButton, 'none')
+    ? setItemDisplay(infoDismissButton, 'initial')
+    : setItemDisplay(infoDismissButton, 'none')
     
   infoTextElement.textContent = message
 }
@@ -86,14 +87,14 @@ function restoreDefaultUI() {
 }
 
 function dismissInfoPage() {
-  GlobalUI.setItemDisplay(lastComboPageInfo, 'none')
-  GlobalUI.setItemDisplay(infoDismissButton, 'none')
-  GlobalUI.setItemDisplay(lastComboPageContent, 'initial')
+  setItemDisplay(lastComboPageInfo, 'none')
+  setItemDisplay(infoDismissButton, 'none')
+  setItemDisplay(lastComboPageContent, 'initial')
   isPageInfoDismissed = true
 }
 
 function init() {
-  GlobalUI.initNavigation(navElementsArray, tabContentContainersArray)
+  NavigationUI.initNavigation(navElementsArray, tabContentContainersArray)
   TricksUI.init()
   GraphsUI.init()
 }

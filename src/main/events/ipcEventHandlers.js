@@ -190,3 +190,7 @@ export function onSendWsClientMessageRequest(event, arg, mainWindow) {
 export function onSendWsServerMessageRequest(event, arg, mainWindow) {
   handleMessageByType(JSON.stringify(arg), undefined, true)
 }
+
+export function onDrawBalanceRequest(event, arg, overlayWindow) {
+  overlayWindow.webContents.send('draw-balance', arg)
+}

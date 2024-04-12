@@ -16,21 +16,21 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-app.allowRendererProcessReuse = false
-const gotTheLock = app.requestSingleInstanceLock()
+// app.allowRendererProcessReuse = false
+// const gotTheLock = app.requestSingleInstanceLock()
     
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore()
-      }
-      mainWindow.focus()
-    }
-  })
+// if (!gotTheLock) {
+//   app.quit()
+// } else {
+//   app.on('second-instance', (event, commandLine, workingDirectory) => {
+//     // Someone tried to run a second instance, we should focus our window.
+//     if (mainWindow) {
+//       if (mainWindow.isMinimized()) {
+//         mainWindow.restore()
+//       }
+//       mainWindow.focus()
+//     }
+//   })
   
   // Create mainWindow, load the rest of the app, etc...
   app.whenReady().then(async () => {
@@ -48,7 +48,11 @@ if (!gotTheLock) {
       overlayWindow.close()
     })
   })
-}
+// }
+
+app.on('browser-window-created', (_, window) => {
+  require("@electron/remote/main").enable(window.webContents)
+})
 
 app.on('will-quit', () => {
   shutdownServer();

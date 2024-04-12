@@ -18,6 +18,7 @@ import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { isConnectedToOnlineCT, sendNewComboData } from '../online/connectionService'
+import { requestDrawingBalance } from '../events/outgoingIpcEvents'
 
 let finalScore = null
 let comboStartTime = 0
@@ -425,9 +426,37 @@ function checkComboScreenshotCondition(score, mapBestScoreNumber, generalBestSco
 }
 
 function updateComboValues() {
+  const previousBalanceTrickType = balance.balanceTrickType;
+
   balance.update()
   score.update()
   trickHistory.update()
+
+  const {
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    manualBalanceArrowPosition,
+    balanceTrickType
+  } = balance;
+
+  const isVerticalBalance = balanceTrickType === 'MANUAL'
+
+  // TODO: of course this should be moved elsewhere
+  if (!balanceTrickType && previousBalanceTrickType) {
+    requestDrawingBalance({
+      horizontal: null,
+      vertical: null
+    })
+  } else if (balanceTrickType) {
+    requestDrawingBalance({
+      horizontal: isVerticalBalance
+        ? null
+        : balanceTrickType === 'GRIND'
+          ? grindBalanceArrowPosition
+          : lipBalanceArrowPosition,
+      vertical: isVerticalBalance ? manualBalanceArrowPosition : null
+    })
+  }
 
   updateComboTime(Date.now())
 }

@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
-import * as GlobalUI from './ui/uiGlobal'
+import * as NavigationUI from './ui/uiNavigation'
 import * as NewMapModalUI from './ui/uiNewMapModal'
 import * as SettingsUI from './ui/uiSettings'
 import * as GameProcessService from './game/gameProcessService'
@@ -45,7 +45,7 @@ function runCoreLogic(paths) {
       LastComboUI.init()
       HighscoresUI.initMapCategoriesMenu()
       NewMapModalUI.initMapModal()
-      GlobalUI.setupToolbarListeners()
+      NavigationUI.setupToolbarListeners()
       OnlineCTUI.init()
 
       await GameProcessService.handleHookingToGameProcess()
@@ -62,10 +62,10 @@ function runCoreLogic(paths) {
         false
       )
 
-      GlobalUI.blockHighscoresPage()
+      NavigationUI.blockHighscoresPage()
     })
     .finally(() => {
-      GlobalUI.showApp()
+      NavigationUI.showApp()
     })
 }
 

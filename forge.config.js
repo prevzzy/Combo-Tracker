@@ -38,11 +38,17 @@ module.exports = {
               html: "./src/renderer/toast.html",
               js: "./src/renderer/js/toasts/index.js",
               name: "toast_window",
+              preload: {
+                js: './src/main/preload/preload.js'
+              }
             },
             {
               html: "./src/renderer/overlay.html",
               js: "./src/renderer/js/overlay/index.js",
               name: "overlay",
+              preload: {
+                js: './src/main/preload/preload.js'
+              }
             },
           ],
         },

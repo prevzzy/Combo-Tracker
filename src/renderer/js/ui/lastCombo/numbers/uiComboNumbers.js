@@ -9,7 +9,9 @@ import {
   formatBalancePropertyTime,
   getNumberWithOrdinal,
 } from '../../../utils/helpers'
-import * as GlobalUI from '../../uiGlobal'
+import {
+  colorComboPropertyText,
+} from '../../uiHelpers';
 
 const finalScoreElement = document.getElementById('combo-final-score') 
 const finalNumbersElement  = document.getElementById('combo-final-numbers')
@@ -128,9 +130,9 @@ function displayComboDate(date) {
 }
 
 function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, tagLimitAddedTime }) {
-  GlobalUI.colorComboPropertyText(tagLimitElement, tagLimitAddedTime, 6)
-  GlobalUI.colorComboPropertyText(doubleGrindsElement, doubleGrindsAddedTime, 3 * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY)
-  GlobalUI.colorComboPropertyText(newGrindsElement, newGrindsSavedTime, 1, -0.0001)
+  colorComboPropertyText(tagLimitElement, tagLimitAddedTime, 6)
+  colorComboPropertyText(doubleGrindsElement, doubleGrindsAddedTime, 3 * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY)
+  colorComboPropertyText(newGrindsElement, newGrindsSavedTime, 1, -0.0001)
 
   grindTimeElement.textContent = formatBalancePropertyTime(grindTime)
   newGrindsElement.textContent = formatBalancePropertyTime(newGrindsSavedTime)
@@ -139,8 +141,8 @@ function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, ta
 }
 
 function displayManual({ manualTime, manualCheeseAddedTime, pivotsAddedTime }) {
-  GlobalUI.colorComboPropertyText(cheesePenaltyElement, manualCheeseAddedTime, 3 * BALANCE_TIME_VALUES.MANUAL_CHEESE_TIME_PENALTY)
-  GlobalUI.colorComboPropertyText(pivotPenaltyElement, pivotsAddedTime, 5 * BALANCE_TIME_VALUES.PIVOT_TIME_PENALTY)
+  colorComboPropertyText(cheesePenaltyElement, manualCheeseAddedTime, 3 * BALANCE_TIME_VALUES.MANUAL_CHEESE_TIME_PENALTY)
+  colorComboPropertyText(pivotPenaltyElement, pivotsAddedTime, 5 * BALANCE_TIME_VALUES.PIVOT_TIME_PENALTY)
 
   manualTimeElement.textContent = formatBalancePropertyTime(manualTime)
   cheesePenaltyElement.textContent = formatBalancePropertyTime(manualCheeseAddedTime, true)
@@ -148,7 +150,7 @@ function displayManual({ manualTime, manualCheeseAddedTime, pivotsAddedTime }) {
 }
 
 function displayMisc({ lipTime, maxRevertPenalty, multiplierFromGaps, graffitiTags }) {
-  GlobalUI.colorComboPropertyText(revertPenaltyElement, maxRevertPenalty, 5, 4)
+  colorComboPropertyText(revertPenaltyElement, maxRevertPenalty, 5, 4)
 
   lipTimeElement.textContent = formatBalancePropertyTime(lipTime)
   revertPenaltyElement.textContent = maxRevertPenalty

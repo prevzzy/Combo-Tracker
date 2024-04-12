@@ -10,6 +10,7 @@ import {
   onSendWsServerMessageRequest,
   onShutdownServerRequest,
   onDisconnectFromServerRequest,
+  onDrawBalanceRequest,
 } from './ipcEventHandlers'
 import { OverlayController } from 'electron-overlay-window'
 
@@ -77,6 +78,10 @@ export function initIpcEvents(mainWindow, toastWindow, overlayWindow) {
       process.platform === 'darwin' ? 'Untitled' : 'THUG Pro',
       { hasTitleBarOnMac: true }
     )
+  })
+
+  ipcMain.on('draw-balance-request', (event, arg) => {
+    onDrawBalanceRequest(event, arg, overlayWindow);
   })
 
   ipcMain.on('request-app-exit', () => {

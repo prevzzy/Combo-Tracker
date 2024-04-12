@@ -1,4 +1,4 @@
-import * as GlobalUI from './uiGlobal'
+import { setItemDisplay } from './uiHelpers';
 
 let overlayErrorDisplayTimeoutId = null
 const overlayElement = document.getElementById('overlay')
@@ -16,28 +16,28 @@ function displayOverlay(isOverlayVisible, isSpinnerVisible, message, isButtonVis
   const button = overlayElement.querySelector('#overlay-button')
 
   if (isOverlayVisible) {
-    GlobalUI.setItemDisplay(overlayElement, 'flex')
+    setItemDisplay(overlayElement, 'flex')
     if (!isButtonVisible && isSpinnerVisible) {
       setErrorOverlayDisplayTimeout()
     }
   } else {
-    GlobalUI.setItemDisplay(overlayElement, 'none')
+    setItemDisplay(overlayElement, 'none')
   }
 
   isSpinnerVisible
-    ? GlobalUI.setItemDisplay(spinner, 'initial')
-    : GlobalUI.setItemDisplay(spinner, 'none')
+    ? setItemDisplay(spinner, 'initial')
+    : setItemDisplay(spinner, 'none')
 
   isButtonVisible
-    ? GlobalUI.setItemDisplay(button, 'initial')
-    : GlobalUI.setItemDisplay(button, 'none')
+    ? setItemDisplay(button, 'initial')
+    : setItemDisplay(button, 'none')
   
   if (message) {
     text.textContent = message
-    GlobalUI.setItemDisplay(text, 'initial')
+    setItemDisplay(text, 'initial')
   } else {
     text.textContent = ''
-    GlobalUI.setItemDisplay(text, 'none')
+    setItemDisplay(text, 'none')
   }
 }
 

@@ -17,12 +17,12 @@ import {
   trickCountAddressData,
   trickAmountAddressData,
   currentStanceAddressData,
+  balanceTrickComponentAddressData,
   specialMeterNumericValueAddressData,
   trickHistoryArrayAddressData,
   grindBalanceArrowPositionAddressData,
   manualBalanceArrowPositionAddressData,
-  observedPlayerNameAddressData,
-  observedPlayerFlagsAddressData,
+  lipBalanceArrowPositionAddressData,
   observedPlayerInfoAddressData,
 } from './offsets'
 
@@ -33,6 +33,7 @@ let manualTimeAddress
 let lipTimeAddress
 let grindBalanceArrowPositionAddress
 let manualBalanceArrowPositionAddress
+let lipBalanceArrowPositionAddress
 let currentMapAddress
 let basePointsAddress
 let multiplierAddress
@@ -44,9 +45,8 @@ let currentTrickNameAddress
 let trickCountAddress
 let tricksAmountAddress
 let currentStanceAddress
+let balanceTrickComponentAddress
 let specialMeterNumericValueAddress
-let observedPlayerNameAddress
-let observedPlayerFlagsAddress
 let observedPlayerInfoAddress
 
 function initAddresses (_gameHandle, _processBaseAddress) {
@@ -58,6 +58,7 @@ function initAddresses (_gameHandle, _processBaseAddress) {
   lipTimeAddress = getAddress(gameHandle, processBaseAddress, lipTimeAddressData)
   grindBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, grindBalanceArrowPositionAddressData)
   manualBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, manualBalanceArrowPositionAddressData)
+  lipBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, lipBalanceArrowPositionAddressData)
   currentMapAddress = getAddress(gameHandle, processBaseAddress, currentMapScriptAddressData)
   basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData)
   multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData)
@@ -69,9 +70,10 @@ function initAddresses (_gameHandle, _processBaseAddress) {
   trickCountAddress = getAddress(gameHandle, processBaseAddress, trickCountAddressData)
   tricksAmountAddress = getAddress(gameHandle, processBaseAddress, trickAmountAddressData)
   currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData)
+  balanceTrickComponentAddress = getAddress(gameHandle, processBaseAddress, balanceTrickComponentAddressData)
   specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData)
-  observedPlayerNameAddress = getAddress(gameHandle, processBaseAddress, observedPlayerNameAddressData)
-  observedPlayerFlagsAddress = getAddress(gameHandle, processBaseAddress, observedPlayerFlagsAddressData)
+  // observedPlayerNameAddress = getAddress(gameHandle, processBaseAddress, observedPlayerNameAddressData)
+  // observedPlayerFlagsAddress = getAddress(gameHandle, processBaseAddress, observedPlayerFlagsAddressData)
   observedPlayerInfoAddress = getAddress(gameHandle, processBaseAddress, observedPlayerInfoAddressData)
 }
 
@@ -290,6 +292,14 @@ function getCurrentStance() {
   return memoryjs.readMemory(gameHandle, currentStanceAddress, memoryjs.INT)
 }
 
+function getBalanceTrickType() {
+  return memoryjs.readMemory(gameHandle, getBalanceComponent() + 0x18, memoryjs.UINT32)
+}
+
+function getBalanceComponent() {
+  return memoryjs.readMemory(gameHandle, balanceTrickComponentAddress, memoryjs.PTR);
+}
+
 function getSpecialMeterNumericValue() {
   return memoryjs.readMemory(gameHandle, specialMeterNumericValueAddress, memoryjs.INT)
 }
@@ -300,6 +310,10 @@ function getGrindBalanceArrowPosition() {
 
 function getManualBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, manualBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function getLipBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, lipBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
 function getObservedPlayerName() {
@@ -322,6 +336,7 @@ export {
   getLipTime,
   getGrindBalanceArrowPosition,
   getManualBalanceArrowPosition,
+  getLipBalanceArrowPosition,
   getCurrentMapScript,
   getMultiplier,
   getBasePoints,
@@ -340,4 +355,5 @@ export {
   getSpecialMeterNumericValue,
   getObservedPlayerName,
   getObservedPlayerFlags,
+  getBalanceTrickType,
 }

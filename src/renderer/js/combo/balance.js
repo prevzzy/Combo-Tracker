@@ -14,6 +14,14 @@ const BALANCE_PENALTIES = {
   TAG_LIMIT_3_AND_DOUBLE_GRIND: 'TAG_LIMIT_3_AND_DOUBLE_GRIND',
 }
 
+const BALANCE_TRICK_TYPE_CHECKSUMS = {
+  0xef24413b: 'MANUAL', // manual
+  0x0ac90769: 'MANUAL', // nose manual
+  0xa549b57b: 'LIP', // lip
+  0x255ed86f: 'GRIND', // grind (e.g. 50-50)
+  0x8d10119d: 'GRIND', // slide (e.g. boardslide)
+}
+
 class Range {
   constructor(start, end) {
     this.start = start
@@ -87,6 +95,7 @@ class Balance {
     this.lipTimeDataset = []
     this.manualBalanceArrowPosition = 0
     this.grindBalanceArrowPosition = 0
+    this.balanceTrickType = undefined
   }
 
   assumePenaltyRange(balancePenaltyRangeObject, timeDiff) {
@@ -103,8 +112,10 @@ class Balance {
     this.updateManualTime()
     this.manualBalanceArrowPosition = MemoryController.getManualBalanceArrowPosition()
     this.grindBalanceArrowPosition = MemoryController.getGrindBalanceArrowPosition()
+    this.lipBalanceArrowPosition = MemoryController.getLipBalanceArrowPosition()
     this.lipTime = MemoryController.getLipTime()
     this.stateType = MemoryController.getStateType()
+    this.updateBalanceTrickType()
   }
 
   updateDatasets() {
@@ -174,6 +185,10 @@ class Balance {
 
   isNewGrindStarted() {
     return this.grindTime !== 0 && this.stateType !== 4 && MemoryController.getStateType() === 4 // 4 means rail, anything else is not rail
+  }
+
+  updateBalanceTrickType() {
+    this.balanceTrickType = BALANCE_TRICK_TYPE_CHECKSUMS[MemoryController.getBalanceTrickType()];
   }
 }
 

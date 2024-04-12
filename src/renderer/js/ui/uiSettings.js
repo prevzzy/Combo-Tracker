@@ -5,7 +5,7 @@ import {
 } from '../events/outgoingIpcEvents'
 import { formatScore } from '../utils/helpers'
 import { resetHighscores, isPathWritable } from '../files/fileService'
-import { setItemDisplay } from './uiGlobal'
+import { setItemDisplay } from './uiHelpers'
 import { mapKeyToAccelerator } from '../utils/hotkeyMapper'
 import * as OverlayUI from './uiOverlay'
 import * as HighscoresUI from './uiHighscores'

@@ -13,7 +13,6 @@ export function log(...message) {
 
 export function enableInspectingHtml() {
   if (isAppInDebugMode()) {
-
     let rightClickPosition;
     const contextMenu = new Menu();
     const menuItem = new MenuItem({
