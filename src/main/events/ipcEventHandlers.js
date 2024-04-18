@@ -194,3 +194,7 @@ export function onSendWsServerMessageRequest(event, arg, mainWindow) {
 export function onDrawBalanceRequest(event, arg, overlayWindow) {
   overlayWindow.webContents.send('draw-balance', arg)
 }
+
+export function onDrawScoreNumbersRequest(event, arg, overlayWindow) {
+  overlayWindow.webContents.send('draw-score-numbers', arg)
+}

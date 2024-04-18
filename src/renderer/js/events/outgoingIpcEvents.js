@@ -119,3 +119,7 @@ export function requestSendingWsMessage(message, isHost) {
 export function requestDrawingBalance(balanceData) {
   ipcRenderer.send('draw-balance-request', balanceData)
 }
+
+export function requestDrawingScoreNumbers(scoreData) {
+  ipcRenderer.send('draw-score-numbers-request', scoreData)
+}

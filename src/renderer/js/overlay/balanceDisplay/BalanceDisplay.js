@@ -1,4 +1,5 @@
 import { setItemDisplay } from '../../ui/uiHelpers';
+import { getScreenRatioAdjustmentFactors } from '../ui/overlayRatioHelpers';
 import { vhToPixels, pixelsToVh, vwToPixels, pixelsToVw } from './helpers';
 
 export class BalanceDisplay {
@@ -25,20 +26,7 @@ export class BalanceDisplay {
     this.drawingXOffset = drawingXOffset;
     this.drawingYOffset = drawingYOffset;
 
-    this.adjustmentFactorX = 1;
-    this.adjustmentFactorY = 1;
-
     this.hideBalanceCallCount = 0;
-  }
-
-  updateScreenRatioAdjustmentFactor() {
-    const screenWidth = document.documentElement.clientWidth;
-    const screenHeight = document.documentElement.clientHeight;
-    const referenceScreenRatio = 16 / 9;
-    const currentScreenRatio = screenWidth / screenHeight;
-   
-    this.adjustmentFactorX = currentScreenRatio / referenceScreenRatio;
-    this.adjustmentFactorY = referenceScreenRatio / currentScreenRatio;
   }
 
   getBalanceArcDimensions() {
@@ -88,13 +76,13 @@ export class BalanceDisplay {
   }
 
   getTranslateArrowYValue(value, arrowHeight) {
-    const adjustedY = this.isVertical ? value : value * this.adjustmentFactorY
+    const adjustedY = this.isVertical ? value : value * getScreenRatioAdjustmentFactors().y
 
     return adjustedY - (this.isVertical ? arrowHeight / 2 : -arrowHeight / 2)
   }
 
   getTranslateArrowXValue(value, arrowWidth) {
-    const adjustedX = this.isVertical ? value * this.adjustmentFactorX : value;
+    const adjustedX = this.isVertical ? value * getScreenRatioAdjustmentFactors().x : value;
     const adjustedArrowWidth = arrowWidth / (this.isVertical ? 1 : 2);
   
     return adjustedX - adjustedArrowWidth
@@ -115,15 +103,13 @@ export class BalanceDisplay {
   }
   
   drawBalance(value) {
-    this.updateScreenRatioAdjustmentFactor();
-
     const { width: balanceArcWidth, height: balanceArcHeight } = this.getBalanceArcDimensions();
     const { width: arrowWidth, height: arrowHeight } = this.getArrowDimensions(this.arrowBaseRotation);
 
     const radius = this.getBalanceRadius(balanceArcWidth, balanceArcHeight);
     const { x, y, rotation } = this.mapBalancePositionToArc(value, radius);
   
-    this.drawBalanceArrow(x, y, rotation, arrowWidth, arrowHeight,);
+    this.drawBalanceArrow(x, y, rotation, arrowWidth, arrowHeight);
   }
 
   getSvgContainerCenter() {

@@ -10,6 +10,7 @@
   --transparent: rgba(0, 0, 0, 0);
   --scrollbar-color: #322b3f;
   --scrollbar-color-hover: #433a54;
+  --secondary-light: #d6d2ef;
 }
 
 * {

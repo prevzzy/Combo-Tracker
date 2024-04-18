@@ -18,7 +18,7 @@ import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { isConnectedToOnlineCT, sendNewComboData } from '../online/connectionService'
-import { requestDrawingBalance } from '../events/outgoingIpcEvents'
+import { requestDrawingBalance, requestDrawingScoreNumbers } from '../events/outgoingIpcEvents'
 
 let finalScore = null
 let comboStartTime = 0
@@ -89,7 +89,6 @@ function getOnlineCtComboData() {
     manualTime,
     grindTime,
   } = balance;
-
 
   return {
     manualBalanceArrowPosition,
@@ -236,6 +235,11 @@ function isComboSuitableToDisplay() {
 }
 
 async function finishTrackingCurrentCombo(isIdle) {
+  // TODO: is in online ct
+  if (true) {
+    cleanOverlayComboDisplay();
+  }
+
   if (isComboSuitableToDisplay()) {
     await handleComboFinish(isIdle)
   } else {
@@ -288,6 +292,21 @@ async function handlePostComboLogic(isIdle, shouldSaveCombo, shouldScreenshotCom
   )
 
   restart()
+}
+
+function cleanOverlayComboDisplay() {
+  const { score, multiplier, basePoints } = getOnlineCtComboData();
+  requestDrawingScoreNumbers({
+    score,
+    isLanded: isComboLanded(),
+    multiplier,
+    basePoints,
+  })
+
+  requestDrawingBalance({
+    horizontal: null,
+    vertical: null
+  })
 }
 
 async function handleSavingComboData(comboData, shouldScreenshotCombo) {
@@ -440,6 +459,12 @@ function updateComboValues() {
   } = balance;
 
   const isVerticalBalance = balanceTrickType === 'MANUAL'
+
+  requestDrawingScoreNumbers({
+    score: score.getScore(),
+    multiplier: score.multiplier,
+    basePoints: score.basePoints,
+  })
 
   // TODO: of course this should be moved elsewhere
   if (!balanceTrickType && previousBalanceTrickType) {

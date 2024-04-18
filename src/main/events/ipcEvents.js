@@ -11,6 +11,7 @@ import {
   onShutdownServerRequest,
   onDisconnectFromServerRequest,
   onDrawBalanceRequest,
+  onDrawScoreNumbersRequest,
 } from './ipcEventHandlers'
 import { OverlayController } from 'electron-overlay-window'
 
@@ -82,6 +83,10 @@ export function initIpcEvents(mainWindow, toastWindow, overlayWindow) {
 
   ipcMain.on('draw-balance-request', (event, arg) => {
     onDrawBalanceRequest(event, arg, overlayWindow);
+  })
+
+  ipcMain.on('draw-score-numbers-request', (event, arg) => {
+    onDrawScoreNumbersRequest(event, arg, overlayWindow);
   })
 
   ipcMain.on('request-app-exit', () => {

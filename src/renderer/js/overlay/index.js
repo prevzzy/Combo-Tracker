@@ -6,6 +6,7 @@ import '../../overlay.css';
 import { enableInspectingHtml } from '../debug/debugHelpers';
 import { BalanceDisplay } from './balanceDisplay/BalanceDisplay';
 import { ipcRenderer } from 'electron';
+import { ScoreDisplay } from './scoreDisplay';
 
 const HORIZONTAL_BALANCE_CONTAINER_ID = 'horizontal-balance-arc-svg-container';
 const VERTICAL_BALANCE_CONTAINER_ID = 'vertical-balance-arc-svg-container';
@@ -33,6 +34,8 @@ const horizontalBalanceDisplay = new BalanceDisplay(
   0,
 )
 
+const scoreDisplay = new ScoreDisplay();
+
 ipcRenderer.on('focus-change', (e, state) => {
   document.getElementById('text1').textContent = (state) ? ' (overlay is clickable) ' : 'clicks go through overlay'
 });
@@ -45,22 +48,30 @@ ipcRenderer.on('visibility-change', (e, state) => {
   }
 });
 
+function handleDrawingBalance(balanceDisplay, balancePosition) {
+  if (typeof balancePosition === 'number') {
+    balanceDisplay.showBalance()
+    balanceDisplay.drawBalance(balancePosition);
+  } else {
+    balanceDisplay.hideBalance()
+  }
+}
+
 ipcRenderer.on('draw-balance', (event, arg) => {
   const { horizontal, vertical } = arg;
 
-  if (typeof horizontal === 'number') {
-    horizontalBalanceDisplay.showBalance()
-    horizontalBalanceDisplay.drawBalance(horizontal);
-  } else {
-    horizontalBalanceDisplay.hideBalance()
-  }
-  
-  if (typeof vertical === 'number') {
-    verticalBalanceDisplay.showBalance()
-    verticalBalanceDisplay.drawBalance(vertical);
-  } else {
-    verticalBalanceDisplay.hideBalance()
-  }
+  handleDrawingBalance(horizontalBalanceDisplay, horizontal);
+  handleDrawingBalance(verticalBalanceDisplay, vertical);
 });
+
+ipcRenderer.on('draw-score-numbers', (event, arg) => {
+  const { basePoints, multiplier, score, isLanded } = arg;
+
+  if (typeof isLanded === 'boolean') {
+    scoreDisplay.displayFinalScore(basePoints, multiplier, score, isLanded)
+  } else {
+    scoreDisplay.updateScoreText(basePoints, multiplier, score);
+  }
+})
 
 enableInspectingHtml()
