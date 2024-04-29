@@ -90,3 +90,28 @@ export function requestAppFullscreen() {
 export function requestAppExit() {
   ipcRenderer.send('request-app-exit')
 }
+
+export function requestServerHosting(username) {
+  ipcRenderer.send('host-server-request', { username });
+}
+
+export function requestConnectingToServer(username) {
+  ipcRenderer.send('connect-to-server-request', { username });
+}
+
+export function requestServerShutdown() {
+  ipcRenderer.send('shutdown-server-request');
+}
+
+export function requestDisconnectingFromServer() {
+  ipcRenderer.send('disconnect-from-server-request');
+}
+
+export function requestShowingOverlay() {
+  ipcRenderer.send('show-overlay-request');
+}
+
+export function requestSendingWsMessage(message, isHost) {
+  const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
+  ipcRenderer.send(event, message);
+}

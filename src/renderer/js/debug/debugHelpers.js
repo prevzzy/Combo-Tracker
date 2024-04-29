@@ -1,4 +1,5 @@
-import { remote, webFrame } from 'electron'
+import { getCurrentWebContents, Menu, MenuItem } from '@electron/remote';
+import { webFrame } from 'electron';
 
 export function isAppInDebugMode() {
   return process.env.APP_MODE === 'DEBUG'
@@ -12,7 +13,6 @@ export function log(...message) {
 
 export function enableInspectingHtml() {
   if (isAppInDebugMode()) {
-    const { getCurrentWebContents, Menu, MenuItem } = remote;
 
     let rightClickPosition;
     const contextMenu = new Menu();
