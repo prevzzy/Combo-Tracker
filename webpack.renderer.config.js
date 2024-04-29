@@ -32,15 +32,16 @@ module.exports = {
     new DotEnv({
       path: './.env'
     }),
-    {
-      apply(compiler) {
-        compiler.hooks.compilation.tap(
-          'webpack-asset-relocator-loader',
-          (compilation) => {
-            relocateLoader.initAssetCache(compilation, 'native_modules');
-          },
-        );
-      },
-    },
-  ]
+    // {
+    //   apply(compiler) {
+    //     compiler.hooks.compilation.tap(
+    //       'webpack-asset-relocator-loader',
+    //       (compilation) => {
+    //         relocateLoader.initAssetCache(compilation, 'native_modules');
+    //       },
+    //     );
+    //   },
+    // },
+  ],
+  externals: ['electron-overlay-window']
 };

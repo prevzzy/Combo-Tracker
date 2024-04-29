@@ -16,6 +16,7 @@ function hasActiveGameInstance() {
 
 function isGameRunning() {
   try {
+    // memoryjs.openProcess(Number(process.env.GAME_PROCESS_NAME))
     memoryjs.openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
     return true
   } catch {
@@ -40,6 +41,7 @@ async function handleHookingToGameProcess() {
   log('...handleHookingToGameProcess')
   try {
     openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
+    // openProcess(Number(process.env.GAME_PROCESS_NAME))
 
     log('openProcess OK')
     await ComboTracker.resumeComboTracking()
