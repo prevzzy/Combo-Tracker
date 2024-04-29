@@ -32,12 +32,10 @@ export function initIncomingIpcEventListeners() {
   }) 
 
   ipcRenderer.on('new-ws-message', (event, arg) => {
-    console.log('new message', JSON.parse(arg))
-
     if (!isConnectedToOnlineCT()) {
       return;
     }
 
-    handleNewOnlineCTMessage(JSON.parse(arg));
+    handleNewOnlineCTMessage(arg);
   })
 }

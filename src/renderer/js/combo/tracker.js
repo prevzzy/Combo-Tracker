@@ -29,6 +29,7 @@ let score = new Score()
 let trickHistory = new TrickHistory()
 let datasetsUpdatingInterval = null
 let trackingInterval = null
+let onlineCtDataSendInterval = null
 let mapScriptName = null
 let comboTrackingNumbers = {
   mapComboNumber: null,
@@ -166,6 +167,7 @@ function resetComboValues() {
   }
   clearInterval(trackingInterval)
   clearInterval(datasetsUpdatingInterval)
+  clearInterval(onlineCtDataSendInterval)
 }
 
 async function listenForComboStart() {
@@ -205,6 +207,18 @@ async function startTracking(startTime = Date.now()) {
   startDatasetUpdating()
   runIdleDetector(null, null, null, null, comboStartTime)
   await track()
+
+  if (isConnectedToOnlineCT()) {
+    startSendingComboDataToOnlineCt()
+  }
+}
+
+function startSendingComboDataToOnlineCt() {
+  onlineCtDataSendInterval = setInterval(() => {
+    if (isComboInProgress() && isComboSuitableToDisplay()) {
+      sendNewComboData(getOnlineCtComboData())
+    }
+  }, 1000)
 }
 
 function startDatasetUpdating() {
@@ -219,8 +233,11 @@ async function track() {
   trackingInterval = setInterval(async () => {
     if (isComboInProgress()) {
       updateComboValues()
-      if (isConnectedToOnlineCT() && isComboSuitableToDisplay()) {
-        sendNewComboData(getOnlineCtComboData())
+
+      if (balance.grindBalanceArrowPosition > 3500 || balance.manualBalanceArrowPosition > 3500) {
+        MemoryController.bounceBalance(-150);
+      } else if (balance.grindBalanceArrowPosition < -3500 || balance.manualBalanceArrowPosition < -3500) {
+        MemoryController.bounceBalance(150);
       }
     } else {
       clearInterval(trackingInterval)

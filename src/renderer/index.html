@@ -458,8 +458,8 @@
                     <input id="online-username-input" type="text" class="rounded-left rounded-right form-control text-light" maxlength="15" />
                   </div>
                   <div class="form-group" style="display: none">
-                    <label for="online-room-code-input" class="text-white">Room code</label>
-                    <input id="online-room-code-input" type="text" class="rounded-left rounded-right form-control text-light" maxlength="6" />
+                    <label for="online-room-id-input" class="text-white">Room code</label>
+                    <input id="online-room-id-input" type="text" class="rounded-left rounded-right form-control text-light" maxlength="6" />
                   </div>
                   <div class="form-group text-center mt-4">
                     <button id="online-submit-login-button" type="button" class="btn btn-primary w-100">Host room</button>
@@ -473,7 +473,7 @@
             <div class="m-auto h-100">
               <div class="text-light d-flex justify-content-between w-100 py-3 px-5">
                 <div class="display-4">
-                  Connected to online <span id="online-connection-type" class="display-4"></span>
+                  Connected to online <span id="online-connection-type" class="display-4"></span><span class="ml-2" id="online-room-id"></span>
                 </div>
                 <button id="online-disconnect-button" type="button" class="btn btn-primary">Disconnect</button>
               </div>

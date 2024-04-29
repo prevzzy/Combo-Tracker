@@ -12,6 +12,9 @@ import {
   onDisconnectFromServerRequest,
   onDrawBalanceRequest,
   onDrawScoreNumbersRequest,
+  __TWILIO__open,
+  __TWILIO__send,
+  __TWILIO__close,
 } from './ipcEventHandlers'
 import { OverlayController } from 'electron-overlay-window'
 
@@ -48,29 +51,35 @@ export function initIpcEvents(mainWindow, toastWindow, overlayWindow) {
   })
 
   ipcMain.on('host-server-request', (event, arg) => {
-    onHostServerRequest(event, arg, mainWindow);
+    // onHostServerRequest(event, arg, mainWindow);
+    __TWILIO__open(event, arg, mainWindow);
   });
 
   ipcMain.on('connect-to-server-request', (event, arg) => {
     console.log('connecting to server')
-    onConnectToServerRequest(event, arg, mainWindow);
+    // onConnectToServerRequest(event, arg, mainWindow);
+    __TWILIO__open(event, arg, mainWindow);
   });
 
   ipcMain.on('shutdown-server-request', (event, arg) => {
-    onShutdownServerRequest(event, arg, mainWindow);
+    // onShutdownServerRequest(event, arg, mainWindow);
+    __TWILIO__close()
   });
 
   ipcMain.on('disconnect-from-server-request', (event, arg) => {
     console.log('disconnecting from server')
-    onDisconnectFromServerRequest(event, arg, mainWindow);
+    // onDisconnectFromServerRequest(event, arg, mainWindow);
+    __TWILIO__close()
   });
 
   ipcMain.on('send-ws-client-message', (event, arg) => {
-    onSendWsClientMessageRequest(event, arg, mainWindow)
+    // onSendWsClientMessageRequest(event, arg, mainWindow)
+    __TWILIO__send(event, arg, mainWindow);
   })
 
   ipcMain.on('send-ws-server-message', (event, arg) => {
-    onSendWsServerMessageRequest(event, arg, mainWindow)
+    // onSendWsServerMessageRequest(event, arg, mainWindow)
+    __TWILIO__send(event, arg, mainWindow);
   })
 
   ipcMain.on('show-overlay-request', () => {

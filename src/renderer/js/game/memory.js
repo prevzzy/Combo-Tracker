@@ -1,5 +1,5 @@
 import memoryjs from 'memoryjs'
-import { log } from '../debug/debugHelpers'
+import { isAppInDebugMode, log } from '../debug/debugHelpers'
 import { GAME_CONSTANTS } from '../utils/constants'
 import { CustomError } from '../utils/customError'
 import {
@@ -308,6 +308,16 @@ function getGrindBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, grindBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
+function bounceBalance(value) {
+  if (!isAppInDebugMode()) {
+    return;
+  }
+  memoryjs.writeMemory(gameHandle, grindBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, grindTimeAddress, 0, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualTimeAddress, 0, memoryjs.FLOAT)
+}
+
 function getManualBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, manualBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
@@ -356,4 +366,7 @@ export {
   getObservedPlayerName,
   getObservedPlayerFlags,
   getBalanceTrickType,
+
+  // debug helpers
+  bounceBalance
 }

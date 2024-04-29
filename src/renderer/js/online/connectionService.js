@@ -6,15 +6,20 @@ import {
   requestDisconnectingFromServer,
 } from '../events/outgoingIpcEvents';
 import { WS_CLIENT_MESSAGE_TYPES, WS_SERVER_MESSAGE_TYPES } from '../../../main/onlineCT/wsServer/wsMessageTypes';
-import { updateDisplayedPlayerList, renderPlayersComboData } from '../ui/onlineCT/uiOnlineCT'
+import { updateDisplayedPlayerList, renderPlayersComboData, setDisplayedRoomId } from '../ui/onlineCT/uiOnlineCT'
+import * as MemoryController from '../game/memory'
+import { isLocalPlayer } from './playerInfoFlags';
 
 let isHost = false;
 let isConnected = false;
 let playerList = [];
+let playerName = '';
 
 const messageHandlersByType = new Map([
   [WS_SERVER_MESSAGE_TYPES.COMBOS_UPDATE, updatePlayerCombos],
-  [WS_SERVER_MESSAGE_TYPES.PLAYER_LIST_UPDATE, updatePlayerList]
+  [WS_CLIENT_MESSAGE_TYPES.NEW_COMBO_DATA, updatePlayerCombos],
+  [WS_SERVER_MESSAGE_TYPES.PLAYER_LIST_UPDATE, updatePlayerList],
+  [WS_SERVER_MESSAGE_TYPES.CONNECTED, onConnected]
 ])
 
 function restart() {
@@ -31,19 +36,24 @@ export function isConnectedToOnlineCT() {
   return isConnected;
 }
 
+export function getObservedPlayerName() {
+  return !isLocalPlayer(MemoryController.getObservedPlayerFlags()) && MemoryController.getObservedPlayerName()
+}
+
 export function changeOnlineCTConnectionStatus(newIsConnected) {
   isConnected = newIsConnected;
 }
 
-export function connectToOnlineCT(isHost, username, roomCode, onConnectedCallback) {
-  // TODO: error handling - ogólnie to trzeba by było czekać na response po dołączeniu/zahostowaniu z icp eventu i wtedy callbackiem na to reagować
-  if (isHost) {
-    requestServerHosting(username)
+export function connectToOnlineCT(isHosting, name, roomId, onConnectedCallback) {
+  // TODO: error handling
+  if (isHosting) {
+    requestServerHosting(name)
   } else {
-    requestConnectingToServer(username, roomCode)
+    requestConnectingToServer(name, roomId)
   }
+  playerName = name;
 
-  setIsHost(isHost);
+  setIsHost(isHosting);
   changeOnlineCTConnectionStatus(true);
   onConnectedCallback();
 }
@@ -67,9 +77,14 @@ export function sendNewComboData(comboData) {
     return;
   }
 
+  const observedPlayer = getObservedPlayerName();
+
   requestSendingWsMessage({
     type: WS_CLIENT_MESSAGE_TYPES.NEW_COMBO_DATA,
-    payload: comboData
+    payload: {
+      comboData,
+      playerName,
+    }
   }, isHost)
 }
 
@@ -83,6 +98,10 @@ function updatePlayerCombos(newComboData) {
   renderPlayersComboData(newComboData);
 }
 
+function onConnected(data) {
+  setDisplayedRoomId(data.roomId);
+}
+
 function updatePlayerList(newPlayerList) {
   if (!isConnectedToOnlineCT()) {
     return;
@@ -93,16 +112,24 @@ function updatePlayerList(newPlayerList) {
 }
 
 export function handleNewOnlineCTMessage(message) {
-  const messageTypes = Object.keys(message);
-  if (!messageTypes.length) {
-    return;
+  // console.log(message);
+  // const messageTypes = Object.keys(message);
+  // if (!messageTypes.length) {
+  //   return;
+  // }
+
+  // messageTypes.forEach((messageType) => {
+  //   const handler = messageHandlersByType.get(messageType);
+
+  //   if (handler) {
+  //     handler(message[messageType])
+  //   }
+  // })
+
+  const handler = messageHandlersByType.get(message.type);
+
+  console.log(message.payload);
+  if (handler) {
+    handler(message.payload)
   }
-
-  messageTypes.forEach((messageType) => {
-    const handler = messageHandlersByType.get(messageType);
-
-    if (handler) {
-      handler(message[messageType])
-    }
-  })
 }

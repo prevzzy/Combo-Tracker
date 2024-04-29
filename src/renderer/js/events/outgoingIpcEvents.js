@@ -95,8 +95,8 @@ export function requestServerHosting(username) {
   ipcRenderer.send('host-server-request', { username });
 }
 
-export function requestConnectingToServer(username) {
-  ipcRenderer.send('connect-to-server-request', { username });
+export function requestConnectingToServer(username, roomId) {
+  ipcRenderer.send('connect-to-server-request', { username, roomId });
 }
 
 export function requestServerShutdown() {
@@ -112,7 +112,8 @@ export function requestShowingOverlay() {
 }
 
 export function requestSendingWsMessage(message, isHost) {
-  const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
+  // const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
+  const event = 'send-ws-server-message'
   ipcRenderer.send(event, message);
 }
 

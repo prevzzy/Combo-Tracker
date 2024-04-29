@@ -12,7 +12,7 @@ let playersComboElementsByName = new Map()
 const hostRoomOption = document.getElementById('host-room-option')
 const connectToRoomOption = document.getElementById('connect-to-room-option')
 const usernameInput = document.getElementById('online-username-input')
-const roomCodeInput = document.getElementById('online-room-code-input')
+const roomIdInput = document.getElementById('online-room-id-input')
 const submitLoginButton = document.getElementById('online-submit-login-button')
 const onlineLoginPanelView = document.getElementById('online-login-panel')
 const onlineRoomView = document.getElementById('online-room')
@@ -20,6 +20,7 @@ const onlineRoomScoreboardBody = document.getElementById('online-scoreboard-body
 const onlineConnectionType = document.getElementById('online-connection-type')
 const onlineDisconnectButton = document.getElementById('online-disconnect-button')
 const overlayButton = document.getElementById('overlay-window-button')
+const roomIdElement = document.getElementById('online-room-id');
 
 function init() {
   hostRoomOption.addEventListener('click', (e) => { onLoginTypeChange(e, true) });
@@ -47,10 +48,10 @@ function onLoginTypeChange(e, isHostValue) {
   isHosting = isHostValue;
 
   if (isHosting) {
-    setItemDisplay(roomCodeInput.parentElement, 'none');
+    setItemDisplay(roomIdInput.parentElement, 'none');
     submitLoginButton.textContent = 'Host room';
   } else {
-    setItemDisplay(roomCodeInput.parentElement, 'block');
+    setItemDisplay(roomIdInput.parentElement, 'block');
     submitLoginButton.textContent = 'Connect to room';
   }
 }
@@ -60,8 +61,8 @@ function onSubmitLoginClick(e) {
   let roomCode;
   const username = usernameInput.value;
   
-  if (isHosting) {
-    roomCode = roomCodeInput.value;
+  if (!isHosting) {
+    roomCode = roomIdInput.value;
   }
 
   // go to connectionService
@@ -141,6 +142,10 @@ function setPlayerComboElement(playerName, playerElement) {
   playersComboElementsByName.set(playerName, playerElement);
 }
 
+function setDisplayedRoomId(roomId) {
+  roomIdElement.textContent = roomId;
+}
+
 function findElementsInFirstArrayNotInSecond(array1, array2) {
   return array1.map(item1 => {
     if (!array2.find(item2 => item2 === item1)) {
@@ -150,7 +155,12 @@ function findElementsInFirstArrayNotInSecond(array1, array2) {
 }
 
 function renderPlayersComboData(updatedCombo) {
-  Object.keys(updatedCombo).forEach(playerName => {
+  const {
+    playerName,
+    comboData,
+  } = updatedCombo
+
+  // Object.keys(updatedCombo).forEach(playerName => {
     if (!playersComboElementsByName.has(playerName)) {
       log(`${playerName} couldn't be found in current online players list`)
       return;
@@ -163,12 +173,13 @@ function renderPlayersComboData(updatedCombo) {
       setItemDisplay(waitingForComboElement, 'none')
     }
 
-    drawHighscoreStats(playerElement, updatedCombo[playerName].comboData)
-  });
+    drawHighscoreStats(playerElement, comboData)
+  // });
 }
 
 export {
   init,
   updateDisplayedPlayerList,
   renderPlayersComboData,
+  setDisplayedRoomId,
 }

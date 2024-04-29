@@ -6,7 +6,8 @@ import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './eventTypes/toastEventTypes'
 import { handleMessageByType, hostServer, shutdownServer } from '../onlineCT/wsServer/wsServer'
 import { connectToServer, sendWsClientMessage, disconnectFromServer } from '../onlineCT/wsClient/wsClient'
-import { WS_CLIENT_MESSAGE_TYPES } from '../onlineCT/wsServer/wsMessageTypes'
+import { WS_CLIENT_MESSAGE_TYPES, WS_SERVER_MESSAGE_TYPES } from '../onlineCT/wsServer/wsMessageTypes'
+import onlineConnectionService from '../onlineCT/OnlineConnectionService'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -143,14 +144,15 @@ export async function onRestartSettingsRequest(mainWindow) {
   })
 }
 
-export function onHostServerRequest(event, arg, mainWindow) {
-  const message = hostServer(arg.username, (data) => {
-    mainWindow.webContents.send('new-ws-message', data)
-  })
-  mainWindow.webContents.send('host-server-request-response', message)
+export async function onHostServerRequest(event, arg, mainWindow) {
+  // const message = hostServer(arg.username, (data) => {
+  //   mainWindow.webContents.send('new-ws-message', data)
+  // })
+  await createOnlineCtRoom(arg.username);
+  // mainWindow.webContents.send('host-server-request-response', message)
 }
 
-export function onConnectToServerRequest(event, arg, mainWindow) {
+export async function onConnectToServerRequest(event, arg, mainWindow) {
   const onMessageCallback = (data) => {
     mainWindow.webContents.send('new-ws-message', data)
   }
@@ -197,4 +199,36 @@ export function onDrawBalanceRequest(event, arg, overlayWindow) {
 
 export function onDrawScoreNumbersRequest(event, arg, overlayWindow) {
   overlayWindow.webContents.send('draw-score-numbers', arg)
+}
+
+export function __TWILIO__open(event, arg, mainWindow) {
+  const onMessageCallback = (data) => {
+    mainWindow.webContents.send('new-ws-message', data)
+  }
+  const onOpenCallback = (roomId) => {
+    console.log('onOpenCallback', roomId);
+    mainWindow.webContents.send('new-ws-message',
+      {
+        type: WS_SERVER_MESSAGE_TYPES.CONNECTED,
+        payload: { username: arg.username, roomId },
+      },
+    );
+  }
+  
+  onlineConnectionService.startOnlineCt(
+    arg.username,
+    arg.roomId,
+    onOpenCallback,
+    onMessageCallback,
+  );
+
+  mainWindow.webContents.send('connect-to-server-request-response', 'server request response')
+}
+
+export function __TWILIO__close() {
+  onlineConnectionService.exitOnline();
+}
+
+export function __TWILIO__send(event, arg, mainWindow) {
+  onlineConnectionService.sendStreamMessage(arg);
 }

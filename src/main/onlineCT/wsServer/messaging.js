@@ -77,14 +77,14 @@ export function setupBroadcastInterval(onMessageCallback) {
     const batchedData = JSON.stringify(messageBuffer);
     messageBuffer = {};
 
-// Convert the string to a Buffer
-const buffer = Buffer.from(batchedData, 'utf-8');
+    // Convert the string to a Buffer
+    const buffer = Buffer.from(batchedData, 'utf-8');
 
-// Get the size in bytes
-const sizeInBytes = buffer.length;
+    // Get the size in bytes
+    const sizeInBytes = buffer.length;
 
-console.log(`Size in bytes: ${sizeInBytes} bytes`);
-    
+    console.log(`Size in bytes: ${sizeInBytes} bytes`);
+        
     broadcast(clients, batchedData);
     // Also send data to host's renderer process
     onMessageCallback(batchedData)
