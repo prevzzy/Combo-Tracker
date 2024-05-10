@@ -1,10 +1,16 @@
 import { isAppInDebugMode } from "../debug/debugHelpers"
 
+export const GAME_PROCESSES = {
+  THUGPRO: 'THUGPro.exe',
+  RETHAWED: 'reTHAWed.exe',
+}
+
 export const GAME_CONSTANTS = {
-  THUGPRO_PROCESS_NAME: 'THUGPro.exe',
   MAX_INT32_VALUE: 2147483647,
-  CREATE_A_PARK_MAP_SCRIPT_NAME: 'sk5ed',
-  MAIN_MENU_SCRIPT_NAME: 'skateshop'
+  THUGPRO_CAP_SCRIPT: 'sk5ed',
+  THUGPRO_MAIN_MENU_SCRIPT: 'skateshop',
+  RETHAWED_CAP_SCRIPT: '5ed',
+  RETHAWED_MAIN_MENU_SCRIPT: 'mainmenu'
 }
 
 export const BALANCE_TIME_VALUES = {

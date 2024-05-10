@@ -1,6 +1,6 @@
 import bs from 'binary-search'
 import { APP_CONFIG_VALUES, CREATE_A_PARK } from '../utils/constants'
-import { requestNewBestScoreToast } from '../events/mainIpcEvents'
+import { requestNewBestScoreToast } from '../events/outgoingIpcEvents'
 import * as FileService from '../files/fileService'
 import * as LastComboUI from '../ui/lastCombo/uiLastCombo'
 import * as SavedCombosService from '../combo/savedCombosService'

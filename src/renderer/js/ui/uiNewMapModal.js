@@ -1,6 +1,6 @@
 import { APP_CONFIG_VALUES } from '../utils/constants'
 import { formatTimestamp } from '../utils/helpers'
-import { requestNewMapToast } from '../events/mainIpcEvents'
+import { requestNewMapToast } from '../events/outgoingIpcEvents'
 import * as FileService from '../files/fileService'
 import * as GlobalUI from '../ui/uiGlobal'
 import * as HighscoresUI from '../ui/uiHighscores'
