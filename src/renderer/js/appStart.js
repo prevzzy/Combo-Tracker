@@ -19,7 +19,7 @@ function startApp() {
 
   ipcRenderer.send('user-data-path-request')
   ipcRenderer.on('user-data-path-request-response', (event, arg) => {
-    initMainWindowIpcEventListeners()
+    initIncomingIpcEventListeners()
     SettingsUI.initSettings()
     runCoreLogic(arg)
     ipcRenderer.removeAllListeners('user-data-path-request-response')
@@ -46,7 +46,6 @@ function runCoreLogic(paths) {
       NewMapModalUI.initMapModal()
       GlobalUI.setupToolbarListeners()
 
-      await GameProcessService.handleHookingToGameProcess()
       await GameProcessService.mainLoop()
     })
     .catch((error) => {

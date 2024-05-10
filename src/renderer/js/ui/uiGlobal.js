@@ -2,7 +2,7 @@ import {
   requestAppMinimize, 
   requestAppFullscreen,
   requestAppExit
-} from '../events/mainIpcEvents'
+} from '../events/outgoingIpcEvents'
 
 const lastComboPage = document.getElementById('last-combo-page')
 const highscoresPage = document.getElementById('highscores-page')

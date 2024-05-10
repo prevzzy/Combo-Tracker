@@ -1,5 +1,5 @@
 import memoryjs from 'memoryjs'
-import { GAME_CONSTANTS } from '../utils/constants'
+import { GAME_PROCESSES } from '../utils/constants'
 import { CustomError } from '../utils/customError'
 import * as LastComboUI from '../ui/lastCombo/uiLastCombo'
 import * as MemoryController from './memory'
@@ -8,44 +8,71 @@ import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { watchActiveMap, setActiveMapData } from '../ui/uiHighscores'
 
-let gameInstanceExists = false
+const supportedGames = [
+  GAME_PROCESSES.THUGPRO,
+  GAME_PROCESSES.RETHAWED
+]
+
+let activeGameProcessName
+
+function getActiveGameProcessName() {
+  return activeGameProcessName
+}
 
 function hasActiveGameInstance() {
-  return gameInstanceExists
+  return !!activeGameProcessName
 }
 
 function isGameRunning() {
   try {
     // memoryjs.openProcess(Number(process.env.GAME_PROCESS_NAME))
-    memoryjs.openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
+    memoryjs.openProcess(activeGameProcessName)
     return true
   } catch {
     return false
   }
 }
 
-function openProcess(name) {
-  memoryjs.openProcess(name, (error, processObject) => {
-    if (error) {
-      throw new CustomError('Could not find THUGPRO process.', 1)
-    } else {
-      MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr)
-      MemoryController.testInitializedAddresses()
+function scanProcessesForSupportedGame() {
+  const gameProcess = memoryjs.getProcesses().find(process =>
+    supportedGames.find(game => game === process.szExeFile)
+  );
 
-      gameInstanceExists = true
-    }
+  if (!gameProcess) {
+    log('No active game found.')
+  }
+
+  return gameProcess?.szExeFile
+}
+
+function openProcess(gameProcessName) {
+  return new Promise((resolve, reject) => {
+    memoryjs.openProcess(gameProcessName, (error, processObject) => {
+      if (error) {
+        reject(new CustomError(`Could not find THUGPro or reTHAWed process.`, 1));
+      } else {
+        console.log('otwieram', processObject.handle, processObject.modBaseAddr, gameProcessName)
+        MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
+        MemoryController.testInitializedAddresses(gameProcessName)
+  
+        activeGameProcessName = gameProcessName
+        resolve(true);
+      }
+    })
   })
 }
 
-async function handleHookingToGameProcess() {
+async function handleHookingToGameProcess(gameProcessName) {
   log('...handleHookingToGameProcess')
+
   try {
-    openProcess(GAME_CONSTANTS.THUGPRO_PROCESS_NAME)
+    await openProcess(gameProcessName)
     // openProcess(Number(process.env.GAME_PROCESS_NAME))
 
-    log('openProcess OK')
-    await ComboTracker.resumeComboTracking()
-  } catch(error) {
+    log(`openProcess ${gameProcessName} OK`)
+    await ComboTracker.resumeComboTracking();
+    return gameProcessName;
+  } catch (error) {
     if (!ComboTracker.isComboTrackingSuspended()) {
       LastComboUI.setLastComboPageInfo(
         true,
@@ -56,7 +83,7 @@ async function handleHookingToGameProcess() {
     }
 
     ComboTracker.shouldSuspendComboTracking(true)
-    log('openProcess FAIL')
+    log(`openProcess ${gameProcessName} FAIL`)
     console.error(error)
     setupGlobalError(true, error.message, error.status)
   }
@@ -65,7 +92,7 @@ async function handleHookingToGameProcess() {
 async function checkMemoryControllerHealth() {
   log('...checkMemoryControllerHealth')
   try {
-    MemoryController.testInitializedAddresses();
+    MemoryController.testInitializedAddresses(activeGameProcessName);
     log('healthCheck OK')
 
     if (ComboTracker.isComboTrackingSuspended()) {
@@ -76,29 +103,37 @@ async function checkMemoryControllerHealth() {
     log('healthCheck FAIL - suspending ComboTracker')
     console.error(error);
     setupGlobalError(true, error.message, error.status)
-    handleHookingToGameProcess()
+    await handleHookingToGameProcess(activeGameProcessName)
     ComboTracker.shouldSuspendComboTracking(true)
   }
 }
 
 async function mainLoop() {
-  setTimeout(async () => {
-    if (isGameRunning() && hasActiveGameInstance()) {
-      await checkMemoryControllerHealth()
-      watchActiveMap()
-    } else {
-      gameInstanceExists = false
-      handleHookingToGameProcess()
-      setActiveMapData()
-    }
+  mainLoopLogic()
 
-    await mainLoop()
+  setInterval(async () => {
+    await mainLoopLogic()
   }, 5000)
 }
 
+async function mainLoopLogic() {
+  if (hasActiveGameInstance() && isGameRunning()) {
+    await checkMemoryControllerHealth()
+    watchActiveMap()
+  } else {
+    activeGameProcessName = scanProcessesForSupportedGame()
+
+    if (!activeGameProcessName) {
+      setupGlobalError(true, 'Could not find THUGPro or reTHAWed process.', 1);
+      setActiveMapData()
+    }
+
+    await handleHookingToGameProcess(activeGameProcessName || '')
+  }
+}
+
 export {
+  getActiveGameProcessName,
   hasActiveGameInstance,
-  openProcess,
   mainLoop,
-  handleHookingToGameProcess,
 }

@@ -477,9 +477,12 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 #global-error-container {
   position: fixed;
   bottom: 0;
-  left: calc(50% - 200px + (97.7px / 2));
-  height: 50px;
-  width: 400px;
+  left: calc(50% - 250px + (97.7px / 2));
+  min-height: 50px;
+  width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 100;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;

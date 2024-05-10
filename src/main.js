@@ -49,6 +49,10 @@ if (!gotTheLock) {
   })
 }
 
+app.on('browser-window-created', (_, window) => {
+  require("@electron/remote/main").enable(window.webContents)
+})
+
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
 })
