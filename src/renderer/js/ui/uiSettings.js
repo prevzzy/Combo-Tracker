@@ -2,7 +2,7 @@ import {
   requestSettingValue,
   requestSettingUpdate,
   requestSettingsRestart,
-} from '../events/mainIpcEvents'
+} from '../events/outgoingIpcEvents'
 import { formatScore } from '../utils/helpers'
 import { resetHighscores, isPathWritable } from '../files/fileService'
 import { setItemDisplay } from './uiGlobal'
