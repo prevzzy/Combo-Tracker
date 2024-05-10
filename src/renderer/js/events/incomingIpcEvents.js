@@ -1,11 +1,11 @@
 import { ipcRenderer } from 'electron'
 import { getCurrentMapScript } from '../game/memory'
 import { hasActiveGameInstance } from '../game/gameProcessService'
-import { requestMapHighscoresToast } from './mainIpcEvents'
+import { requestMapHighscoresToast } from './outgoingIpcEvents'
 import { ALL_MAPS } from '../utils/constants'
 import { onSettingsRequestResponse } from '../ui/uiSettings'
 
-export function initMainWindowIpcEventListeners() {
+export function initIncomingIpcEventListeners() {
   ipcRenderer.on('display-all-maps-highscores', () => {
     requestMapHighscoresToast(ALL_MAPS)
   })

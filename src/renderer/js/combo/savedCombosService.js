@@ -1,4 +1,5 @@
-import { GAME_CONSTANTS, CREATE_A_PARK } from '../utils/constants'
+import { isInCreateAPark } from '../game/interGameUtils'
+import { CREATE_A_PARK } from '../utils/constants'
 
 let savedCombos
 
@@ -49,7 +50,7 @@ function getMapName(mapScriptName) {
     return
   }
 
-  if (mapScriptName === GAME_CONSTANTS.CREATE_A_PARK_MAP_SCRIPT_NAME) {
+  if (isInCreateAPark(mapScriptName)) {
     return CREATE_A_PARK
   }
 

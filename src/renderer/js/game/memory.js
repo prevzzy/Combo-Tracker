@@ -1,6 +1,5 @@
 import memoryjs from 'memoryjs'
 import { log } from '../debug/debugHelpers'
-import { GAME_CONSTANTS } from '../utils/constants'
 import { CustomError } from '../utils/customError'
 import {
   grindTimeAddressData,
@@ -13,19 +12,28 @@ import {
   graffitiTagsAddressData,
   stateTypeAddressData,
   revertPenaltyAddressData,
+  trickHistoryArrayAddressData,
+  trickPropertyOffsets,
   currentTrickNameAddressData,
   trickCountAddressData,
-  trickAmountAddressData,
+  trickCountWithNoGarbageAddressData,
   currentStanceAddressData,
   specialMeterNumericValueAddressData,
-  trickHistoryArrayAddressData,
+  grindBalanceArrowPositionAddressData,
+  manualBalanceArrowPositionAddressData,
+  lipBalanceArrowPositionAddressData,
 } from './offsets'
+import { getActiveGameProcessName } from './gameProcessService'
+import { isInMainMenu } from './interGameUtils'
 
 let gameHandle
 let processBaseAddress
 let grindTimeAddress
 let manualTimeAddress
 let lipTimeAddress
+let grindBalanceArrowPositionAddress
+let manualBalanceArrowPositionAddress
+let lipBalanceArrowPositionAddress
 let currentMapAddress
 let basePointsAddress
 let multiplierAddress
@@ -35,33 +43,36 @@ let stateTypeAddress
 let revertPenaltyAddress
 let currentTrickNameAddress
 let trickCountAddress
-let tricksAmountAddress
+let trickCountWithNoGarbageAddress
 let currentStanceAddress
 let specialMeterNumericValueAddress
 
-function initAddresses (_gameHandle, _processBaseAddress) {
+function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   gameHandle = _gameHandle
   processBaseAddress = _processBaseAddress
-  
-  grindTimeAddress = getAddress(gameHandle, processBaseAddress, grindTimeAddressData)
-  manualTimeAddress = getAddress(gameHandle, processBaseAddress, manualTimeAddressData)
-  lipTimeAddress = getAddress(gameHandle, processBaseAddress, lipTimeAddressData)
-  currentMapAddress = getAddress(gameHandle, processBaseAddress, currentMapScriptAddressData)
-  basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData)
-  multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData)
-  gameScoreAddress = getAddress(gameHandle, processBaseAddress, gameScoreAddressData)
-  graffitiTagsCountAddress = getAddress(gameHandle, processBaseAddress, graffitiTagsAddressData)
-  stateTypeAddress = getAddress(gameHandle, processBaseAddress, stateTypeAddressData)
-  revertPenaltyAddress = getAddress(gameHandle, processBaseAddress, revertPenaltyAddressData)
-  currentTrickNameAddress = getAddress(gameHandle, processBaseAddress, currentTrickNameAddressData)
-  trickCountAddress = getAddress(gameHandle, processBaseAddress, trickCountAddressData)
-  tricksAmountAddress = getAddress(gameHandle, processBaseAddress, trickAmountAddressData)
-  currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData)
-  specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData)
+
+  grindTimeAddress = getAddress(gameHandle, processBaseAddress, grindTimeAddressData[gameProcessName])
+  manualTimeAddress = getAddress(gameHandle, processBaseAddress, manualTimeAddressData[gameProcessName])
+  lipTimeAddress = getAddress(gameHandle, processBaseAddress, lipTimeAddressData[gameProcessName])
+  grindBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, grindBalanceArrowPositionAddressData[gameProcessName])
+  manualBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, manualBalanceArrowPositionAddressData[gameProcessName])
+  lipBalanceArrowPositionAddress = getAddress(gameHandle, processBaseAddress, lipBalanceArrowPositionAddressData[gameProcessName])
+  currentMapAddress = getAddress(gameHandle, processBaseAddress, currentMapScriptAddressData[gameProcessName])
+  basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData[gameProcessName])
+  multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData[gameProcessName])
+  gameScoreAddress = getAddress(gameHandle, processBaseAddress, gameScoreAddressData[gameProcessName])
+  graffitiTagsCountAddress = getAddress(gameHandle, processBaseAddress, graffitiTagsAddressData[gameProcessName])
+  stateTypeAddress = getAddress(gameHandle, processBaseAddress, stateTypeAddressData[gameProcessName])
+  revertPenaltyAddress = getAddress(gameHandle, processBaseAddress, revertPenaltyAddressData[gameProcessName])
+  currentTrickNameAddress = getAddress(gameHandle, processBaseAddress, currentTrickNameAddressData[gameProcessName])
+  trickCountAddress = getAddress(gameHandle, processBaseAddress, trickCountAddressData[gameProcessName])
+  trickCountWithNoGarbageAddress = getAddress(gameHandle, processBaseAddress, trickCountWithNoGarbageAddressData[gameProcessName])
+  currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData[gameProcessName])
+  specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData[gameProcessName])
 }
 
 // It's hard to predict whether this function will always work. Current checks depend only on relations between incorrectly initialized values that I noticed.
-function testInitializedAddresses() {
+function testInitializedAddresses(gameProcessName) {
   const floatValues = [
     getGrindTime(),
     getManualTime(),
@@ -94,7 +105,14 @@ function testInitializedAddresses() {
   //   getBasePoints,  ${getBasePoints()}
   //   getGameScore,  ${getGameScore()}
   //   getStateType,  ${getStateType()}
-  //   getRevertPenalty,  ${getRevertPenalty()}`
+  //   getRevertPenalty,  ${getRevertPenalty()}
+  //   getGrindBalanceArrowPosition, ${getGrindBalanceArrowPosition()}
+  //   getManualBalanceArrowPosition, ${getManualBalanceArrowPosition()}
+  //   getLipBalanceArrowPosition, ${getLipBalanceArrowPosition()}
+  //   getGraffitiTagsCount, ${getGraffitiTagsCount()}
+  //   getSpecialMeterNumericValue, ${getSpecialMeterNumericValue()}
+  //   getTrickCount, ${getTrickCount()}
+  //   `
   // )
 
   // log(`
@@ -116,25 +134,25 @@ function testInitializedAddresses() {
 
   if (currentBasePoints === 0 && currentMultiplier !== 0 && gameScore !== 0) {
     log('basePointsAddress silent update')
-    basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData)
+    basePointsAddress = getAddress(gameHandle, processBaseAddress, basePointsAddressData[gameProcessName])
   }
 
   if (currentBasePoints !== 0 && currentMultiplier === 0 && gameScore !== 0) {
     log('multiplierAddress silent update')
-    multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData)
+    multiplierAddress = getAddress(gameHandle, processBaseAddress, multiplierAddressData[gameProcessName])
   }
 
   if (currentBasePoints !== 0 && currentMultiplier !== 0 && gameScore === 0) {
     log('gameScoreAddress silent update')
-    gameScoreAddress = getAddress(gameHandle, processBaseAddress, gameScoreAddressData)
+    gameScoreAddress = getAddress(gameHandle, processBaseAddress, gameScoreAddressData[gameProcessName])
   }
 
   if (
     currentMapScript === '' || 
-    currentMapScript === GAME_CONSTANTS.MAIN_MENU_SCRIPT_NAME &&
+    isInMainMenu(currentMapScript) &&
     (isEveryValueInArrayTheSameAndNot0(floatValues) &&
     isEveryValueInArrayTheSameAndNot0(integerValues) ||
-    lipTimeAddress === lipTimeAddressData.offsets[0])
+    lipTimeAddress === lipTimeAddressData[gameProcessName].offsets[0])
   ) {
     throw new CustomError('Game loading...', 2)
   }
@@ -188,7 +206,7 @@ function getTrickHistoryArrayAddress() {
     throw new Error('Can\'t read memory without gameHandle.')
   }
 
-  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData)
+  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData[getActiveGameProcessName()])
 
   return trickHistoryArrayAddress
 }
@@ -207,17 +225,16 @@ function getTrickDataPointer(index) {
   return memoryjs.readMemory(gameHandle, activeTrickHistoryAddress + 0x4 * (index), memoryjs.PTR);
 }
 
-
 function getTrickValue(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + 0x0, memoryjs.INT)
+  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].value, memoryjs.INT)
 }
 
 function getTrickName(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + 0x1C, memoryjs.STRING);
+  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].name, memoryjs.STRING);
 }
 
 function getTrickFlags(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + 0x18, memoryjs.INT);
+  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].flags, memoryjs.INT);
 }
 
 function getGrindTime() {
@@ -268,8 +285,8 @@ function getTrickCount() {
   return memoryjs.readMemory(gameHandle, trickCountAddress, memoryjs.INT)
 }
 
-function getTricksAmount() {
-  return memoryjs.readMemory(gameHandle, tricksAmountAddress, memoryjs.INT)
+function getTrickCountWithNoGarbage() {
+  return memoryjs.readMemory(gameHandle, trickCountWithNoGarbageAddress, memoryjs.INT)
 }
 
 function getCurrentStance() {
@@ -278,6 +295,18 @@ function getCurrentStance() {
 
 function getSpecialMeterNumericValue() {
   return memoryjs.readMemory(gameHandle, specialMeterNumericValueAddress, memoryjs.INT)
+}
+
+function getGrindBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, grindBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function getManualBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, manualBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function getLipBalanceArrowPosition() {
+  return memoryjs.readMemory(gameHandle, lipBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
 export {
@@ -295,7 +324,7 @@ export {
   getRevertPenalty,
   getCurrentTrickName,
   getTrickCount,
-  getTricksAmount,
+  getTrickCountWithNoGarbage,
   getCurrentStance,
   getTrickHistoryArrayAddress,
   getTrickDataPointer,
