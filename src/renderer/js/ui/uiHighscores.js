@@ -1,6 +1,7 @@
 import {
   APP_CONFIG_VALUES,
   ERROR_STRINGS,
+  GAME_PROCESSES,
 } from '../utils/constants'
 import {
   formatTimestamp,
@@ -14,6 +15,7 @@ import * as GlobalUI from './uiGlobal'
 import * as SavedCombosService from '../combo/savedCombosService'
 import * as LastComboUI from './lastCombo/uiLastCombo'
 import * as MemoryController from '../game/memory'
+import { getActiveGameProcessName } from '../game/gameProcessService'
 
 const mapCategoriesMenu = document.getElementById('hs-map-categories-menu')
 const mapNameElement = document.getElementById('hs-map')
@@ -21,15 +23,19 @@ const trackedCombosAmountElement = document.getElementById('hs-map-combos-tracke
 const mapTimeSpentElement = document.getElementById('hs-map-time-spent')
 const highscoresContainerElement = document.getElementById('hs-scores-container')
 const sideDrawerTrigger = document.getElementById('hs-side-drawer-trigger')
+const gameSelect = document.getElementById('hs-game-select')
 
 let activeCategoryElement = document.getElementById('hs-all-maps-category');
 
 let activeMapData = {
+  game: null,
   categoryIcon: null,
   mapIcon: null,
   mapName: null,
   categoryName: null,
 }
+
+let displayedGame = GAME_PROCESSES.THUGPRO;
 
 const highscoreStatElementsConfig = {
   score: {
@@ -60,12 +66,16 @@ const highscoreStatElementsConfig = {
   },
 }
 
-function initMapCategoriesMenu() {
+function initHighscoresPage() {
+  initGameSelect()
   sideDrawerTrigger.addEventListener('click', changeSideDrawerVisibility)
   document.getElementById('hs-backdrop')
     .addEventListener('click', changeSideDrawerVisibility)
-  
-  const allMapCategories = SavedCombosService.getAllMapCategoriesData()
+  onGameClick(getActiveGameProcessName() || GAME_PROCESSES.THUGPRO)
+}
+
+function displayMapCategoriesMenuForGame(game) {
+  const allMapCategories = SavedCombosService.getAllMapCategoriesData(game)
   
   if (!allMapCategories) {
     return
@@ -196,7 +206,7 @@ function getHighscoresDataForMapCategory(mapCategory) {
   const scoresArray = [];
   let combosTrackedTotal = 0;
   let timeSpentTotal = 0;
-  const mapCategories = SavedCombosService.getMapCategoryData(mapCategory);
+  const mapCategories = SavedCombosService.getMapCategoryData(displayedGame, mapCategory);
 
   if (mapCategories) {
     Object.keys(mapCategories).forEach((mapScriptName) => {
@@ -243,8 +253,8 @@ function handleHighscoresDisplay(mapCategory, mapScriptName, shouldDisplayAllMap
     highscoresData = getHighscoresDataForMapCategory(mapCategory);
   } else {
     highscoresData = shouldDisplayAllMapsScores
-      ? SavedCombosService.getAllMapsData(mapCategory, mapScriptName)
-      : SavedCombosService.getMapData(mapCategory, mapScriptName)
+      ? SavedCombosService.getAllMapsData(displayedGame)
+      : SavedCombosService.getMapData(displayedGame, mapCategory, mapScriptName)
   }
 
   highscoresContainerElement.innerHTML = null
@@ -305,9 +315,9 @@ function createNewHighscoreElement(comboData, standing) {
   highscoreElement.querySelector('.hs-acc-map').textContent = mapName
   
   if (comboData.fullDataFileName) {
-    highscoreElement.querySelector('.hs-acc-container').addEventListener('click', () =>
-      LastComboUI.displayComboFromFile(comboData.fullDataFileName)
-    )
+    highscoreElement.querySelector('.hs-acc-container').addEventListener('click', () => {
+      LastComboUI.displayComboFromFile(displayedGame, comboData.fullDataFileName)
+    })
   }
   
   const drawAllHighscoreStats = (obj) => {
@@ -446,7 +456,7 @@ function resetMapCategoriesMenu() {
   mapCategoriesMenu.appendChild(allMapsCopy)
   
   activeCategoryElement = allMapsCopy
-  initMapCategoriesMenu()
+  displayMapCategoriesMenuForGame(displayedGame)
   refreshCurrentlyDisplayedHighscores()
 }
 
@@ -465,19 +475,29 @@ function changeSideDrawerVisibility() {
   }
 }
 
-function watchActiveMap() {
-  const activeMapName = SavedCombosService.getMapName(MemoryController.getCurrentMapScript())
-  const activeCategoryName = SavedCombosService.getMapCategory(MemoryController.getCurrentMapScript())
+function updateActiveMapData() {
+  const activeGame = getActiveGameProcessName()
 
-  if (activeMapData.mapName !== activeMapName || activeMapData.categoryName !== activeCategoryName) {
+  if (!activeGame || activeGame !== displayedGame) {
+    setActiveMapData()
+    return;
+  }
+
+  const activeMapName = SavedCombosService.getMapName(displayedGame, MemoryController.getCurrentMapScript())
+  const activeCategoryName = SavedCombosService.getMapCategory(displayedGame, MemoryController.getCurrentMapScript())
+
+  if (
+    activeMapData.mapName !== activeMapName ||
+    activeMapData.categoryName !== activeCategoryName
+  ) {
     setActiveMapData()
     if (activeMapName && activeCategoryName) {
-      setupActiveMapIcons(activeMapName, activeCategoryName)
+      setupActiveMapIcons(displayedGame, activeMapName, activeCategoryName)
     }
   }
 }
 
-function setupActiveMapIcons(activeMapName, activeCategoryName) {
+function setupActiveMapIcons(game, activeMapName, activeCategoryName) {
   for (const mapCategoryElement of Array.from(mapCategoriesMenu.children)) {
     const mapCategoryTextElement = mapCategoryElement.querySelector('.category-name')
 
@@ -492,7 +512,7 @@ function setupActiveMapIcons(activeMapName, activeCategoryName) {
         mapCategoryTextElement.insertAdjacentElement('afterend', categoryIcon)
         mapElement.firstElementChild.appendChild(mapIcon)
         
-        setActiveMapData(categoryIcon, mapIcon, activeMapName, activeCategoryName)
+        setActiveMapData(game, categoryIcon, mapIcon, activeMapName, activeCategoryName)
         
         return
       }
@@ -508,11 +528,12 @@ function createActiveMapIcon() {
   return activeMapIcon
 }
 
-function setActiveMapData(categoryIcon, mapIcon, mapName, categoryName) {
+function setActiveMapData(game, categoryIcon, mapIcon, mapName, categoryName) {
   activeMapData.categoryIcon && activeMapData.categoryIcon.remove()
   activeMapData.mapIcon && activeMapData.mapIcon.remove()
 
   activeMapData = {
+    game,
     categoryIcon,
     mapIcon,
     mapName,
@@ -520,11 +541,36 @@ function setActiveMapData(categoryIcon, mapIcon, mapName, categoryName) {
   }
 }
 
+function initGameSelect() {
+  Array.from(gameSelect.children).forEach(element => {
+    const game = GAME_PROCESSES[element.attributes['data-game'].value]
+    element.addEventListener('click', (e) => {
+      onGameClick(game)
+    })
+  })
+}
+
+function onGameClick(game) {
+  displayedGame = game;
+  resetMapCategoriesMenu()
+
+  const allGames = gameSelect.children
+  Array.from(allGames).forEach(gameElement => {
+    gameElement.classList.remove('active')
+
+    if (game === GAME_PROCESSES[gameElement.attributes['data-game'].value]) {
+      gameElement.classList.add('active')
+    }
+  })
+
+  updateActiveMapData()
+}
+
 export {
-  initMapCategoriesMenu,
+  initHighscoresPage,
   resetMapCategoriesMenu,
   appendNewMapToMapCategoryDropdown,
   refreshCurrentlyDisplayedHighscores,
-  watchActiveMap,
+  updateActiveMapData,
   setActiveMapData,
 }
