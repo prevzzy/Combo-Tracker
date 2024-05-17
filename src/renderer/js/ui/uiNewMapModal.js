@@ -1,4 +1,4 @@
-import { APP_CONFIG_VALUES } from '../utils/constants'
+import { APP_CONFIG_VALUES, GAME_PROCESSES } from '../utils/constants'
 import { formatTimestamp } from '../utils/helpers'
 import { requestNewMapToast } from '../events/outgoingIpcEvents'
 import * as FileService from '../files/fileService'
@@ -22,7 +22,7 @@ function setupAutomaticModalHidingCountdown(closeModalCallback) {
   }, 1000)
 }
 
-async function showNewMapModal(mapScriptName, postComboLogicCallback) {
+async function showNewMapModal(game, mapScriptName, postComboLogicCallback) {
   requestNewMapToast()
 
   document.getElementById('navbar-last-combo').click()
@@ -37,7 +37,7 @@ async function showNewMapModal(mapScriptName, postComboLogicCallback) {
   
   const newMapSaveListener = async function(e) {
     newMapSaveBtn.removeEventListener('click', newMapSaveListener)
-    await handleNewMapSubmit(mapScriptName, postComboLogicCallback)
+    await handleNewMapSubmit(game, mapScriptName, postComboLogicCallback)
       .then((data) => {
         data
           ? newMapDismissBtn.removeEventListener('click', newMapDismissListener)
@@ -70,7 +70,10 @@ async function showNewMapModal(mapScriptName, postComboLogicCallback) {
 function initMapModal() {
   timeToModalClose.textContent = `${formatTimestamp(APP_CONFIG_VALUES.HIDE_NEW_MAP_MODAL_TIMELEFT)}`
   const mapCategoryContainer = document.getElementById('new-map-category')
-  const categories = SavedCombosService.getMapCategoriesArray()
+
+  // todo: tutaj nie wiem
+  const game = GAME_PROCESSES.THUGPRO
+  const categories = SavedCombosService.getMapCategoriesArray(game)
   
   categories.forEach(category => {
     const categoryItem = document.createElement('option')
@@ -84,7 +87,7 @@ function initMapModal() {
   $('#new-map-category').selectpicker('render');
 }
 
-async function handleNewMapSubmit(mapScriptName, postComboLogicCallback) {
+async function handleNewMapSubmit(game, mapScriptName, postComboLogicCallback) {
   const mapInput = document.getElementById('new-map-name')
   const categoryInput = document.getElementById('new-map-category')
   mapInput.value = mapInput.value.trim().replace(/\s+/g, ' ').toUpperCase()
@@ -97,7 +100,7 @@ async function handleNewMapSubmit(mapScriptName, postComboLogicCallback) {
       'invalid-map-name',
       `Map name has to be at least 2 characters long and at most ${APP_CONFIG_VALUES.MAX_MAP_NAME_INPUT_LENGTH} characters long.`
     )
-  } else if (!isMapNameUnique(categoryInput.value, mapInput.value)) {
+  } else if (!isMapNameUnique(game, categoryInput.value, mapInput.value)) {
     GlobalUI.adjustTextInputUI(
       false,
       mapInput,
@@ -106,7 +109,7 @@ async function handleNewMapSubmit(mapScriptName, postComboLogicCallback) {
       `Map with this name already exists in this category.`
     )
   } else {
-    await saveNewMapAlias(mapScriptName, mapInput.value, categoryInput.value)
+    await saveNewMapAlias(game, mapScriptName, mapInput.value, categoryInput.value)
 
     HighscoresUI.appendNewMapToMapCategoryDropdown(mapScriptName, mapInput.value, categoryInput.value)
     postComboLogicCallback(true) // shouldSaveCombo = true
@@ -154,8 +157,8 @@ function isMapInputValid() {
   )
 }
 
-function isMapNameUnique(categoryInput, mapNameInput) {
-  const mapCategoriesSavedCombos = SavedCombosService.getSavedCombos().mapCategories
+function isMapNameUnique(game, categoryInput, mapNameInput) {
+  const mapCategoriesSavedCombos = SavedCombosService.getSavedCombos(game).mapCategories
   let isNameUnique = true
 
   Object.keys(mapCategoriesSavedCombos).forEach(category => {
@@ -174,8 +177,8 @@ function isMapNameUnique(categoryInput, mapNameInput) {
   return isNameUnique
 }
 
-async function saveNewMapAlias(mapScriptName, mapName, categoryName) {
-  const savedCombos = SavedCombosService.getSavedCombos()
+async function saveNewMapAlias(game, mapScriptName, mapName, categoryName) {
+  const savedCombos = SavedCombosService.getSavedCombos(game)
 
   if (!(savedCombos && savedCombos.mapCategories)) {
     return
@@ -195,7 +198,7 @@ async function saveNewMapAlias(mapScriptName, mapName, categoryName) {
     }
   }
 
-  await FileService.saveHighscoresJson(savedCombos)
+  await FileService.saveHighscoresJson(game, savedCombos)
     .catch((error) => {
       console.error(error)
     })

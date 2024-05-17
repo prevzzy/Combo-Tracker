@@ -6,8 +6,8 @@ import * as LastComboUI from '../ui/lastCombo/uiLastCombo'
 import * as SavedCombosService from '../combo/savedCombosService'
 import { getUniqueComboId } from '../utils/helpers'
 
-async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondition) {
-  const savedCombos = SavedCombosService.getSavedCombos()
+async function saveNewCombo(game, mapScriptName, comboData, hasPassedBailedComboCondition) {
+  const savedCombos = SavedCombosService.getSavedCombos(game)
   if (!(savedCombos && savedCombos.mapCategories)) {
     return
   }
@@ -17,7 +17,7 @@ async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondit
   let mapBestScoreNumber
   let generalComboNumber
   let generalBestScoreNumber
-  const mapName = SavedCombosService.getMapName(mapScriptName)
+  const mapName = SavedCombosService.getMapName(game, mapScriptName)
 
   if (mapName === CREATE_A_PARK) {
     return {
@@ -40,12 +40,12 @@ async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondit
         fullDataFileName,
         comboNumber: generalComboNumber,
         bestScoreNumber: generalBestScoreNumber,
-      } = handleComboSavingLogic(savedCombos.allMaps, comboData, hasPassedBailedComboCondition, false))
+      } = handleComboSavingLogic(game, savedCombos.allMaps, comboData, hasPassedBailedComboCondition, false))
       ;({
         fullDataFileName,
         comboNumber: mapComboNumber,
         bestScoreNumber: mapBestScoreNumber,
-      } = handleComboSavingLogic(map, comboData, hasPassedBailedComboCondition, true))
+      } = handleComboSavingLogic(game, map, comboData, hasPassedBailedComboCondition, true))
 
       if (comboData.stats) {
         comboData.stats.comboTrackingNumbers = {
@@ -68,9 +68,9 @@ async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondit
 
   LastComboUI.setLastComboPageInfo(true, 'Saving last combo...', 2, false)
   if (fullDataFileName) {
-    await FileService.saveFullComboData(comboData, fullDataFileName)
+    await FileService.saveFullComboData(game, comboData, fullDataFileName)
   }
-  await FileService.saveHighscoresJson(savedCombos)
+  await FileService.saveHighscoresJson(game, savedCombos)
   LastComboUI.setLastComboPageInfo()
 
 
@@ -83,6 +83,7 @@ async function saveNewCombo(mapScriptName, comboData, hasPassedBailedComboCondit
 }
 
 function handleComboSavingLogic(
+  game,
   mapData,
   comboData,
   hasPassedBailedComboCondition,
@@ -98,7 +99,11 @@ function handleComboSavingLogic(
   if (hasPassedBailedComboCondition && isNewScoreWorthSaving(mapData.scores, score)) {
     fullDataFileName = getUniqueComboId(score, comboData.stats.mainComboData.mapName)
     mapData.scores = saveNewComboToScoresArray(
-      [...mapData.scores], comboData, fullDataFileName, shouldRemoveOldScoreFile
+      game,
+      [...mapData.scores],
+      comboData,
+      fullDataFileName,
+      shouldRemoveOldScoreFile
     )
   }
 
@@ -126,7 +131,7 @@ function getBestScoreNumber(scores, comboData) {
   return bestScoreNumber
 }
 
-function saveNewComboToScoresArray(scores, comboData, fullDataFileName, shouldRemoveOldScoreFile) {
+function saveNewComboToScoresArray(game, scores, comboData, fullDataFileName, shouldRemoveOldScoreFile) {
   const {
     stats: {
       mainComboData,
@@ -158,7 +163,7 @@ function saveNewComboToScoresArray(scores, comboData, fullDataFileName, shouldRe
   if (scores.length > APP_CONFIG_VALUES.MAX_SCORES_PER_MAP) {
     const { fullDataFileName } = scores.pop()
     if (fullDataFileName && shouldRemoveOldScoreFile) {
-      FileService.deleteSavedComboFile(fullDataFileName)
+      FileService.deleteSavedComboFile(game, fullDataFileName)
     }
   }
 

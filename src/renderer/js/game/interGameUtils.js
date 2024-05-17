@@ -2,12 +2,20 @@ import { GAME_PROCESSES, GAME_CONSTANTS } from '../utils/constants';
 import { getActiveGameProcessName } from './gameProcessService';
 import * as MemoryController from './memory';
 
-export function isTrackingThugPro() {
-  return getActiveGameProcessName() === GAME_PROCESSES.THUGPRO
+export function isTrackingThugPro(game) {
+  if (!game) {
+    game = getActiveGameProcessName()
+  }
+
+  return game === GAME_PROCESSES.THUGPRO
 }
 
-export function isTrackingRethawed() {
-  return getActiveGameProcessName() === GAME_PROCESSES.RETHAWED
+export function isTrackingRethawed(game) {
+  if (!game) {
+    game = getActiveGameProcessName()
+  }
+
+  return game === GAME_PROCESSES.RETHAWED
 }
 
 export function isInMainMenu(currentMapScript) {

@@ -30,7 +30,7 @@ function startApp() {
 
 function runCoreLogic(paths) {
   FileService.setSavingPaths(paths)
-  FileService.readHighscoresJson()
+  FileService.readAllHighscoreJsons()
     .then(async () => {
       LastComboUI.setLastComboPageInfo(
         true,
@@ -42,11 +42,12 @@ function runCoreLogic(paths) {
       isRunning = true
 
       LastComboUI.init()
-      HighscoresUI.initMapCategoriesMenu()
-      NewMapModalUI.initMapModal()
       GlobalUI.setupToolbarListeners()
-
+      
       await GameProcessService.mainLoop()
+
+      NewMapModalUI.initMapModal()
+      HighscoresUI.initHighscoresPage()
     })
     .catch((error) => {
       console.error(error)

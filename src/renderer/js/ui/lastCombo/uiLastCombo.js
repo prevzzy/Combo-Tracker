@@ -98,11 +98,11 @@ function init() {
   GraphsUI.init()
 }
 
-async function displayComboFromFile(fileName) {
+async function displayComboFromFile(game, fileName) {
   try {
     setLastComboPageInfo(true, '', 2, false)
     document.getElementById('navbar-last-combo').click()
-    const { stats, tricks, graphs } = await readSavedComboFile(fileName)
+    const { stats, tricks, graphs } = await readSavedComboFile(game, fileName)
 
     tricks.tricksInCombo = tricks.tricksInCombo.map(trick =>
       new Trick(trick.name, trick.flags, trick.timesUsed)
