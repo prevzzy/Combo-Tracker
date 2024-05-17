@@ -5,7 +5,13 @@ import { isTrackingRethawed } from '../game/interGameUtils'
 
 const TRICK_CONSTANTS = {
   SWITCH: 'Switch',
+  GRIND_GARBAGE_SUFFIXES: ['bonk', 'ding', 'tap', 'kiss', 'clip'],
+  BONK_TRICKS: ['Tapped The Rail', 'Clipped The Rail', 'Dinged The Rail', 'Bonked The Rail', 'Kissed The Rail']
 }
+
+const spacesRe = /\\_/g // spaces in trick names are represented by \_
+const colorsRe = /\\c[\w]/gi // f.e. special and gap trick colors
+const allowedNameSymbolsRe = /[a-zA-Z0-9-!().'\s]/g
 
 class Trick {
   constructor(name = '', flags = 0, timesUsed = 0) {
@@ -15,10 +21,6 @@ class Trick {
   }
 
   parseTrickName(name) {
-    const spacesRe = /\\_/g // spaces in trick names are represented by \_
-    const colorsRe = /\\c[\w]/g // f.e. special and gap trick colors
-    const allowedNameSymbolsRe = /[a-zA-Z0-9-!().'\s]/g
-
     let parsedName = this.isSwitch() && !this.isGap() && !name.startsWith(`${TRICK_CONSTANTS.SWITCH} `)
       ? `${TRICK_CONSTANTS.SWITCH} `
       : ''
@@ -45,6 +47,20 @@ class Trick {
   
   incrementTimesUsedCounter() {
     this.timesUsed++
+  }
+
+  isDegradeable() {
+    return !(this.isGap() || this.isNonMultiTrick())
+  }
+
+  isNonMultiTrick() {
+    const trickNameParts = this.name.split(' ')
+    const trickSuffix = trickNameParts[trickNameParts.length - 1]
+
+    return (
+      TRICK_CONSTANTS.GRIND_GARBAGE_SUFFIXES.some(suffix => suffix === trickSuffix) ||
+      TRICK_CONSTANTS.BONK_TRICKS.some(bonkTrick => bonkTrick === this.name)
+    )
   }
 }
 

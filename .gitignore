@@ -91,4 +91,6 @@ out/
 # Other
 src/renderer/js/game/offsets.js
 combos/
+combos-reTHAWed/
 highscores.json
+highscores-reTHAWed.json

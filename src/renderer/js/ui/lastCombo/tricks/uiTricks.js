@@ -75,6 +75,10 @@ function displayTrickUsage(tricksInCombo) {
   const shouldColorTrickUsage = trickFilteringService.activeFilters[TRICK_FILTERS.SHOW_SWITCH]
 
   tricksInCombo && tricksInCombo.forEach((trickObject) => {
+    if (trickObject.isNonMultiTrick()) {
+      return;
+    }
+
     const trickUsageEntryElement = document.importNode(template.content, true);
     const nameElement = trickUsageEntryElement.querySelector('.trick-usage-entry-name')
     const countElement = trickUsageEntryElement.querySelector('.trick-usage-entry-count')
@@ -83,7 +87,7 @@ function displayTrickUsage(tricksInCombo) {
     countElement.textContent = trickObject.timesUsed
     nameElement.classList.add(getTrickColorClass(trickObject))
 
-    if (shouldColorTrickUsage && !trickObject.isGap()) {
+    if (shouldColorTrickUsage && !trickObject.isDegradeable()) {
       countElement.classList.add(trickObject.timesUsed > 10 && 'text-danger')
     }
 

@@ -1,50 +1,53 @@
 import { isInCreateAPark } from '../game/interGameUtils'
-import { CREATE_A_PARK } from '../utils/constants'
+import { CREATE_A_PARK, GAME_PROCESSES } from '../utils/constants'
 
-let savedCombos
-
-function setSavedCombos(newCombos) {
-  savedCombos = newCombos
+let savedCombos = {
+  [GAME_PROCESSES.THUGPRO]: {},
+  [GAME_PROCESSES.RETHAWED]: {}
 }
 
-function getSavedCombos() {
-  return savedCombos
+function setSavedCombos(game, newCombos) {
+  savedCombos[game] = newCombos
 }
 
-function getAllMapsData() {
-  const savedCombos = getSavedCombos()
+function getSavedCombos(game) {
+  return savedCombos[game]
+}
+
+function getAllMapsData(game) {
+  const savedCombos = getSavedCombos(game)
 
   return savedCombos && savedCombos.allMaps
 }
 
-function getAllMapCategoriesData() {
-  const savedCombos = getSavedCombos()
+function getAllMapCategoriesData(game) {
+  const savedCombos = getSavedCombos(game)
 
   return savedCombos && savedCombos.mapCategories
 }
 
-function getMapCategory(mapScriptName) {
-  const allMapCategories = getAllMapCategoriesData()
+function getMapCategory(game, mapScriptName) {
+  const allMapCategories = getAllMapCategoriesData(game)
 
   return Object
     .keys(allMapCategories)
     .find(mapCategory => allMapCategories[mapCategory][mapScriptName])
 }
 
-function getMapCategoryData(mapCategory) {
-  const mapCategories = getAllMapCategoriesData()
+function getMapCategoryData(game, mapCategory) {
+  const mapCategories = getAllMapCategoriesData(game)
 
   return mapCategories && mapCategories[mapCategory]
 }
 
-function getMapData(mapCategory, mapScriptName) {
-  const mapCategoryData = getMapCategoryData(mapCategory)
+function getMapData(game, mapCategory, mapScriptName) {
+  const mapCategoryData = getMapCategoryData(game, mapCategory)
 
   return mapCategoryData && mapCategoryData[mapScriptName]
 }
 
-function getMapName(mapScriptName) {
-  const allMapCategories = getAllMapCategoriesData()
+function getMapName(game, mapScriptName) {
+  const allMapCategories = getAllMapCategoriesData(game)
   
   if (!allMapCategories) {
     return
@@ -61,8 +64,8 @@ function getMapName(mapScriptName) {
   }
 }
 
-function getMapCategoriesArray() {
-  const allMapCategories = getAllMapCategoriesData()
+function getMapCategoriesArray(game) {
+  const allMapCategories = getAllMapCategoriesData(game)
   return Object.keys(allMapCategories)
 }
 

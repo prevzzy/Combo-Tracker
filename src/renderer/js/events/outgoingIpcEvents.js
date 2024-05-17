@@ -4,11 +4,11 @@ import { ALL_MAPS } from '../utils/constants'
 import { HIGHSCORE_PEEK_TYPES, TOAST_EVENT_TYPES } from '../../../main/events/toastEventTypes'
 import * as SavedCombosService from '../combo/savedCombosService'
 
-export function requestMapHighscoresToast(mapScriptName) {
+export function requestMapHighscoresToast(game, mapScriptName) {
   let payload
 
   if (mapScriptName === ALL_MAPS) {
-    const allMapsData = SavedCombosService.getAllMapsData()
+    const allMapsData = SavedCombosService.getAllMapsData(game)
   
     payload = {
       mapName: allMapsData.name,
@@ -17,15 +17,15 @@ export function requestMapHighscoresToast(mapScriptName) {
       highscoresPeekType: HIGHSCORE_PEEK_TYPES.ALL_MAPS
     }
   } else {
-    const mapCategory = SavedCombosService.getMapCategory(mapScriptName)
+    const mapCategory = SavedCombosService.getMapCategory(game, mapScriptName)
 
     if (!mapCategory) { 
       return
     }
 
     payload = {
-      mapName: SavedCombosService.getMapName(mapScriptName),
-      scores: SavedCombosService.getMapData(mapCategory, mapScriptName).scores,
+      mapName: SavedCombosService.getMapName(game, mapScriptName),
+      scores: SavedCombosService.getMapData(game, mapCategory, mapScriptName).scores,
       shouldDisplayScoreMapName: false,
       highscoresPeekType: HIGHSCORE_PEEK_TYPES.CURRENT_MAP
     }
