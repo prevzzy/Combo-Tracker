@@ -81,10 +81,10 @@ function screenshotMainDisplay(imageName) {
   })
 }
 
-function screenshotLastComboScore(finalScore, comboStartTime, mapScriptName) {
+function screenshotLastComboScore(game, finalScore, comboStartTime, mapScriptName) {
   const fileName = getUniqueComboId(
     finalScore,
-    SavedCombosService.getMapName(mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP,
+    SavedCombosService.getMapName(game, mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP,
     comboStartTime,
   )
   

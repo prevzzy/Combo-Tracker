@@ -17,6 +17,7 @@ import * as MemoryController from '../game/memory'
 import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
+import { getActiveGameProcessName } from '../game/gameProcessService'
 
 let finalScore = null
 let comboStartTime = 0
@@ -36,6 +37,7 @@ let comboTrackingNumbers = {
 }
 let isSuspended = true
 let shouldRunIdleDetector = true
+let game = null
 
 function isComboTrackingSuspended() {
   return isSuspended
@@ -86,7 +88,7 @@ function getComboNumbersData(isIdle) {
   const mainComboData = {
     ...getFinalNumbersData(),
     isIdle,
-    mapName: SavedCombosService.getMapName(mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP
+    mapName: SavedCombosService.getMapName(game, mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP
   }
 
   return {
@@ -126,7 +128,7 @@ function getGraphData() {
   }
 }
 
-function resetComboValues() {
+function resetTracker() {
   finalScore = null
   mapScriptName = null
   comboStartTime = 0
@@ -142,6 +144,7 @@ function resetComboValues() {
     generalComboNumber: null,
     generalBestScoreNumber: null,
   }
+  game = null,
   clearInterval(trackingInterval)
   clearInterval(datasetsUpdatingInterval)
 }
@@ -177,6 +180,7 @@ function displayInProgressInfoWithDelay(lastComboStart) {
 async function startTracking(startTime = Date.now()) {
   comboStartTime = startTime
   mapScriptName = MemoryController.getCurrentMapScript()
+  game = getActiveGameProcessName()
 
   LastComboUI.setNewComboTextDisplay(true)
   displayInProgressInfoWithDelay(comboStartTime)
@@ -195,6 +199,7 @@ function startDatasetUpdating() {
 
 async function track() {
   trackingInterval = setInterval(async () => {
+    console.log(MemoryController.getGrindTime())
     if (isComboInProgress()) {
       updateComboValues()
     } else {
@@ -218,19 +223,20 @@ async function handleComboFinish(isIdle) {
 
   if (!isMapKnown() && !isIdle) {
     await NewMapModalUI.showNewMapModal(
+      game,
       MemoryController.getCurrentMapScript(),
-      async (shouldSaveCombo) => await handlePostComboLogic(isIdle, shouldSaveCombo, false) // shouldSaveCombo means that user submitted new map in modal
+      async (shouldSaveCombo) => await handlePostComboLogic(game, isIdle, shouldSaveCombo, false) // shouldSaveCombo means that user submitted new map in modal
     )
   } else {
-    handlePostComboLogic(isIdle, true, true)
+    handlePostComboLogic(game, isIdle, true, true)
   }
 }
 
 function isMapKnown() {
-  return SavedCombosService.getMapName(mapScriptName) ? true : false
+  return SavedCombosService.getMapName(game, mapScriptName) ? true : false
 }
 
-async function handlePostComboLogic(isIdle, shouldSaveCombo, shouldScreenshotCombo) {
+async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreenshotCombo) {
   if (!isComboBigEnoughToDisplay()) {
     LastComboUI.setLastComboPageInfo(true, 'Something went wrong. Start a new combo.', 1);
     restart()
@@ -247,7 +253,7 @@ async function handlePostComboLogic(isIdle, shouldSaveCombo, shouldScreenshotCom
   }
 
   if (!isIdle && shouldSaveCombo && isComboBigEnoughToSave()) {
-    await handleSavingComboData(comboData, shouldScreenshotCombo)
+    await handleSavingComboData(game, comboData, shouldScreenshotCombo)
   }
 
   LastComboUI.handleLastComboDisplay(
@@ -260,11 +266,12 @@ async function handlePostComboLogic(isIdle, shouldSaveCombo, shouldScreenshotCom
   restart()
 }
 
-async function handleSavingComboData(comboData, shouldScreenshotCombo) {
+async function handleSavingComboData(game, comboData, shouldScreenshotCombo) {
   const finalNumbersData = getFinalNumbersData()
 
   try {
     let comboSaverResponse = await ComboSaver.saveNewCombo(
+      game,
       mapScriptName,
       comboData,
       checkBailedComboCondition()
@@ -281,7 +288,7 @@ async function handleSavingComboData(comboData, shouldScreenshotCombo) {
         comboData.stats.comboTrackingNumbers.generalBestScoreNumber
       )
     ) {
-      screenshotLastComboScore(finalScore, comboStartTime, mapScriptName)
+      screenshotLastComboScore(game, finalScore, comboStartTime, mapScriptName)
     }
   } catch (error) {
     console.error(error)
@@ -295,7 +302,7 @@ function restart() {
 
   LastComboUI.setNewComboTextDisplay(false)
 
-  resetComboValues()
+  resetTracker()
   setTimeout(async () => {
     await listenForComboStart()
   }, 250)
@@ -412,6 +419,10 @@ function updateComboTime(timestamp) {
 }
 
 async function resumeComboTracking() {
+  if (!isSuspended) {
+    return
+  }
+
   shouldSuspendComboTracking(false)
   await listenForComboStart()
   setupGlobalError(false)

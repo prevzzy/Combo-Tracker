@@ -6,7 +6,7 @@ import * as MemoryController from './memory'
 import * as ComboTracker from '../combo/tracker'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
-import { watchActiveMap, setActiveMapData } from '../ui/uiHighscores'
+import { updateActiveMapData, setActiveMapData } from '../ui/uiHighscores'
 
 const supportedGames = [
   GAME_PROCESSES.THUGPRO,
@@ -51,7 +51,6 @@ function openProcess(gameProcessName) {
       if (error) {
         reject(new CustomError(`Could not find THUGPro or reTHAWed process.`, 1));
       } else {
-        console.log('otwieram', processObject.handle, processObject.modBaseAddr, gameProcessName)
         MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
         MemoryController.testInitializedAddresses(gameProcessName)
   
@@ -70,7 +69,12 @@ async function handleHookingToGameProcess(gameProcessName) {
     // openProcess(Number(process.env.GAME_PROCESS_NAME))
 
     log(`openProcess ${gameProcessName} OK`)
-    await ComboTracker.resumeComboTracking();
+
+    if (ComboTracker.isComboTrackingSuspended()) {
+      log('resuming ComboTracker')
+      await ComboTracker.resumeComboTracking()
+    }
+
     return gameProcessName;
   } catch (error) {
     if (!ComboTracker.isComboTrackingSuspended()) {
@@ -96,7 +100,6 @@ async function checkMemoryControllerHealth() {
     log('healthCheck OK')
 
     if (ComboTracker.isComboTrackingSuspended()) {
-      log('resuming ComboTracker')
       await ComboTracker.resumeComboTracking()
     }
   } catch (error) {
@@ -119,7 +122,7 @@ async function mainLoop() {
 async function mainLoopLogic() {
   if (hasActiveGameInstance() && isGameRunning()) {
     await checkMemoryControllerHealth()
-    watchActiveMap()
+    updateActiveMapData(activeGameProcessName)
   } else {
     activeGameProcessName = scanProcessesForSupportedGame()
 
