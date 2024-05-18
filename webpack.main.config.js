@@ -19,5 +19,5 @@ module.exports = {
       path: './.env'
     })
   ],
-  externals: ['electron-overlay-window']
+  // externals: ['electron-overlay-window']
 };

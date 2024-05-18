@@ -8,7 +8,7 @@ initialize()
 
 let mainWindow
 let toastWindow
-let overlayWindow
+// let overlayWindow
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -36,15 +36,15 @@ if (!gotTheLock) {
     ({
       mainWindow,
       toastWindow,
-      overlayWindow,
+      // overlayWindow,
     } = createAppWindows())
 
     await initSettings(mainWindow, toastWindow)
-    initIpcEvents(mainWindow, toastWindow, overlayWindow)
+    initIpcEvents(mainWindow, toastWindow)
 
     mainWindow.on('close', () => {
       toastWindow.close()
-      overlayWindow.close()
+      // overlayWindow.close()
     })
   })
 }
