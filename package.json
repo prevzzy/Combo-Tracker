@@ -42,7 +42,6 @@
     "bootswatch": "4.5.0",
     "chart.js": "2.9.4",
     "dotenv-webpack": "^7.1.0",
-    "electron-overlay-window": "^3.3.0",
     "electron-settings": "^4.0.2",
     "electron-squirrel-startup": "^1.0.0",
     "eslint": "^7.3.0",
