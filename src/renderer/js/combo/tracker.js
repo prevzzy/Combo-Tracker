@@ -199,7 +199,6 @@ function startDatasetUpdating() {
 
 async function track() {
   trackingInterval = setInterval(async () => {
-    console.log(MemoryController.getGrindTime())
     if (isComboInProgress()) {
       updateComboValues()
     } else {

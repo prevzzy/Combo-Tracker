@@ -433,7 +433,10 @@ function appendNewMapToMapCategoryDropdown(mapScriptName, mapName, mapCategoryNa
       mapCategoryElement &&
       categoryNameElement && 
       categoryNameElement.textContent === mapCategoryName
-      ) {
+    ) {
+      if (!mapCategoryElement.lastElementChild.lastElementChild.textContent) {
+        mapCategoryElement.lastElementChild.lastElementChild.remove();
+      }
       mapCategoryElement.lastElementChild.appendChild(createMapCategoryElement(mapCategoryName, mapScriptName, mapName))
       return
     }

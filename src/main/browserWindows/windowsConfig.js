@@ -1,4 +1,4 @@
-import { OVERLAY_WINDOW_OPTS } from "electron-overlay-window"
+// import { OVERLAY_WINDOW_OPTS } from "electron-overlay-window"
 
 export const mainWindowConfig = {
   getBrowserWindowConfig(display) {
@@ -12,7 +12,8 @@ export const mainWindowConfig = {
         nodeIntegration: true,
         contextIsolation: false,
         enableRemoteModule: true,
-        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        backgroundThrottling: false,
       },
     }
   },
@@ -51,22 +52,22 @@ export const toastWindowConfig = {
   preventMultiple: true,
 }
 
-export const overlayWindowConfig = {
-  getBrowserWindowConfig(display) {
-    return {
-      height: 400,
-      width: 300,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-        enableRemoteModule: true,
-        preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
-      },
-      ...OVERLAY_WINDOW_OPTS,
-    }
-  },
-  url: {
-    pathname: OVERLAY_WEBPACK_ENTRY,
-  },
-  preventMultiple: true,
-}
+// export const overlayWindowConfig = {
+//   getBrowserWindowConfig(display) {
+//     return {
+//       height: 400,
+//       width: 300,
+//       webPreferences: {
+//         nodeIntegration: true,
+//         contextIsolation: false,
+//         enableRemoteModule: true,
+//         preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
+//       },
+//       ...OVERLAY_WINDOW_OPTS,
+//     }
+//   },
+//   url: {
+//     pathname: OVERLAY_WEBPACK_ENTRY,
+//   },
+//   preventMultiple: true,
+// }
