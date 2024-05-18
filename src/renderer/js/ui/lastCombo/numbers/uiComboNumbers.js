@@ -3,6 +3,7 @@ import {
   ERROR_STRINGS,
   CREATE_A_PARK,
   GAME_PROCESSES,
+  GAMES,
 } from '../../../utils/constants'
 import { 
   formatTimestamp,
@@ -102,10 +103,10 @@ function displayGameName(game) {
   generalTrackedComboGameNameElement.className = ''
   if (game === GAME_PROCESSES.RETHAWED) {
     generalTrackedComboGameNameElement.classList.add('text-rethawed')
-    generalTrackedComboGameNameElement.textContent = 'reTHAWed'
+    generalTrackedComboGameNameElement.textContent = GAMES.RETHAWED
   } else if (!game || game === GAME_PROCESSES.THUGPRO) {
     generalTrackedComboGameNameElement.classList.add('text-thugpro')
-    generalTrackedComboGameNameElement.textContent = 'THUG Pro'
+    generalTrackedComboGameNameElement.textContent = GAMES.THUGPRO
   }
 }
 

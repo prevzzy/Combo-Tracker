@@ -94,39 +94,39 @@ function testInitializedAddresses(gameProcessName) {
   
   const currentMapScript = getCurrentMapScript()
 
-  log(`
-    gameHandle, ${gameHandle}
-    processBaseAddress, ${processBaseAddress}
-    getGrindTime, ${getGrindTime()}
-    getManualTime, ${getManualTime()}
-    getLipTime, ${getLipTime()}
-    getCurrentMapScript, ${getCurrentMapScript()}
-    getMultiplier,  ${getMultiplier()}
-    getBasePoints,  ${getBasePoints()}
-    getGameScore,  ${getGameScore()}
-    getStateType,  ${getStateType()}
-    getRevertPenalty,  ${getRevertPenalty()}
-    getGrindBalanceArrowPosition, ${getGrindBalanceArrowPosition()}
-    getManualBalanceArrowPosition, ${getManualBalanceArrowPosition()}
-    getLipBalanceArrowPosition, ${getLipBalanceArrowPosition()}
-    getGraffitiTagsCount, ${getGraffitiTagsCount()}
-    getSpecialMeterNumericValue, ${getSpecialMeterNumericValue()}
-    getTrickCount, ${getTrickCount()}
-    `
-  )
+  // log(`
+  //   gameHandle, ${gameHandle}
+  //   processBaseAddress, ${processBaseAddress}
+  //   getGrindTime, ${getGrindTime()}
+  //   getManualTime, ${getManualTime()}
+  //   getLipTime, ${getLipTime()}
+  //   getCurrentMapScript, ${getCurrentMapScript()}
+  //   getMultiplier,  ${getMultiplier()}
+  //   getBasePoints,  ${getBasePoints()}
+  //   getGameScore,  ${getGameScore()}
+  //   getStateType,  ${getStateType()}
+  //   getRevertPenalty,  ${getRevertPenalty()}
+  //   getGrindBalanceArrowPosition, ${getGrindBalanceArrowPosition()}
+  //   getManualBalanceArrowPosition, ${getManualBalanceArrowPosition()}
+  //   getLipBalanceArrowPosition, ${getLipBalanceArrowPosition()}
+  //   getGraffitiTagsCount, ${getGraffitiTagsCount()}
+  //   getSpecialMeterNumericValue, ${getSpecialMeterNumericValue()}
+  //   getTrickCount, ${getTrickCount()}
+  //   `
+  // )
 
-  log(`
-      GrindTimeAddress ${grindTimeAddress.toString(16)}
-      ManualTimeAddress ${manualTimeAddress.toString(16)}
-      LipTimeAddress ${lipTimeAddress.toString(16)}
-      CurrentMapScriptAddress ${getCurrentMapScript()}
-      MultiplierAddress ${multiplierAddress.toString(16)}
-      BasePointsAddress ${basePointsAddress.toString(16)}
-      GameScoreAddress ${gameScoreAddress.toString(16)}
-      StateTypeAddress ${stateTypeAddress.toString(16)}
-      RevertPenaltyAddress ${revertPenaltyAddress.toString(16)}
-    `
-  )
+  // log(`
+  //     GrindTimeAddress ${grindTimeAddress.toString(16)}
+  //     ManualTimeAddress ${manualTimeAddress.toString(16)}
+  //     LipTimeAddress ${lipTimeAddress.toString(16)}
+  //     CurrentMapScriptAddress ${getCurrentMapScript()}
+  //     MultiplierAddress ${multiplierAddress.toString(16)}
+  //     BasePointsAddress ${basePointsAddress.toString(16)}
+  //     GameScoreAddress ${gameScoreAddress.toString(16)}
+  //     StateTypeAddress ${stateTypeAddress.toString(16)}
+  //     RevertPenaltyAddress ${revertPenaltyAddress.toString(16)}
+  //   `
+  // )
 
   const currentMultiplier = getMultiplier()
   const currentBasePoints = getBasePoints()
