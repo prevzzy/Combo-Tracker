@@ -10,9 +10,12 @@ import { mapKeyToAccelerator } from '../utils/hotkeyMapper'
 import * as OverlayUI from './uiOverlay'
 import * as HighscoresUI from './uiHighscores'
 import _ from 'lodash'
+import { GAMES, GAME_PROCESSES } from '../utils/constants'
 
 const settingFields = document.querySelectorAll('.user-setting')
 const pageContainer = document.getElementById('settings-page-container')
+const minimalScoreSelect = document.getElementById('settings-screenshots-minimal-score')
+const gameSelect = document.getElementById('settings-reset-scores-game')
 
 function getSettingFieldsOfType(typeClass) {
   return Array.from(settingFields).filter(field => field.classList.contains(typeClass))
@@ -104,13 +107,6 @@ function initMinimalScoreSelect() {
     1000000000,
   ]
   
-  const minimalScoreSelect = document.getElementById('settings-screenshots-minimal-score')
-  minimalScoreSelect.addEventListener('change', (e) => {
-    requestSettingUpdate({
-      [getSettingNameAttribute(minimalScoreSelect)]: Number(e.target.value)
-    })
-  })
-
   scores.forEach(score => {
     const scoreItem = document.createElement('option')
     scoreItem.className = 'map m-0 border-0'
@@ -124,6 +120,7 @@ function initMinimalScoreSelect() {
 }
 
 function initResetAllModal() {
+  initGameOptionsForResetModal()
   const resetAllInput = document.getElementById('reset-all-scores-input')
   const resetAllConfirmButton = document.getElementById('reset-all-scores-confirm-button')
 
@@ -133,7 +130,8 @@ function initResetAllModal() {
 
   resetAllConfirmButton.addEventListener('click', async (e) => {
     try {
-      await resetHighscores()
+      const game = gameSelect.value;
+      await resetHighscores(game)
       updateResetButtonSectionDisplay(true)
       HighscoresUI.resetMapCategoriesMenu()
     } catch(error) {
@@ -150,6 +148,30 @@ function initResetAllModal() {
     resetAllInput.value = ''
     resetAllConfirmButton.disabled = true
   })
+}
+
+function initGameOptionsForResetModal() {
+  const games = [
+    {
+      value: GAME_PROCESSES.THUGPRO,
+      text: GAMES.THUGPRO
+    },
+    {
+      value: GAME_PROCESSES.RETHAWED,
+      text: GAMES.RETHAWED
+    }
+  ]
+  
+  games.forEach(({ value, text }) => {
+    const gameItem = document.createElement('option')
+    gameItem.className = 'map m-0'
+    gameItem.value = value
+    gameItem.textContent = text
+      
+    gameSelect.appendChild(gameItem) 
+  })
+
+  $('#settings-reset-scores-game').selectpicker('render');
 }
 
 function updateResetButtonSectionDisplay(isResetSuccessful) {

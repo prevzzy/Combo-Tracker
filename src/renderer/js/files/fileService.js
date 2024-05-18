@@ -39,17 +39,21 @@ function readAllHighscoreJsons() {
 }
 
 function readHighscoresJson(game) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (!fs.existsSync(highscoresJsonPaths[game])) {
-      createNewHighscoresJson(game)
-        .catch((error) => {
-          reject(error)
-        })
+      try {
+        log(`no highscores.json for ${game}`)
+        await createNewHighscoresJson(game)
+      } catch(error) {
+        reject(error)
+        return
+      }
     }
 
     fs.readFile(highscoresJsonPaths[game], 'utf8', async (error, data) => {
       if (error) {
         reject(error)
+        return
       }
 
       let parsedData = JSON.parse(data);
@@ -58,7 +62,7 @@ function readHighscoresJson(game) {
         if (correctedData) {
           log('highscore file needed correcting - overriding')
           parsedData = correctedData;
-          saveHighscoresJson(game, correctedData);
+          await saveHighscoresJson(game, correctedData);
         }
       } catch {
         // It's hard to predict all scenarios that can result in throwing an error here, but having an uncorrected highscores file isn't the end of the world anyway. There is no reason to stop the entire application from running, so just catch the error and move on.
@@ -70,6 +74,7 @@ function readHighscoresJson(game) {
         resolve()
       } catch {
         reject(error)
+        return;
       }
     })
   })
