@@ -222,9 +222,11 @@
                           <p class="mb-1">Double grinds </p>
                           <span id="combo-double-grinds"></span>
                         </div>
-                        <div class="d-flex justify-content-between">
-                          <p class="mb-1">Tag limit </p>
-                          <span id="combo-tag-limit"></span>
+                        <div id="combo-tag-limit-stat" >
+                          <div class="d-flex justify-content-between">
+                            <p class="mb-1">Tag limit </p>
+                            <span id="combo-tag-limit"></span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -274,7 +276,7 @@
                       <div class="ml-md-3">
                         <p class="mb-2 display-6 text-secondary">Tracking</p>
                           <div class="d-flex">
-                            <span class="mb-1">This was your <span id="combo-map-tracked-combo" class="text-secondary"></span> tracked combo on <span id="combo-details-map" class="text-secondary"></span> and <span id="combo-general-tracked-combo" class="text-secondary"></span> one in general.</span>
+                            <span class="mb-1">This was your <span id="combo-map-tracked-combo" class="text-secondary"></span> tracked combo on <span id="combo-details-map" class="text-secondary"></span> and <span id="combo-general-tracked-combo" class="text-secondary"></span> one in <span id="combo-general-tracked-combo-game-name"></span>.</span>
                             <span id="combo-tracking-skipped" class="mb-1"></span>
                           </div>
                           <div id="new-combo-date" class="mt-3"></div>
@@ -604,7 +606,7 @@
                 <div class="mt-3">Double grind</div>
                 <div class="text-muted display-8">Two consecutive grinds made on the same object. The game penalizes the player by adding 2 seconds to the grind timer value, making grind balance noticeably faster. When regrinding an object quickly, the grind balance indicator will also drastically change its position.</div>
                 <div class="mt-3">Tag limit</div>
-                <div class="text-muted display-8">Also known as robot line detection. A mechanism with the purpose of penalizing players who use very short lines to get high scores. In a single combo, one object can be grinded exactly 10 times without any penalty. The 11th grind (and every further one) on that object will make the grind balance significantly harder to control. The grind balance indicator will also become unpredictable and appear in different places than it normally should. 2 seconds are added to the grind timer value for the 11th grind, about 3.3 seconds for the 12th grind and 5 seconds for the 13th and every following grind.</div>
+                <div class="text-muted display-8">Exclusive to THUG, THUG2 and THUG Pro. Also known as robot line detection. A mechanism with the purpose of penalizing players who use very short lines to get high scores. In a single combo, one object can be grinded exactly 10 times without any penalty. The 11th grind (and every further one) on that object will make the grind balance significantly harder to control. The grind balance indicator will also become unpredictable and appear in different places than it normally should. 2 seconds are added to the grind timer value for the 11th grind, about 3.3 seconds for the 12th grind and 5 seconds for the 13th and every following grind.</div>
                 <div class="mt-3">Cheese penalty</div>
                 <div class="text-muted display-8">Three or more consecutive manuals without a grind, revert, sticker slap/wallplant or a lip trick in-between. Every time this condition is met, 2 seconds are added to the manual timer value. The penalty doesn't apply to special manuals.</div>
                 <div class="mt-3">Pivot penalty</div>
