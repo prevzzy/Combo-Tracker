@@ -46,7 +46,6 @@ function runCoreLogic(paths) {
       
       await GameProcessService.mainLoop()
 
-      NewMapModalUI.initMapModal()
       HighscoresUI.initHighscoresPage()
     })
     .catch((error) => {

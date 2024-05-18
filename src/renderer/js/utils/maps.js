@@ -46,6 +46,7 @@ export const maps = {
     THP8: {
       shops: 'DOWNTOWN',
       Center: 'CITY CENTER',
+      riod: 'DOWNHILL'
     },
   },
   [GAME_PROCESSES.THUGPRO]: {
