@@ -40,20 +40,20 @@ module.exports = {
                 js: './src/main/preload/preload.js'
               }
             },
-            {
-              html: "./src/renderer/overlay.html",
-              js: "./src/renderer/js/overlay/index.js",
-              name: "overlay",
-              preload: {
-                js: './src/main/preload/preload.js'
-              }
-            },
+            // {
+            //   html: "./src/renderer/overlay.html",
+            //   js: "./src/renderer/js/overlay/index.js",
+            //   name: "overlay",
+            //   preload: {
+            //     js: './src/main/preload/preload.js'
+            //   }
+            // },
           ],
         },
       },
     },
     new ForgeExternalsPlugin({
-      externals: ['electron-overlay-window'],
+      // externals: ['electron-overlay-window'],
     })
   ],
 };
