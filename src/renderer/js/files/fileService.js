@@ -193,8 +193,9 @@ function readSavedComboFile(game, fileName) {
 
   return new Promise((resolve, reject) => {
     fs.readFile(path.join(savedCombosFolderPaths[game], `${fileName}.json`), 'utf8', (error, data) => {
-      if (error) {
+      if (error || !data) {
         reject(error)
+        return
       }
 
       resolve(JSON.parse(data))

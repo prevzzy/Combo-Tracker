@@ -86,6 +86,7 @@ function getComboNumbersData(isIdle) {
   const { grindData, manualData } = getFinalBalanceData()
   const miscData = getMiscData()
   const mainComboData = {
+    game,
     ...getFinalNumbersData(),
     isIdle,
     mapName: SavedCombosService.getMapName(game, mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP

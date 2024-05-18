@@ -549,3 +549,11 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   -webkit-user-select: text;
   user-select: text;
 }
+
+.text-thugpro {
+  color: var(--thugpro-color);
+}
+
+.text-rethawed {
+  color: var(--rethawed-color);
+}
