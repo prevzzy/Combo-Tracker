@@ -5,6 +5,11 @@ export const GAME_PROCESSES = {
   RETHAWED: 'reTHAWed.exe',
 }
 
+export const GAMES = {
+  THUGPRO: 'THUG Pro',
+  RETHAWED: 'reTHAWed',
+}
+
 export const GAME_CONSTANTS = {
   MAX_INT32_VALUE: 2147483647,
   THUGPRO_CAP_SCRIPT: 'sk5ed',
