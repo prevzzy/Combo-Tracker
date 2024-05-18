@@ -23,6 +23,7 @@ function setupAutomaticModalHidingCountdown(closeModalCallback) {
 }
 
 async function showNewMapModal(game, mapScriptName, postComboLogicCallback) {
+  initMapModal(game)
   requestNewMapToast()
 
   document.getElementById('navbar-last-combo').click()
@@ -67,12 +68,10 @@ async function showNewMapModal(game, mapScriptName, postComboLogicCallback) {
   newMapSaveBtn.addEventListener('click', newMapSaveListener)
 }
 
-function initMapModal() {
+function initMapModal(game) {
   timeToModalClose.textContent = `${formatTimestamp(APP_CONFIG_VALUES.HIDE_NEW_MAP_MODAL_TIMELEFT)}`
   const mapCategoryContainer = document.getElementById('new-map-category')
 
-  // todo: tutaj nie wiem
-  const game = GAME_PROCESSES.THUGPRO
   const categories = SavedCombosService.getMapCategoriesArray(game)
   
   categories.forEach(category => {
@@ -85,12 +84,14 @@ function initMapModal() {
   })
 
   $('#new-map-category').selectpicker('render');
+  $('select[name=new-map-category]').val(categories[0])
+  $('#new-map-category').selectpicker('refresh');
 }
 
 async function handleNewMapSubmit(game, mapScriptName, postComboLogicCallback) {
   const mapInput = document.getElementById('new-map-name')
   const categoryInput = document.getElementById('new-map-category')
-  mapInput.value = mapInput.value.trim().replace(/\s+/g, ' ').toUpperCase()
+  const mapName = mapInput.value.trim().replace(/\s+/g, ' ').toUpperCase()
 
   if (!isMapInputValid()) {
     GlobalUI.adjustTextInputUI(
@@ -100,7 +101,7 @@ async function handleNewMapSubmit(game, mapScriptName, postComboLogicCallback) {
       'invalid-map-name',
       `Map name has to be at least 2 characters long and at most ${APP_CONFIG_VALUES.MAX_MAP_NAME_INPUT_LENGTH} characters long.`
     )
-  } else if (!isMapNameUnique(game, categoryInput.value, mapInput.value)) {
+  } else if (!isMapNameUnique(game, categoryInput.value, mapName)) {
     GlobalUI.adjustTextInputUI(
       false,
       mapInput,
@@ -109,9 +110,9 @@ async function handleNewMapSubmit(game, mapScriptName, postComboLogicCallback) {
       `Map with this name already exists in this category.`
     )
   } else {
-    await saveNewMapAlias(game, mapScriptName, mapInput.value, categoryInput.value)
+    await saveNewMapAlias(game, mapScriptName, mapName, categoryInput.value)
 
-    HighscoresUI.appendNewMapToMapCategoryDropdown(mapScriptName, mapInput.value, categoryInput.value)
+    HighscoresUI.appendNewMapToMapCategoryDropdown(mapScriptName, mapName, categoryInput.value)
     postComboLogicCallback(true) // shouldSaveCombo = true
     restartModal()
     clearInterval(timeToModalCloseUpdatingInterval)
@@ -126,18 +127,23 @@ function restartModal () {
   const mapInput = document.getElementById('new-map-name')
 
   document.getElementById('hide-map-modal-button').click()
-  mapInput.value = ''
-  $('select[name=new-map-category]').val('THPS1')
-  $('#new-map-category').selectpicker('refresh')
 
-  const invalidMessageBox = document.getElementById('invalid-map-name')
-
-  if (invalidMessageBox) {
-    invalidMessageBox.remove()
-  }
-
-  mapInput.classList.remove('is-invalid')
-  mapInput.classList.remove('is-valid')
+  // wait for hiding animation to end
+  setTimeout(() => {
+    mapInput.value = ''
+    $('select[name=new-map-category]').val('THPS1')
+    document.getElementById('new-map-category').innerHTML = ''
+    $('#new-map-category').selectpicker('render');
+    
+    const invalidMessageBox = document.getElementById('invalid-map-name')
+  
+    if (invalidMessageBox) {
+      invalidMessageBox.remove()
+    }
+  
+    mapInput.classList.remove('is-invalid')
+    mapInput.classList.remove('is-valid')
+  }, 500)
 }
 
 function isMapInputValid() {
