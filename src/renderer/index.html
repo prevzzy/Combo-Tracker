@@ -387,6 +387,11 @@
                   </div>
                 </div>
               </div>
+              <div id="combo-details-actions-container" class="w-100 mt-3 text-right border-top-primary-dark">
+                <div class="mt-4">
+                  <button id="combo-details-delete-score-button" type="button" class="btn btn-outline-danger">Delete highscore</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -565,13 +570,13 @@
               <div class="modal-body">
                 <div class="mt-2 mb-4 text-center display-6">Do you really want to delete your saved highscores and all the corresponding data?</div>
                 <div class="form-group">
-                  <label for="reset-all-scores-input" class="text-danger col-form-label">Type in "RESET ALL" below.</label>
-                  <input type="text" class="rounded form-control text-light" id="reset-all-scores-input" />
-                </div>
-                <div class="form-group">
                   <label for="settings-reset-scores-game" class="col-form-label">For which game should the scores be deleted?</label>
                   <select id="settings-reset-scores-game" class="w-100 m-0 border-0" name="settings-reset-scores-game" data-style="btn btn-primary form-control bg-primary-dark">
                   </select>
+                </div>
+                <div class="form-group">
+                  <label for="reset-all-scores-input" class="text-danger col-form-label">Type in "RESET ALL" below.</label>
+                  <input type="text" class="rounded form-control text-light" id="reset-all-scores-input" />
                 </div>
                 <div id="reset-all-buttons-1" class="text-center mb-2 mt-4">
                   <button type="button" class="btn btn-primary mr-1" data-dismiss="modal">Cancel</button>
