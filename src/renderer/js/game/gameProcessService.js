@@ -49,7 +49,7 @@ function openProcess(gameProcessName) {
   return new Promise((resolve, reject) => {
     memoryjs.openProcess(gameProcessName, (error, processObject) => {
       if (error) {
-        reject(new CustomError(`Could not find THUGPro or reTHAWed process.`, 1));
+        reject(new CustomError(`Could not find THUG Pro or reTHAWed process.`, 1));
       } else {
         MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
         MemoryController.testInitializedAddresses(gameProcessName)
@@ -78,12 +78,7 @@ async function handleHookingToGameProcess(gameProcessName) {
     return gameProcessName;
   } catch (error) {
     if (!ComboTracker.isComboTrackingSuspended()) {
-      LastComboUI.setLastComboPageInfo(
-        true,
-        'To see combo details do a combo in-game, or click on one of your saved highscores.',
-        3,
-        LastComboUI.hasDisplayedComboDetails()
-      );
+      LastComboUI.displayDefaultComboPageInfo()
     }
 
     ComboTracker.shouldSuspendComboTracking(true)
@@ -127,7 +122,7 @@ async function mainLoopLogic() {
     activeGameProcessName = scanProcessesForSupportedGame()
 
     if (!activeGameProcessName) {
-      setupGlobalError(true, 'Could not find THUGPro or reTHAWed process.', 1);
+      setupGlobalError(true, 'Could not find THUG Pro or reTHAWed process.', 1);
       setActiveMapData()
     }
 
