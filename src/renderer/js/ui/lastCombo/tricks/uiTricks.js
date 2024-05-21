@@ -87,7 +87,7 @@ function displayTrickUsage(tricksInCombo) {
     countElement.textContent = trickObject.timesUsed
     nameElement.classList.add(getTrickColorClass(trickObject))
 
-    if (shouldColorTrickUsage && !trickObject.isDegradeable()) {
+    if (shouldColorTrickUsage && trickObject.isDegradeable()) {
       countElement.classList.add(trickObject.timesUsed > 10 && 'text-danger')
     }
 
