@@ -556,6 +556,7 @@ function initGameSelect() {
 function onGameClick(game) {
   displayedGame = game;
   resetMapCategoriesMenu()
+  highscoresContainerElement.parentElement.scrollTo(0, 0)
 
   const allGames = gameSelect.children
   Array.from(allGames).forEach(gameElement => {

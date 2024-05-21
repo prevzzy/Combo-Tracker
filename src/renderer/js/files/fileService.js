@@ -217,6 +217,7 @@ function deleteSavedComboFile(game, fileName) {
     fs.unlink(path.join(savedCombosFolderPaths[game], `${fileName}.json`), (error) => {
       if (error) {
         reject(error)
+        return;
       }
 
       resolve()
@@ -229,6 +230,7 @@ function deleteAllSavedCombos(game) {
     rimraf(savedCombosFolderPaths[game], error => {
       if (error) {
         reject(error)
+        return;
       }
       resolve()
     })

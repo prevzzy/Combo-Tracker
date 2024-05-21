@@ -38,5 +38,19 @@ export const ERROR_STRINGS = {
   STANDARD_ERROR_TEXT: '???'
 }
 
+export const COMBO_PAGE_INFO_MESSAGES = {
+  HIGHSCORE_DELETE_SUCCESS: 'Highscore deleted.',
+  HIGHSCORE_DELETE_FAILED: 'An error occured deleting your highscore.',
+  TRACKER_IN_PROGRESS: 'Combo in progress...',
+  TRACKER_FAIL: 'Something went wrong. Start a new combo.',
+  TRACKER_READY: `Combo tracking ready. Waiting for combo longer than ${APP_CONFIG_VALUES.MINIMAL_SAVEABLE_COMBO_LENGTH / 1000} seconds...`,
+  TRACKER_NOT_READY: 'To see combo details do a combo in-game, or click on one of your saved highscores.',
+  TRACKER_IDLE: 'Stopped combo tracking due to idle behaviour. Start a new combo.',
+  SAVING_LAST_COMBO: 'Saving last combo...',
+  GENERAL_ERROR: 'Something went wrong...',
+  READING_FILE_FAILED: 'Failed to read combo data.',
+  TRACKER_UNAVAILABLE: 'Combo tracking unavailable.'
+}
+
 export const ALL_MAPS = 'allMaps'
 export const CREATE_A_PARK = 'CREATE-A-PARK'
