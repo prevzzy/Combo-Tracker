@@ -9,6 +9,7 @@ import * as LastComboUI from './ui/lastCombo/uiLastCombo'
 import * as FileService from './files/fileService'
 import { setupGlobalError } from './ui/globalError'
 import { app } from '@electron/remote'
+import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
 
 let isRunning = false
 
@@ -32,12 +33,7 @@ function runCoreLogic(paths) {
   FileService.setSavingPaths(paths)
   FileService.readAllHighscoreJsons()
     .then(async () => {
-      LastComboUI.setLastComboPageInfo(
-        true,
-        'To see combo details do a combo in-game, or click on one of your saved highscores.',
-        3,
-        LastComboUI.hasDisplayedComboDetails()
-      );
+      LastComboUI.displayDefaultComboPageInfo()
 
       isRunning = true
 
@@ -54,7 +50,7 @@ function runCoreLogic(paths) {
 
       LastComboUI.setLastComboPageInfo(
         true,
-        'Combo tracking unavailable.',
+        COMBO_PAGE_INFO_MESSAGES.TRACKER_UNAVAILABLE,
         1,
         false
       )

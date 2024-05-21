@@ -2,6 +2,7 @@ import {
   BALANCE_TIME_VALUES,
   APP_CONFIG_VALUES,
   ERROR_STRINGS,
+  COMBO_PAGE_INFO_MESSAGES,
 } from '../utils/constants'
 import { formatTimestamp } from '../utils/helpers'
 import { Balance } from './balance'
@@ -173,7 +174,8 @@ async function listenForComboStart() {
 function displayInProgressInfoWithDelay(lastComboStart) {
   setTimeout(() => {
     if (comboStartTime === lastComboStart) {
-      LastComboUI.setLastComboPageInfo(true, 'Combo in progress...', 2, false);
+      LastComboUI.setLastComboPageInfo(true, COMBO_PAGE_INFO_MESSAGES.TRACKER_IN_PROGRESS, 2, false);
+      LastComboUI.setNewComboTextDisplay(false)
     }
   }, APP_CONFIG_VALUES.MINIMAL_SAVEABLE_COMBO_LENGTH)
 }
@@ -238,7 +240,7 @@ function isMapKnown() {
 
 async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreenshotCombo) {
   if (!isComboBigEnoughToDisplay()) {
-    LastComboUI.setLastComboPageInfo(true, 'Something went wrong. Start a new combo.', 1);
+    LastComboUI.setLastComboPageInfo(true, COMBO_PAGE_INFO_MESSAGES.TRACKER_FAIL, 1);
     restart()
     return
   }
@@ -426,12 +428,7 @@ async function resumeComboTracking() {
   shouldSuspendComboTracking(false)
   await listenForComboStart()
   setupGlobalError(false)
-  LastComboUI.setLastComboPageInfo(
-    true,
-    `Combo tracking ready. Waiting for combo longer than ${APP_CONFIG_VALUES.MINIMAL_SAVEABLE_COMBO_LENGTH / 1000} seconds...`,
-    2,
-    LastComboUI.hasDisplayedComboDetails()
-  );
+  LastComboUI.displayDefaultComboPageInfo()
 }
 
 export {
@@ -439,4 +436,5 @@ export {
   shouldSuspendComboTracking,
   isComboTrackingSuspended,
   resumeComboTracking,
+  isComboInProgress,
 }

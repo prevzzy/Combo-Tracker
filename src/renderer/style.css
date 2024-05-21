@@ -215,6 +215,10 @@ input:focus, button:focus, textarea:focus, .bootstrap-select:focus, .dropdown a:
   border-bottom: 1px solid var(--primary-dark) !important;
 }
 
+.border-top-primary-dark {
+  border-top: 1px solid var(--primary-dark) !important;
+}
+
 .map {
   background-color: var(--primary-dark) !important;
 }
@@ -539,6 +543,7 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 }
 
 #global-error-close-button {
+  top: 0px;
   position: absolute;
   right: 9px;
   cursor: pointer;

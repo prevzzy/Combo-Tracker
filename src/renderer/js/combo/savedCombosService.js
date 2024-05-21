@@ -69,6 +69,51 @@ function getMapCategoriesArray(game) {
   return Object.keys(allMapCategories)
 }
 
+function deleteHighscoreFromAppSavedCombos(game, highscoreFileName) {
+  const savedCombos = getSavedCombos(game)
+  const allMapsScores = savedCombos.allMaps.scores
+  const oldLowestAllMapsHighscore = allMapsScores[allMapsScores.length - 1]
+  let newLowestAllMapsHighscore
+
+  Object.keys(savedCombos.mapCategories).forEach(mapCategory =>
+    Object.keys(savedCombos.mapCategories[mapCategory]).forEach(mapScriptName => {
+      const { scores } = savedCombos.mapCategories[mapCategory][mapScriptName];
+
+      scores.forEach(scoreData => {
+        const { score } = scoreData
+
+        if (
+          (!newLowestAllMapsHighscore || score > newLowestAllMapsHighscore.score) &&
+          score < oldLowestAllMapsHighscore.score
+        ) {
+          newLowestAllMapsHighscore = scoreData
+        }
+      })
+
+      removeScoreFromScoresArrayByFileName(scores, highscoreFileName)
+    })
+  )
+
+  removeScoreFromScoresArrayByFileName(allMapsScores, highscoreFileName)
+
+  if (newLowestAllMapsHighscore) {
+    allMapsScores[allMapsScores.length] = newLowestAllMapsHighscore
+  }
+
+  return savedCombos
+}
+
+function removeScoreFromScoresArrayByFileName(scores, highscoreFileName) {
+  const scoreToDeleteIndex = scores.findIndex(score =>
+    score.fullDataFileName === highscoreFileName
+  )
+
+  if (scoreToDeleteIndex !== -1) {
+    scores.splice(scoreToDeleteIndex, 1);
+    return true;
+  }
+}
+
 export {
   setSavedCombos,
   getSavedCombos,
@@ -79,4 +124,5 @@ export {
   getMapName,
   getMapCategoriesArray,
   getMapCategory,
+  deleteHighscoreFromAppSavedCombos,
 }
