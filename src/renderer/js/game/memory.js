@@ -92,41 +92,44 @@ function testInitializedAddresses(gameProcessName) {
     })
   }
   
+  const hasValidIntegerAddresses = !isEveryValueInArrayTheSameAndNot0(integerValues)
+  const hasValidFloatAddresses = !isEveryValueInArrayTheSameAndNot0(floatValues)
+
   const currentMapScript = getCurrentMapScript()
 
-  // log(`
-  //   gameHandle, ${gameHandle}
-  //   processBaseAddress, ${processBaseAddress}
-  //   getGrindTime, ${getGrindTime()}
-  //   getManualTime, ${getManualTime()}
-  //   getLipTime, ${getLipTime()}
-  //   getCurrentMapScript, ${getCurrentMapScript()}
-  //   getMultiplier,  ${getMultiplier()}
-  //   getBasePoints,  ${getBasePoints()}
-  //   getGameScore,  ${getGameScore()}
-  //   getStateType,  ${getStateType()}
-  //   getRevertPenalty,  ${getRevertPenalty()}
-  //   getGrindBalanceArrowPosition, ${getGrindBalanceArrowPosition()}
-  //   getManualBalanceArrowPosition, ${getManualBalanceArrowPosition()}
-  //   getLipBalanceArrowPosition, ${getLipBalanceArrowPosition()}
-  //   getGraffitiTagsCount, ${getGraffitiTagsCount()}
-  //   getSpecialMeterNumericValue, ${getSpecialMeterNumericValue()}
-  //   getTrickCount, ${getTrickCount()}
-  //   `
-  // )
+  log(`
+    gameHandle, ${gameHandle}
+    processBaseAddress, ${processBaseAddress}
+    getGrindTime, ${getGrindTime()}
+    getManualTime, ${getManualTime()}
+    getLipTime, ${getLipTime()}
+    getCurrentMapScript, ${getCurrentMapScript()}
+    getMultiplier,  ${getMultiplier()}
+    getBasePoints,  ${getBasePoints()}
+    getGameScore,  ${getGameScore()}
+    getStateType,  ${getStateType()}
+    getRevertPenalty,  ${getRevertPenalty()}
+    getGrindBalanceArrowPosition, ${getGrindBalanceArrowPosition()}
+    getManualBalanceArrowPosition, ${getManualBalanceArrowPosition()}
+    getLipBalanceArrowPosition, ${getLipBalanceArrowPosition()}
+    getGraffitiTagsCount, ${getGraffitiTagsCount()}
+    getSpecialMeterNumericValue, ${getSpecialMeterNumericValue()}
+    getTrickCount, ${getTrickCount()}
+    `
+  )
 
-  // log(`
-  //     GrindTimeAddress ${grindTimeAddress.toString(16)}
-  //     ManualTimeAddress ${manualTimeAddress.toString(16)}
-  //     LipTimeAddress ${lipTimeAddress.toString(16)}
-  //     CurrentMapScriptAddress ${getCurrentMapScript()}
-  //     MultiplierAddress ${multiplierAddress.toString(16)}
-  //     BasePointsAddress ${basePointsAddress.toString(16)}
-  //     GameScoreAddress ${gameScoreAddress.toString(16)}
-  //     StateTypeAddress ${stateTypeAddress.toString(16)}
-  //     RevertPenaltyAddress ${revertPenaltyAddress.toString(16)}
-  //   `
-  // )
+  log(`
+      GrindTimeAddress ${grindTimeAddress.toString(16)}
+      ManualTimeAddress ${manualTimeAddress.toString(16)}
+      LipTimeAddress ${lipTimeAddress.toString(16)}
+      CurrentMapScriptAddress ${getCurrentMapScript()}
+      MultiplierAddress ${multiplierAddress.toString(16)}
+      BasePointsAddress ${basePointsAddress.toString(16)}
+      GameScoreAddress ${gameScoreAddress.toString(16)}
+      StateTypeAddress ${stateTypeAddress.toString(16)}
+      RevertPenaltyAddress ${revertPenaltyAddress.toString(16)}
+    `
+  )
 
   const currentMultiplier = getMultiplier()
   const currentBasePoints = getBasePoints()
@@ -150,15 +153,15 @@ function testInitializedAddresses(gameProcessName) {
   if (
     currentMapScript === '' || 
     isInMainMenu(currentMapScript) &&
-    (isEveryValueInArrayTheSameAndNot0(floatValues) &&
-    isEveryValueInArrayTheSameAndNot0(integerValues) ||
+    (!hasValidFloatAddresses &&
+    !hasValidIntegerAddresses ||
     lipTimeAddress === lipTimeAddressData[gameProcessName].offsets[0])
   ) {
     throw new CustomError('Game loading...', 2)
   }
 
-  if (currentMultiplier === 0 && isEveryValueInArrayTheSameAndNot0(floatValues)) {
-    throw new CustomError('Exit observing mode to start combo tracking.', 1)
+  if (currentMultiplier === 0 && !hasValidIntegerAddresses && currentMapScript && !isInMainMenu(currentMapScript)) {
+    throw new CustomError('Exit observer mode to start combo tracking.', 1)
   }
 
   if (
@@ -166,9 +169,10 @@ function testInitializedAddresses(gameProcessName) {
       (currentBasePoints === 0 && currentMultiplier !== 0 && gameScore === 0) ||
       (currentMultiplier % 1 !== 0 && currentMultiplier % 1 !== 0.5)
     ) ||
-    (isEveryValueInArrayTheSameAndNot0(floatValues) && isEveryValueInArrayTheSameAndNot0(integerValues))
+    !hasValidFloatAddresses ||
+    !hasValidIntegerAddresses
   ) {
-    throw new CustomError('An error occured when reading combo values. Please restart Combo Tracker and THUGPRO.', 1)
+    throw new CustomError('An error occured when reading game data. Reinitializing. Restart the game if the problem persists.', 1)
   }
 }
 
