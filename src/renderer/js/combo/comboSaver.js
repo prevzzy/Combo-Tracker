@@ -96,7 +96,7 @@ function handleComboSavingLogic(
   mapData.timeSpent = getTimeSpentValue(mapData, comboData.stats.mainComboData.comboTime)
 
   if (hasPassedBailedComboCondition && isNewScoreWorthSaving(mapData.scores, score)) {
-    fullDataFileName = getUniqueComboId(score, comboData.stats.mainComboData.mapName)
+    fullDataFileName = getUniqueComboId(game, score, comboData.stats.mainComboData.mapName)
     mapData.scores = saveNewComboToScoresArray(
       game,
       [...mapData.scores],

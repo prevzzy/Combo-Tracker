@@ -4,6 +4,7 @@ import { getSetting, setSetting, restoreDefaultSettings } from '../settings/sett
 import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
+import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -138,4 +139,10 @@ export async function onRestartSettingsRequest(mainWindow) {
       updateKeyboardShortcut(key, settings[key], mainWindow)
     }
   })
+}
+
+export async function onGetPrimaryDisplayIdRequest() {
+  const primaryDisplayId = await getPrimaryDisplayId();
+  
+  return primaryDisplayId
 }
