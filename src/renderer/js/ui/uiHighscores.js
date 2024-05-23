@@ -486,17 +486,22 @@ function updateActiveMapData() {
     return;
   }
 
-  const activeMapName = SavedCombosService.getMapName(displayedGame, MemoryController.getCurrentMapScript())
-  const activeCategoryName = SavedCombosService.getMapCategory(displayedGame, MemoryController.getCurrentMapScript())
-
-  if (
-    activeMapData.mapName !== activeMapName ||
-    activeMapData.categoryName !== activeCategoryName
-  ) {
-    setActiveMapData()
-    if (activeMapName && activeCategoryName) {
-      setupActiveMapIcons(displayedGame, activeMapName, activeCategoryName)
+  // if you get the timing right and click a game right after the game is closed, gameProcessService might not update activeGame fast enough and MemoryController can throw an exception here
+  try {
+    const activeMapName = SavedCombosService.getMapName(displayedGame, MemoryController.getCurrentMapScript())
+    const activeCategoryName = SavedCombosService.getMapCategory(displayedGame, MemoryController.getCurrentMapScript())
+  
+    if (
+      activeMapData.mapName !== activeMapName ||
+      activeMapData.categoryName !== activeCategoryName
+    ) {
+      setActiveMapData()
+      if (activeMapName && activeCategoryName) {
+        setupActiveMapIcons(displayedGame, activeMapName, activeCategoryName)
+      }
     }
+  } catch(error) {
+    console.error(error)
   }
 }
 
