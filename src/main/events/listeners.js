@@ -4,6 +4,7 @@ import {
   onGetSettingRequest,
   onSetSettingRequest,
   onRestartSettingsRequest,
+  onGetPrimaryDisplayIdRequest,
 } from './ipcEventHandlers'
 // import { OverlayController } from 'electron-overlay-window'
 
@@ -37,6 +38,11 @@ export function initIpcEvents(mainWindow, toastWindow) {
 
   ipcMain.on('request-app-fullscreen', () => {
     mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
+  })
+
+  ipcMain.handle('get-primary-display-id-request', async (event, arg) => {
+    const displayId = await onGetPrimaryDisplayIdRequest()
+    return displayId
   })
 
   ipcMain.on('host-server-request', (event, arg) => {

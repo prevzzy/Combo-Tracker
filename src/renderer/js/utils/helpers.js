@@ -1,4 +1,4 @@
-import { ERROR_STRINGS } from './constants'
+import { ERROR_STRINGS, GAME_PROCESSES } from './constants'
 
 export function formatTimestamp(timestamp) {
   if (!Number.isInteger(timestamp)) {
@@ -67,11 +67,13 @@ export function getNumberWithOrdinal(n) {
   return ERROR_STRINGS.STANDARD_ERROR_TEXT
 }
 
-export function getUniqueComboId(finalScore, mapName, comboStartTime) {
+export function getUniqueComboId(game, finalScore, mapName, comboStartTime) {
+  let gameName = game.replace('.exe', '');
+
   const date = new Date(Date.now() || comboStartTime)
   const day = date.toISOString().split('T')[0]
   const time = date.toLocaleTimeString().replace(/:/g, '-')
   const mapNameCleared = mapName.match(/[a-zA-Z0-9\s]/g).join('')
   const score = finalScore || ''
-  return `${mapNameCleared} ${score} - ${day} ${time}`
+  return `${gameName} ${mapNameCleared} ${score} - ${day} ${time}`
 }

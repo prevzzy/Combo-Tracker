@@ -91,6 +91,11 @@ export function requestAppExit() {
   ipcRenderer.send('request-app-exit')
 }
 
+export async function requestPrimaryDisplayId() {
+  const response = await ipcRenderer.invoke('get-primary-display-id-request')
+  return response;
+}
+
 export function requestServerHosting(username) {
   ipcRenderer.send('host-server-request', { username });
 }
