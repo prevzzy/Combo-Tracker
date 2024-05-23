@@ -106,6 +106,13 @@ function initMinimalScoreSelect() {
     500000000,
     1000000000,
   ]
+
+  const minimalScoreSelect = document.getElementById('settings-screenshots-minimal-score')
+  minimalScoreSelect.addEventListener('change', (e) => {
+    requestSettingUpdate({
+      [getSettingNameAttribute(minimalScoreSelect)]: Number(e.target.value)
+    })
+  })
   
   scores.forEach(score => {
     const scoreItem = document.createElement('option')
