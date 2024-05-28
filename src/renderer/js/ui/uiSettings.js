@@ -14,7 +14,6 @@ import { GAMES, GAME_PROCESSES } from '../utils/constants'
 
 const settingFields = document.querySelectorAll('.user-setting')
 const pageContainer = document.getElementById('settings-page-container')
-const minimalScoreSelect = document.getElementById('settings-screenshots-minimal-score')
 const gameSelect = document.getElementById('settings-reset-scores-game')
 
 function getSettingFieldsOfType(typeClass) {
