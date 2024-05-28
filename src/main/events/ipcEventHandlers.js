@@ -1,4 +1,3 @@
-import { globalShortcut } from 'electron'
 import { TOASTS_CONFIG } from '../utils/constants'
 import { getSetting, setSetting, restoreDefaultSettings } from '../settings/settings'
 import { SETTINGS_STRINGS } from '../settings/defaultSettings'
@@ -8,11 +7,6 @@ import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
-
-export const shortcutCallbacks = new Map([
-  [SETTINGS_STRINGS.MAP_TOP_SCORES_HOTKEY, onCurrentMapHighscoresShortcut],
-  [SETTINGS_STRINGS.ALL_TOP_SCORES_HOTKEY, onAllMapsHighscoresShortcut],
-])
 
 function hideToastAfterTimeout(toastWindow) {
   toastClosingTimeoutId = setTimeout(() => {
@@ -78,67 +72,17 @@ export async function onGetSettingRequest(event, arg, mainWindow) {
   mainWindow.webContents.send('settings-request-response', settings)
 }
 
-export async function onSetSettingRequest(event, arg, mainWindow) {
+export function onSetSettingRequest(event, arg, mainWindow) {
   const { settingsToUpdate } = arg.payload
-  
-  let shortcutsToUpdate = {}
-  Object.keys(settingsToUpdate).forEach((key) => {
-    if (!!shortcutCallbacks.get(key)) {
-      shortcutsToUpdate = {
-        ...shortcutsToUpdate,
-        [key]: settingsToUpdate[key]
-      }
-    }
-  })
 
-  if (Object.keys(shortcutsToUpdate).length) {
-    await handleShortcutsUpdate(shortcutsToUpdate, mainWindow)
-  }
-
-  await setSetting(settingsToUpdate)
-}
-
-function onAllMapsHighscoresShortcut(mainWindow) {
-  mainWindow.webContents.send('display-all-maps-highscores')
-}
-
-function onCurrentMapHighscoresShortcut(mainWindow) {
-  mainWindow.webContents.send('display-current-map-highscores')
-}
-
-async function handleShortcutsUpdate(shortcutsToUpdate, mainWindow) {
-  for (const key in shortcutsToUpdate) {
-    const oldHotkey = await getSetting(key)
-    globalShortcut.unregister(oldHotkey)
-  }
-  
-  Object.keys(shortcutsToUpdate).forEach(async (key) => {
-    updateKeyboardShortcut(key, shortcutsToUpdate[key], mainWindow)
-  })
-}
-
-function updateKeyboardShortcut(hotkeyName, newValue, mainWindow) {
-  if (newValue) {
-    try {
-      globalShortcut.register(newValue, () => {
-        shortcutCallbacks.get(hotkeyName)(mainWindow)
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  setSetting(mainWindow, settingsToUpdate)
 }
 
 export async function onRestartSettingsRequest(mainWindow) {
-  await restoreDefaultSettings()
+  await restoreDefaultSettings(mainWindow)
   const settings = await getSetting()
-  mainWindow.webContents.send('settings-request-response', settings)
 
-  Object.keys(settings).forEach(async (key) => {
-    if (!!shortcutCallbacks.get(key)) {
-      updateKeyboardShortcut(key, settings[key], mainWindow)
-    }
-  })
+  mainWindow.webContents.send('settings-request-response', settings)
 }
 
 export async function onGetPrimaryDisplayIdRequest() {

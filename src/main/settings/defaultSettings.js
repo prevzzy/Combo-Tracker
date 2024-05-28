@@ -1,17 +1,24 @@
 import path from 'path'
 import { app } from 'electron'
 
+export const SHORTCUT_SETTING_NAMES = {
+  ALL_TOP_SCORES_HOTKEY: 'all-top-scores-hotkey',
+  MAP_TOP_SCORES_HOTKEY: 'map-top-scores-hotkey',
+}
+
 export const SETTINGS_STRINGS = {
+  LAUNCH_AT_STARTUP: 'launch-at-startup',
   ALLOW_BAILED_COMBOS: 'allow-bailed-combos',
   ENABLE_TOASTS: 'enable-toasts',
   ENABLE_SCREENSHOTS: 'enable-screenshots',
   SCREENSHOTS_MINIMAL_SCORE: 'screenshots-minimal-score',
   SCREENSHOTS_PATH: 'screenshots-path',
   ALL_TOP_SCORES_HOTKEY: 'all-top-scores-hotkey',
-  MAP_TOP_SCORES_HOTKEY: 'map-top-scores-hotkey'
+  MAP_TOP_SCORES_HOTKEY: 'map-top-scores-hotkey',
 }
 
 export const defaultSettings = {
+  [SETTINGS_STRINGS.LAUNCH_AT_STARTUP]: false,
   [SETTINGS_STRINGS.ALLOW_BAILED_COMBOS]: true,
   [SETTINGS_STRINGS.ENABLE_TOASTS]: true,
   [SETTINGS_STRINGS.ENABLE_SCREENSHOTS]: true,
