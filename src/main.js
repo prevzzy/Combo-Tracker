@@ -3,11 +3,14 @@ import { initIpcEvents } from './main/events/listeners'
 import { createAppWindows } from './main/browserWindows/browserWindows'
 import { initSettings } from './main/settings/settings'
 import { initialize } from '@electron/remote/main';
+import { initTray } from './main/tray/tray';
+import { startMinimized } from './main/autoLaunch/autoLaunch';
 
 initialize()
 
 let mainWindow
 let toastWindow
+let isQuitting = false;
 // let overlayWindow
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -21,12 +24,11 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on('second-instance', () => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore()
-      }
+      mainWindow.show()
+      mainWindow.restore()
       mainWindow.focus()
     }
   })
@@ -42,10 +44,23 @@ if (!gotTheLock) {
     await initSettings(mainWindow, toastWindow)
     initIpcEvents(mainWindow, toastWindow)
 
-    mainWindow.on('close', () => {
-      toastWindow.close()
-      // overlayWindow.close()
+    mainWindow.on('close', (event) => {
+      if (!isQuitting) {
+        event.preventDefault();
+        mainWindow.hide();
+        toastWindow.hide()
+      }
     })
+
+    mainWindow.on('ready-to-show', () => {
+      if (!startMinimized()) {
+        mainWindow.show()
+        mainWindow.restore()
+        mainWindow.focus()
+      }
+    })
+
+    initTray(mainWindow, toastWindow)
   })
 }
 
@@ -53,8 +68,14 @@ app.on('browser-window-created', (_, window) => {
   require("@electron/remote/main").enable(window.webContents)
 })
 
+app.on('before-quit', () => {
+  isQuitting = true;
+})
+
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
+  mainWindow.destroy();
+  toastWindow.destroy();
 })
 
 app.on('window-all-closed', () => {
