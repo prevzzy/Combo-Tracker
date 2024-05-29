@@ -7,6 +7,7 @@ export const mainWindowConfig = {
       height: 768,
       minWidth: 600,
       minHeight: 500,
+      show: false,
       frame: process.env.APP_MODE === 'DEBUG',
       webPreferences: {
         nodeIntegration: true,
@@ -14,13 +15,13 @@ export const mainWindowConfig = {
         enableRemoteModule: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         backgroundThrottling: false,
+        devTools: false
       },
     }
   },
   url: {
     pathname: MAIN_WINDOW_WEBPACK_ENTRY,
   },
-  showOnAppLaunch: true,
   preventMultiple: true,
 }
 
@@ -43,6 +44,7 @@ export const toastWindowConfig = {
         contextIsolation: false,
         enableRemoteModule: true,
         preload: TOAST_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        devTools: false
       },
     }
   },
@@ -62,6 +64,7 @@ export const toastWindowConfig = {
 //         contextIsolation: false,
 //         enableRemoteModule: true,
 //         preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
+//         devTools: false
 //       },
 //       ...OVERLAY_WINDOW_OPTS,
 //     }
