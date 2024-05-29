@@ -4,6 +4,7 @@ import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
+import { app } from 'electron'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -89,4 +90,15 @@ export async function onGetPrimaryDisplayIdRequest() {
   const primaryDisplayId = await getPrimaryDisplayId();
   
   return primaryDisplayId
+}
+
+export async function onRequestAppExit(event, arg, mainWindow, toastWindow) {
+  const shouldQuit = await getSetting(SETTINGS_STRINGS.CLOSE_ON_X_CLICK)
+
+  if (shouldQuit) {
+    app.quit();
+  } else {
+    mainWindow.hide();
+    toastWindow.hide();
+  }
 }

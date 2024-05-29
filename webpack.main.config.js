@@ -1,4 +1,5 @@
 const DotEnv = require('dotenv-webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   /**
@@ -17,6 +18,11 @@ module.exports = {
   plugins: [
     new DotEnv({
       path: './.env'
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: './src/static' }
+      ]
     })
   ],
   // externals: ['electron-overlay-window']

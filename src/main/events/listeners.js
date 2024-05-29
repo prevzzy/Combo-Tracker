@@ -5,6 +5,7 @@ import {
   onSetSettingRequest,
   onRestartSettingsRequest,
   onGetPrimaryDisplayIdRequest,
+  onRequestAppExit
 } from './ipcEventHandlers'
 // import { OverlayController } from 'electron-overlay-window'
 
@@ -79,7 +80,7 @@ export function initIpcEvents(mainWindow, toastWindow) {
   //   )
   // })
 
-  ipcMain.on('request-app-exit', () => {
-    app.quit()
+  ipcMain.on('request-app-exit', (event, arg) => {
+    onRequestAppExit(event, arg, mainWindow, toastWindow)
   })
 }
