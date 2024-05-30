@@ -1,5 +1,6 @@
 import { app, Menu, Tray } from 'electron'
 import path from 'path'
+import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows';
 
 function getShowHideItem(mainWindow) {
   return mainWindow.isVisible()
@@ -7,7 +8,7 @@ function getShowHideItem(mainWindow) {
     : { label: 'Show', click: () => mainWindow.show() }
 }
 
-function getContextMenu(mainWindow, toastWindow) {
+function getContextMenu(mainWindow) {
   return Menu.buildFromTemplate([
     getShowHideItem(mainWindow),
     { label: 'Quit', click: function() {
@@ -16,8 +17,8 @@ function getContextMenu(mainWindow, toastWindow) {
   ])
 }
 
-function setTrayContextMenu(tray, mainWindow, toastWindow) {
-  tray.setContextMenu(getContextMenu(mainWindow, toastWindow))
+function setTrayContextMenu(tray, mainWindow) {
+  tray.setContextMenu(getContextMenu(mainWindow))
 }
 
 function createTray(mainWindow) {
@@ -33,9 +34,11 @@ function createTray(mainWindow) {
   return tray;
 }
 
-export function initTray(mainWindow, toastWindow) {
+export function initTray() {
+  const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
+
   const tray = createTray(mainWindow)
-  const setTray = () => setTrayContextMenu(tray, mainWindow, toastWindow)
+  const setTray = () => setTrayContextMenu(tray, mainWindow)
   
   mainWindow.on('hide', setTray)
   mainWindow.on('show', setTray)

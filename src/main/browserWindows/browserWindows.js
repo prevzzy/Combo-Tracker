@@ -1,7 +1,37 @@
 
 import url from 'url';
-import electron, { BrowserWindow, globalShortcut } from 'electron';
-import { mainWindowConfig, toastWindowConfig } from './windowsConfig';
+import electron, { BrowserWindow } from 'electron';
+import { mainWindowConfig, stickyWindowConfig, toastWindowConfig } from './windowsConfig';
+import { startMinimized } from '../autoLaunch/autoLaunch';
+import { isAppQuitting } from '../appService/appService';
+
+let mainWindow
+let toastWindow
+let stickyWindow
+
+export const APP_WINDOW_NAMES = {
+  MAIN: 'MAIN',
+  TOAST: 'TOAST',
+  STICKY: 'STICKY'
+}
+
+export function getAppWindow(name) {
+  switch (name) {
+    case APP_WINDOW_NAMES.MAIN:
+      return mainWindow;
+    case APP_WINDOW_NAMES.TOAST:
+      return toastWindow;
+    case APP_WINDOW_NAMES.STICKY:
+      return stickyWindow;
+    default: 
+      console.error(`Could not find '${name}' window`)
+      return;
+  }
+}
+
+export function getAllAppWindowsArray() {
+  return BrowserWindow.getAllWindows()
+}
 
 function createBrowserWindow(config) {
   // needed for relative window position
@@ -26,17 +56,32 @@ function createBrowserWindow(config) {
 }
 
 export function createAppWindows() {
-  const mainWindow = createBrowserWindow(mainWindowConfig)
-  const toastWindow = createBrowserWindow(toastWindowConfig)
+  mainWindow = createBrowserWindow(mainWindowConfig)
+  toastWindow = createBrowserWindow(toastWindowConfig)
+  stickyWindow = createBrowserWindow(stickyWindowConfig)
   // const overlayWindow = createBrowserWindow(overlayWindowConfig)
 
+  
   // makeDemoInteractive(overlayWindow)
+  setupWindowEventHandlers()
+}
 
-  return {
-    mainWindow,
-    toastWindow,
-    // overlayWindow,
-  }
+function setupWindowEventHandlers() {
+  mainWindow.on('close', (event) => {
+    if (!isAppQuitting()) {
+      event.preventDefault();
+      mainWindow.hide();
+      toastWindow.hide()
+    }
+  })
+
+  mainWindow.on('ready-to-show', () => {
+    if (!startMinimized()) {
+      mainWindow.show()
+      mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
 }
 
 // function makeDemoInteractive(window) {

@@ -5,17 +5,19 @@ import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 import { app } from 'electron'
+import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow } from '../browserWindows/browserWindows'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
 
-function hideToastAfterTimeout(toastWindow) {
+function hideToastAfterTimeout() {
   toastClosingTimeoutId = setTimeout(() => {
-    hideToast(toastWindow)
+    hideToast()
   }, TOASTS_CONFIG.CLOSE_TIMEOUT)
 }
 
-function hideToast(toastWindow) {
+function hideToast() {
+  const toastWindow = getAppWindow(APP_WINDOW_NAMES.TOAST)
   toastWindow.webContents.send('hide-toast', toastWindow.getBounds().width)
 
   setTimeout(() => {
@@ -26,7 +28,9 @@ function hideToast(toastWindow) {
   }, 200)
 }
 
-export async function onDisplayToastRequest(event, arg, toastWindow) {
+export async function onDisplayToastRequest(event, arg) {
+  const toastWindow = getAppWindow(APP_WINDOW_NAMES.TOAST)
+
   if (isToastTypeSettingsDependant(arg.toastEventType)) {
     const shouldShowToast = await getSetting(SETTINGS_STRINGS.ENABLE_TOASTS)
 
@@ -58,31 +62,33 @@ export async function onDisplayToastRequest(event, arg, toastWindow) {
     arg.payload.highscoresPeekType &&
     currentlyDisplayedHighscores === arg.payload.highscoresPeekType
   ) {
-    hideToast(toastWindow)
+    hideToast()
   } else {
     toastWindow.webContents.send('display-toast', arg)
-    hideToastAfterTimeout(toastWindow)
+    hideToastAfterTimeout()
     currentlyDisplayedHighscores = arg.payload.highscoresPeekType
   }
 }
 
-export async function onGetSettingRequest(event, arg, mainWindow) {
+export async function onGetSettingRequest(event, arg) {
   const { key } = arg.payload
   const settings = await getSetting(key)
+  const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
 
   mainWindow.webContents.send('settings-request-response', settings)
 }
 
-export function onSetSettingRequest(event, arg, mainWindow) {
+export function onSetSettingRequest(event, arg) {
   const { settingsToUpdate } = arg.payload
 
-  setSetting(mainWindow, settingsToUpdate)
+  setSetting(settingsToUpdate)
 }
 
-export async function onRestartSettingsRequest(mainWindow) {
-  await restoreDefaultSettings(mainWindow)
+export async function onRestartSettingsRequest() {
+  await restoreDefaultSettings()
   const settings = await getSetting()
-
+  const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
+  
   mainWindow.webContents.send('settings-request-response', settings)
 }
 
@@ -92,13 +98,16 @@ export async function onGetPrimaryDisplayIdRequest() {
   return primaryDisplayId
 }
 
-export async function onRequestAppExit(event, arg, mainWindow, toastWindow) {
+export async function onRequestAppExit(event, arg) {
+  const allWindows = getAllAppWindowsArray();
   const shouldQuit = await getSetting(SETTINGS_STRINGS.CLOSE_ON_X_CLICK)
 
   if (shouldQuit) {
     app.quit();
   } else {
-    mainWindow.hide();
-    toastWindow.hide();
+    allWindows.forEach(window => {
+      window.hide();
+      window.hide();
+    })
   }
 }
