@@ -11,6 +11,20 @@ electronSettings.configure({
   numSpaces: 2,
 })
 
+async function setDefaultValuesToSettingsMissingInJson() {
+  const missingSettings = {}
+
+  for (const key in defaultSettings) {
+    if (!electronSettings.hasSync(key)) {
+      missingSettings[key] = defaultSettings[key]
+    }
+  }
+
+  if (Object.keys(missingSettings).length !== 0) {
+    await setSetting(missingSettings)
+  }
+}
+
 function isSettingsJsonValid() {
   if (!fs.existsSync(electronSettings.file())) {
     return false
@@ -20,12 +34,6 @@ function isSettingsJsonValid() {
     JSON.parse(fs.readFileSync(electronSettings.file(), 'utf8'))
   } catch (error) {
     return false
-  }
-
-  for (const key in defaultSettings) {
-    if (!electronSettings.hasSync(key)) {
-      return false
-    }
   }
 
   if (!fs.existsSync(electronSettings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH))) {
@@ -46,18 +54,19 @@ function isSettingsJsonValid() {
   return true
 }
 
-export async function initSettings(mainWindow, toastWindow) {
+export async function initSettings() {
   try {
     let settings = defaultSettings
+    
     if (!isSettingsJsonValid()) {
       fs.writeFileSync(electronSettings.file(), JSON.stringify(defaultSettings, null, 2))
-    } else {
-      await syncAutoLaunchValueWithSystem()
-
-      settings = await getSetting()
     }
     
-    await runSettingChangeHandlers(mainWindow, settings);
+    await setDefaultValuesToSettingsMissingInJson()
+    await syncAutoLaunchValueWithSystem()
+    settings = await getSetting()
+  
+    await runSettingChangeHandlers(settings);
   } catch (error) {
     console.error(error)
   }
@@ -77,7 +86,7 @@ function createDefaultScreenshotsFolder() {
   }
 }
 
-export async function runSettingChangeHandlers(mainWindow, settingsToUpdate) {
+export async function runSettingChangeHandlers(settingsToUpdate) {
   const settingKeys = Object.keys(settingsToUpdate)
   const shortcutsToUpdate = settingKeys.filter(key =>
     Object.values(SHORTCUT_SETTING_NAMES).some(shortcutSettingName =>
@@ -94,7 +103,7 @@ export async function runSettingChangeHandlers(mainWindow, settingsToUpdate) {
 
     if (!!handler) {
       try {
-        await handler(mainWindow, key, settingsToUpdate[key])
+        await handler(key, settingsToUpdate[key])
       } catch(error) {
         console.error(error)
       }
@@ -102,8 +111,8 @@ export async function runSettingChangeHandlers(mainWindow, settingsToUpdate) {
   }
 }
 
-export async function setSetting(mainWindow, newSettings) {
-  await runSettingChangeHandlers(mainWindow, newSettings);
+export async function setSetting(newSettings) {
+  await runSettingChangeHandlers(newSettings);
   
   const currentSettings = await electronSettings.get()
   
@@ -129,8 +138,8 @@ export function getSetting(key) {
   return setting
 }
 
-export async function restoreDefaultSettings(mainWindow) {
-  await runSettingChangeHandlers(mainWindow, defaultSettings)
+export async function restoreDefaultSettings() {
+  await runSettingChangeHandlers(defaultSettings)
   await electronSettings.set(defaultSettings)
 }
 
@@ -140,7 +149,7 @@ async function syncAutoLaunchValueWithSystem() {
     const appSetting = await getSetting(SETTINGS_STRINGS.LAUNCH_AT_STARTUP);
 
     if (appSetting !== systemSetting) {
-      await setSetting(null, systemSetting)
+      await setSetting(systemSetting)
     }
   } catch(error) {
     console.error(error)
