@@ -70,6 +70,16 @@ export async function onDisplayToastRequest(event, arg) {
   }
 }
 
+export function onDisplayStickyWindowRequest() {
+  const stickyWindow = getAppWindow(APP_WINDOW_NAMES.STICKY)
+
+  if (stickyWindow.isVisible() && !stickyWindow.isMinimized()) {
+    stickyWindow.hide()
+  } else {
+    stickyWindow.showInactive()
+  }
+}
+
 export async function onGetSettingRequest(event, arg) {
   const { key } = arg.payload
   const settings = await getSetting(key)
@@ -107,7 +117,16 @@ export async function onRequestAppExit(event, arg) {
   } else {
     allWindows.forEach(window => {
       window.hide();
-      window.hide();
     })
   }
+}
+
+export function onSendBalanceToStickyTimersRequest(event, arg) {
+  const stickyWindow = getAppWindow(APP_WINDOW_NAMES.STICKY);
+  stickyWindow.webContents.send('update-balance-timers', arg)
+}
+
+export function onStickyWindowVisibilityChange(isVisible) {
+  const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN);
+  mainWindow.webContents.send('sticky-window-visibility-change', isVisible)
 }

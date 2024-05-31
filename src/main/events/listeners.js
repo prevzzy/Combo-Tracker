@@ -5,7 +5,8 @@ import {
   onSetSettingRequest,
   onRestartSettingsRequest,
   onGetPrimaryDisplayIdRequest,
-  onRequestAppExit
+  onRequestAppExit,
+  onSendBalanceToStickyTimersRequest
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
 // import { OverlayController } from 'electron-overlay-window'
@@ -44,6 +45,10 @@ export function initIpcEvents() {
   ipcMain.on('request-app-fullscreen', () => {
     const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
     mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
+  })
+
+  ipcMain.on('request-app-exit', (event, arg) => {
+    onRequestAppExit(event, arg)
   })
 
   ipcMain.handle('get-primary-display-id-request', async (event, arg) => {
@@ -85,7 +90,7 @@ export function initIpcEvents() {
   //   )
   // })
 
-  ipcMain.on('request-app-exit', (event, arg) => {
-    onRequestAppExit(event, arg)
+  ipcMain.on('send-balance-to-sticky-timers', (event, arg) => {
+    onSendBalanceToStickyTimersRequest(event, arg)
   })
 }
