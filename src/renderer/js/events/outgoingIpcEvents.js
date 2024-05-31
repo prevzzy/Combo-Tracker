@@ -120,3 +120,15 @@ export function requestSendingWsMessage(message, isHost) {
   const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
   ipcRenderer.send(event, message);
 }
+
+export function sendBalanceToStickyTimers(data) {
+  ipcRenderer.send('send-balance-to-sticky-timers', data)
+}
+
+export function quitSticky() {
+  ipcRenderer.send('quit-sticky')
+}
+
+export function minimizeSticky() {
+  ipcRenderer.send('minimize-sticky')
+}

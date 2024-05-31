@@ -11,11 +11,18 @@ electronSettings.configure({
   numSpaces: 2,
 })
 
+function isScreenshotPathValid() {
+  return fs.existsSync(electronSettings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH))
+}
+
 async function setDefaultValuesToSettingsMissingInJson() {
   const missingSettings = {}
 
   for (const key in defaultSettings) {
-    if (!electronSettings.hasSync(key)) {
+    if (
+      !electronSettings.hasSync(key) ||
+      key === SETTINGS_STRINGS.SCREENSHOTS_PATH && !isScreenshotPathValid()
+    ) {
       missingSettings[key] = defaultSettings[key]
     }
   }
@@ -35,21 +42,6 @@ function isSettingsJsonValid() {
   } catch (error) {
     return false
   }
-
-  if (!fs.existsSync(electronSettings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH))) {
-    return false
-  }
-  // additional naive check for directory permissions - doesn't do it's work anyway
-  // else {
-  //   try {
-  //     const pathToTest = path.join(settings.getSync(SETTINGS_STRINGS.SCREENSHOTS_PATH), `test.txt`)
-  //     fs.writeFileSync(pathToTest, 'test')
-  //     fs.unlinkSync(pathToTest)
-  //   } catch (error) {
-  //     console.error(error)
-  //     return false
-  //   }
-  // }
 
   return true
 }

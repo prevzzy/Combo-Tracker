@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8"/>
+  <title>Combo Tracker - Timers</title>
+
+  <style>
+    * {
+      cursor: default !important;
+    }
+  </style>
+</head>
+
+<body class="bg-transparent" style="background: white; overflow: hidden;" id="sticky-body">
+  <div class="bg-dark rounded shadow-sm d-flex justify-content-center py-2" id="sticky-container">
+    <div id="sticky-display-container" class="w-75">
+      <div class="row">
+        <div class="col-6 d-flex justify-content-start">
+          <span class="font-weight-semibold text-light">Manual</span>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+          <span id="manual-timer" class="font-weight-semibold text-secondary">0.00s</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 d-flex justify-content-start">
+          <span class="font-weight-semibold text-light">Grind</span>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+          <span id="grind-timer" class="font-weight-semibold text-secondary">0.00s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

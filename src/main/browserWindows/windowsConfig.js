@@ -15,7 +15,7 @@ export const mainWindowConfig = {
         enableRemoteModule: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         backgroundThrottling: false,
-        devTools: false
+        devTools: process.env.APP_MODE === 'DEBUG'
       },
     }
   },
@@ -44,12 +44,42 @@ export const toastWindowConfig = {
         contextIsolation: false,
         enableRemoteModule: true,
         preload: TOAST_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        devTools: false
+        devTools: process.env.APP_MODE === 'DEBUG'
       },
     }
   },
   url: {
     pathname: TOAST_WINDOW_WEBPACK_ENTRY,
+  },
+  preventMultiple: true,
+}
+
+export const stickyWindowConfig = {
+  getBrowserWindowConfig(display) {
+    return {
+      height: 70,
+      width: 175,
+      x: display.bounds.width - 173,
+      y: display.bounds.height - 350,
+      frame: false,
+      alwaysOnTop: true,
+      resizable: false,
+      movable: true,
+      show: false,
+      skipTaskbar: false,
+      transparent: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        enableRemoteModule: true,
+        preload: STICKY_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        backgroundThrottling: true,
+        devTools: process.env.APP_MODE === 'DEBUG'
+      },
+    }
+  },
+  url: {
+    pathname: STICKY_WINDOW_WEBPACK_ENTRY,
   },
   preventMultiple: true,
 }
@@ -64,7 +94,7 @@ export const toastWindowConfig = {
 //         contextIsolation: false,
 //         enableRemoteModule: true,
 //         preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
-//         devTools: false
+//         devTools: process.env.APP_MODE === 'DEBUG'
 //       },
 //       ...OVERLAY_WINDOW_OPTS,
 //     }
