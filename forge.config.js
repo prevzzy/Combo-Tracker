@@ -40,6 +40,14 @@ module.exports = {
                 js: './src/main/preload/preload.js'
               }
             },
+            {
+              html: "./src/renderer/sticky.html",
+              js: "./src/renderer/js/sticky/index.js",
+              name: "sticky_window",
+              preload: {
+                js: './src/main/preload/preload.js'
+              }
+            },
             // {
             //   html: "./src/renderer/overlay.html",
             //   js: "./src/renderer/js/overlay/index.js",

@@ -19,6 +19,7 @@ import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { getActiveGameProcessName } from '../game/gameProcessService'
+import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
 
 let finalScore = null
 let comboStartTime = 0
@@ -204,6 +205,7 @@ async function track() {
   trackingInterval = setInterval(async () => {
     if (isComboInProgress()) {
       updateComboValues()
+      handleSendingDataToListeners()
     } else {
       clearInterval(trackingInterval)
       clearInterval(datasetsUpdatingInterval)
@@ -214,6 +216,7 @@ async function track() {
 
 async function finishTrackingCurrentCombo(isIdle) {
   if (isComboLongEnoughToDisplay() && !isComboTrackingSuspended()) {
+    handleSendingDataToListeners()
     await handleComboFinish(isIdle)
   } else {
     restart()
@@ -429,6 +432,10 @@ async function resumeComboTracking() {
   await listenForComboStart()
   setupGlobalError(false)
   LastComboUI.displayDefaultComboPageInfo()
+}
+
+export function getBalance() {
+  return balance;
 }
 
 export {

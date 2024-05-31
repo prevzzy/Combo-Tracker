@@ -562,3 +562,11 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 .text-rethawed {
   color: var(--rethawed-color);
 }
+
+.font-weight-semibold {
+  font-weight: 500 !important;
+}
+
+#sticky-display-container, #sticky-display-container * {
+  font-size: 18px !important;
+}

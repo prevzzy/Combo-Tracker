@@ -4,6 +4,7 @@ import { app } from 'electron'
 export const SHORTCUT_SETTING_NAMES = {
   ALL_TOP_SCORES_HOTKEY: 'all-top-scores-hotkey',
   MAP_TOP_SCORES_HOTKEY: 'map-top-scores-hotkey',
+  BALANCE_TIMERS_HOTKEY: 'balance-timers-hotkey'
 }
 
 export const SETTINGS_STRINGS = {
@@ -16,6 +17,7 @@ export const SETTINGS_STRINGS = {
   SCREENSHOTS_PATH: 'screenshots-path',
   ALL_TOP_SCORES_HOTKEY: 'all-top-scores-hotkey',
   MAP_TOP_SCORES_HOTKEY: 'map-top-scores-hotkey',
+  BALANCE_TIMERS_HOTKEY: 'balance-timers-hotkey'
 }
 
 export const defaultSettings = {
@@ -28,4 +30,5 @@ export const defaultSettings = {
   [SETTINGS_STRINGS.SCREENSHOTS_PATH]: path.join(app.getPath('pictures'), 'Combo Tracker'),
   [SETTINGS_STRINGS.ALL_TOP_SCORES_HOTKEY]: 'F6',
   [SETTINGS_STRINGS.MAP_TOP_SCORES_HOTKEY]: 'F7',
+  [SETTINGS_STRINGS.BALANCE_TIMERS_HOTKEY]: 'F8'
 }

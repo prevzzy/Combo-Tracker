@@ -1,7 +1,7 @@
 import { app, globalShortcut } from 'electron'
 import { initIpcEvents } from '../events/listeners'
 import { initSettings } from '../settings/settings';
-import { createAppWindows, APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows';
+import { createAppWindows, APP_WINDOW_NAMES, getAppWindow, getAllAppWindowsArray } from '../browserWindows/browserWindows';
 import { initTray } from '../tray/tray';
 
 let isQuitting = false
@@ -54,12 +54,10 @@ function setupAppEventListeners() {
   })
 
   app.on('will-quit', () => {
-    const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
-    const toastWindow = getAppWindow(APP_WINDOW_NAMES.TOAST)
+    const windows = getAllAppWindowsArray()
 
     globalShortcut.unregisterAll()
-    mainWindow.destroy();
-    toastWindow.destroy();
+    windows.forEach(window => window.destroy())
   })
 
   app.on('window-all-closed', () => {
