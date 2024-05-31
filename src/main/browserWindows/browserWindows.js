@@ -1,9 +1,10 @@
 
 import url from 'url';
-import electron, { BrowserWindow } from 'electron';
+import electron, { BrowserWindow, Menu, MenuItem } from 'electron';
 import { mainWindowConfig, stickyWindowConfig, toastWindowConfig } from './windowsConfig';
 import { startMinimized } from '../autoLaunch/autoLaunch';
 import { isAppQuitting } from '../appService/appService';
+import { onStickyWindowVisibilityChange } from '../events/ipcEventHandlers';
 
 let mainWindow
 let toastWindow
@@ -82,6 +83,54 @@ function setupWindowEventHandlers() {
       mainWindow.focus()
     }
   })
+
+  stickyWindow.on('show', () => onStickyWindowVisibilityChange(true))
+  stickyWindow.on('restore', () => onStickyWindowVisibilityChange(true))
+  stickyWindow.on('minimize', () => onStickyWindowVisibilityChange(false))
+  stickyWindow.on('hide', () => onStickyWindowVisibilityChange(false))
+  stickyWindow.on('close', (event) => {
+    if (!isAppQuitting()) {
+      event.preventDefault();
+      stickyWindow.hide();
+      onStickyWindowVisibilityChange(false)
+    }
+  })
+
+  setupStickyWindowContextMenu()
+}
+
+function setupStickyWindowContextMenu() {
+  let rightClickPosition;
+  const contextMenu = new Menu();
+  const minimizeItem = new MenuItem({
+    label: 'Minimize',
+    click: () => {    
+      if (stickyWindow) {
+        stickyWindow.minimize();
+      }
+    }
+  });
+  const quitItem = new MenuItem({
+    label: 'Quit',
+    click: () => {    
+      if (stickyWindow) {
+        stickyWindow.hide();
+      }
+    }
+  });
+
+  contextMenu.append(minimizeItem);
+  contextMenu.append(quitItem);
+
+  
+  stickyWindow.webContents.on('context-menu', (event, params) => {
+    rightClickPosition = { x: params.x, y: params.y };
+    contextMenu.popup({
+      window: stickyWindow,
+      x: rightClickPosition.x,
+      y: rightClickPosition.y
+    });
+  }, false);
 }
 
 // function makeDemoInteractive(window) {

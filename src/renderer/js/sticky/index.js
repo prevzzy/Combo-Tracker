@@ -2,6 +2,8 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootswatch/dist/pulse/bootstrap.min.css';
 import '../../style.css'
-import { initToastEvents } from './events/toastIpcEvents'
+import { initStickyEvents } from './events/stickyIpcEvents';
+import { setupDragging } from './ui/uiSticky';
 
-initToastEvents()
+initStickyEvents()
+setupDragging()

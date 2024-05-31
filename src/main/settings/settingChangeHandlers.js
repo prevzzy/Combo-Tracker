@@ -2,16 +2,19 @@ import { SETTINGS_STRINGS } from './defaultSettings'
 import { globalShortcut } from 'electron'
 import comboTrackerAutoLauncher from '../autoLaunch/autoLaunch'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
+import { onDisplayStickyWindowRequest } from '../events/ipcEventHandlers'
 
 export const settingChangeHandlers = new Map([
   [SETTINGS_STRINGS.LAUNCH_AT_STARTUP, onLaunchAtStartupSettingChange],
   [SETTINGS_STRINGS.MAP_TOP_SCORES_HOTKEY, registerNewShortcut],
   [SETTINGS_STRINGS.ALL_TOP_SCORES_HOTKEY, registerNewShortcut],
+  [SETTINGS_STRINGS.BALANCE_TIMERS_HOTKEY, registerNewShortcut]
 ])
 
 export const shortcutCallbacks = new Map([
   [SETTINGS_STRINGS.MAP_TOP_SCORES_HOTKEY, onCurrentMapHighscoresShortcut],
   [SETTINGS_STRINGS.ALL_TOP_SCORES_HOTKEY, onAllMapsHighscoresShortcut],
+  [SETTINGS_STRINGS.BALANCE_TIMERS_HOTKEY, onBalanceTimersShortcut],
 ])
 
 async function onLaunchAtStartupSettingChange(settingKey, newValue) {
@@ -49,4 +52,8 @@ function onAllMapsHighscoresShortcut() {
 function onCurrentMapHighscoresShortcut() {
   const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
   mainWindow.webContents.send('display-current-map-highscores')
+}
+
+function onBalanceTimersShortcut() {
+  onDisplayStickyWindowRequest()
 }
