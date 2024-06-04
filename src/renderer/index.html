@@ -439,8 +439,15 @@
       </div>
       
       <div id="settings-page" class="main" style="display: none">
-        <div id="settings-page-container" class="row m-auto w-100 px-5" style="max-width: 900px; display: none">
+        <div id="settings-page-container" class="row m-auto w-100 px-5 pb-3" style="max-width: 900px; display: none">
           <div class="w-100 mt-5 mb-5">
+            <div id="settings-page-new-update-info" class="mb-5" style="display: none">
+              <div class="py-3 btn btn-outline-secondary px-3 bg-primary-dark rounded w-100">
+                <div id="new-update-available-text" class="text-light text-center font-weight-semibold display-6">
+                  Update available for download
+                </div>
+              </div>
+            </div>
             <div class="text-secondary display-6">General</div>
             <div class="row align-items-center mt-2">
               <div class="col col-8 row no-gutters flex-column">
@@ -673,11 +680,13 @@
                 <div class="text-muted display-8 mt-2">The regular and switch variations of the same trick are distinguished and counted as different tricks - e.g. Kickflip and Switch Kickflip.</div>
               </div>
             </div>
-            <div class="row align-items-center mt-5">
+            <div class="row align-items-center my-3">
               <div class="col text-muted text-center">
-                <div>Created by prevzzy</div>
+                <div>
+                  <a target="_blank" href="https://github.com/prevzzy/THUGPRO-Combo-Tracker/releases" class="display-8 btn-link text-right text-secondary" id="app-version">Releases</a>
+                </div>
+                <div class="mt-2">Created by prevzzy</div>
                 <small class="mt-2 d-block">If you have any feedback, questions or problems regarding Combo Tracker, contact me on Discord - prevzzy#7045</small>
-                <small id="app-version" class="text-right mt-2 d-block"></small>
               </div>
             </div>
           </div>
@@ -719,7 +728,35 @@
         </div>
       </div>
     </div>
-  
+    <div>
+      <button id="general-purpose-modal-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#general-purpose-modal" style="position: absolute; left: -5000px; visibility: hidden"></button>
+      <div class="modal fade" id="general-purpose-modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="general-purpose-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div id="general-purpose-modal-scroll-container"  class="modal-content rounded bg-dark text-light p-2" style="max-height: 600px; overflow-y: scroll;overflow-x: hidden">
+            <div class="w-100 text-right">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">
+                  <svg height="8" width="8">
+                    <line x1="0" y1="0" x2="8" y2="8" style="fill:none;stroke:#868e96; stroke-width:1" />
+                    <line x1="0" y1="8" x2="8" y2="0" style="fill:none;stroke:#868e96; stroke-width:1" />
+                  </svg>
+                </span>
+              </button>
+            </div>
+            <div class="modal-body m-auto w-100 p-3" id="general-purpose-modal-body">
+            </div>
+            <div class="row text-center p-3" id="general-purpose-modal-actions">
+              <div class="col-4 text-left" id="general-purpose-modal-base-actions">
+                <button id="hide-general-purpose-modal-button" type="button" class="btn btn-outline-danger" data-dismiss="modal" data-target="#general-purpose-modal">Close</button>
+              </div>
+              <div class="col-8 text-right" id="general-purpose-modal-dynamic-actions">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <template id="trick-usage-entry-template">
       <div class="d-flex justify-content-between mr-3">
         <span class="trick-usage-entry-name"></span>

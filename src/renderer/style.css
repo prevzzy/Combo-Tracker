@@ -22,7 +22,7 @@
   padding: 0;
   box-sizing: border-box;
   font-size: 1rem;
-  font-weight: 375 !important;
+  font-weight: 400 !important;
 }
 
 body {
@@ -569,4 +569,17 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 
 #sticky-display-container, #sticky-display-container * {
   font-size: 18px !important;
+}
+
+#new-update-available-text {
+  transition: color 0.1s ease-out;
+}
+
+#settings-page-new-update-info:hover #new-update-available-text {
+  color: var(--secondary) !important;
+  cursor: pointer;
+}
+
+#app-version:hover {
+  cursor: pointer;
 }

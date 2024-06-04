@@ -6,7 +6,9 @@ import {
   onRestartSettingsRequest,
   onGetPrimaryDisplayIdRequest,
   onRequestAppExit,
-  onSendBalanceToStickyTimersRequest
+  onSendBalanceToStickyTimersRequest,
+  onGetLatestUpdateInfoRequest,
+  onShowMainWindowRequest
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
 // import { OverlayController } from 'electron-overlay-window'
@@ -19,6 +21,12 @@ export function initIpcEvents() {
       appDataPath: app.getPath('userData'),
       appFolderPath: app.getAppPath(),
     })
+  })
+
+  ipcMain.handle('get-latest-update-info', async () => {
+    const info = await onGetLatestUpdateInfoRequest()
+
+    return info
   })
 
   ipcMain.on('display-toast-request', async (event, arg) => {
@@ -92,5 +100,9 @@ export function initIpcEvents() {
 
   ipcMain.on('send-balance-to-sticky-timers', (event, arg) => {
     onSendBalanceToStickyTimersRequest(event, arg)
+  })
+
+  ipcMain.on('show-main-window-request', () => {
+    onShowMainWindowRequest()
   })
 }

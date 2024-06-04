@@ -67,6 +67,12 @@ export function createAppWindows() {
   setupWindowEventHandlers()
 }
 
+export function showMainWindow() {
+  mainWindow.show()
+  mainWindow.restore()
+  mainWindow.focus()
+}
+
 function setupWindowEventHandlers() {
   mainWindow.on('close', (event) => {
     if (!isAppQuitting()) {
@@ -78,9 +84,7 @@ function setupWindowEventHandlers() {
 
   mainWindow.on('ready-to-show', () => {
     if (!startMinimized()) {
-      mainWindow.show()
-      mainWindow.restore()
-      mainWindow.focus()
+      showMainWindow()
     }
   })
 
