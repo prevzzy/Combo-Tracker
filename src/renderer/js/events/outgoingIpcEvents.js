@@ -96,6 +96,11 @@ export async function requestPrimaryDisplayId() {
   return response;
 }
 
+export async function requestFetchingLatestUpdateInfo() {
+  const response = await ipcRenderer.invoke('get-latest-update-info')
+  return response;
+}
+
 export function requestServerHosting(username) {
   ipcRenderer.send('host-server-request', { username });
 }
@@ -131,4 +136,8 @@ export function quitSticky() {
 
 export function minimizeSticky() {
   ipcRenderer.send('minimize-sticky')
+}
+
+export function requestShowingMainWindow() {
+  ipcRenderer.send('show-main-window-request')
 }
