@@ -1,4 +1,5 @@
-import { ERROR_STRINGS, GAME_PROCESSES } from './constants'
+import { ERROR_STRINGS } from './constants'
+import { shell } from '@electron/remote'
 
 export function formatTimestamp(timestamp) {
   if (!Number.isInteger(timestamp)) {
@@ -76,4 +77,19 @@ export function getUniqueComboId(game, finalScore, mapName, comboStartTime) {
   const mapNameCleared = mapName.match(/[a-zA-Z0-9\s]/g).join('')
   const score = finalScore || ''
   return `${gameName} ${mapNameCleared} ${score} - ${day} ${time}`
+}
+
+export function hasDismissedUpdate(version) {
+  const storedVersion = localStorage.getItem('dismissed-update-version');
+  return storedVersion === version;
+}
+
+export function setupAppVersionLink(version) {
+  const appVersionLink = document.getElementById('app-version')
+
+  appVersionLink.textContent = `v${version}`
+  appVersionLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    shell.openExternal(e.target.href)
+  })
 }

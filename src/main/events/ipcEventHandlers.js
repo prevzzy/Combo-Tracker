@@ -5,7 +5,8 @@ import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 import { app } from 'electron'
-import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow } from '../browserWindows/browserWindows'
+import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, showMainWindow } from '../browserWindows/browserWindows'
+import { getLatestUpdate } from '../api/api'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -129,4 +130,18 @@ export function onSendBalanceToStickyTimersRequest(event, arg) {
 export function onStickyWindowVisibilityChange(isVisible) {
   const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN);
   mainWindow.webContents.send('sticky-window-visibility-change', isVisible)
+}
+
+export async function onGetLatestUpdateInfoRequest() {
+  try {
+    const res = await getLatestUpdate();
+    const info = JSON.parse(res.body);
+    return info
+  } catch(error) {
+    console.error('ERROR GETTING LATEST UPDATE', error)
+  }
+}
+
+export function onShowMainWindowRequest() {
+  showMainWindow()
 }

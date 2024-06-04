@@ -94,3 +94,4 @@ combos/
 combos-reTHAWed/
 highscores.json
 highscores-reTHAWed.json
+src/main/api/auth.js
