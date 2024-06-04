@@ -11,6 +11,7 @@ import * as OverlayUI from './uiOverlay'
 import * as HighscoresUI from './uiHighscores'
 import _ from 'lodash'
 import { GAMES, GAME_PROCESSES } from '../utils/constants'
+import { setAndShowPatchNotesModal } from './generalPurposeModal/uiGeneralPurposeModal'
 
 const settingFields = document.querySelectorAll('.user-setting')
 const pageContainer = document.getElementById('settings-page-container')
@@ -298,6 +299,15 @@ function initRestoreSettingsButton() {
   restoreButton.addEventListener('click', () => {
     requestSettingsRestart()
   })
+}
+
+export function showNewUpdateAlert(newUpdateInfo) {
+  const infoContainer = document.getElementById('settings-page-new-update-info');
+
+  setItemDisplay(infoContainer, 'block')
+  infoContainer.firstElementChild.addEventListener('click', () =>
+    setAndShowPatchNotesModal(newUpdateInfo, true)
+  )
 }
 
 export {

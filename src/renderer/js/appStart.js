@@ -2,7 +2,6 @@ import { ipcRenderer } from 'electron'
 import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
 import * as GlobalUI from './ui/uiGlobal'
-import * as NewMapModalUI from './ui/uiNewMapModal'
 import * as SettingsUI from './ui/uiSettings'
 import * as GameProcessService from './game/gameProcessService'
 import * as LastComboUI from './ui/lastCombo/uiLastCombo'
@@ -10,10 +9,12 @@ import * as FileService from './files/fileService'
 import { setupGlobalError } from './ui/globalError'
 import { app } from '@electron/remote'
 import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
+import { setupAppVersionLink } from './utils/helpers'
+import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
 
 let isRunning = false
 
-function startApp() {
+async function startApp() {
   if (isRunning) {
     return
   }
@@ -26,7 +27,7 @@ function startApp() {
     ipcRenderer.removeAllListeners('user-data-path-request-response')
   })
 
-  document.getElementById('app-version').textContent = `v${app.getVersion()}`
+  setupAppVersionLink(app.getVersion())
 }
 
 function runCoreLogic(paths) {
@@ -39,10 +40,10 @@ function runCoreLogic(paths) {
 
       LastComboUI.init()
       GlobalUI.setupToolbarListeners()
-      
       await GameProcessService.mainLoop()
-
       HighscoresUI.initHighscoresPage()
+
+      setupLatestUpdateInfo()
     })
     .catch((error) => {
       console.error(error)
