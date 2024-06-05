@@ -125,7 +125,6 @@ function setupStickyWindowContextMenu() {
 
   contextMenu.append(minimizeItem);
   contextMenu.append(quitItem);
-
   
   stickyWindow.webContents.on('context-menu', (event, params) => {
     rightClickPosition = { x: params.x, y: params.y };

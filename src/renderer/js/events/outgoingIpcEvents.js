@@ -101,6 +101,11 @@ export async function requestFetchingLatestUpdateInfo() {
   return response;
 }
 
+export async function requestOpeningDirectoryDialog() {
+  const path = await ipcRenderer.invoke('open-directory-dialog')
+  return path;
+}
+
 export function requestServerHosting(username) {
   ipcRenderer.send('host-server-request', { username });
 }

@@ -94,9 +94,9 @@ function deleteHighscoreFromAppSavedCombos(game, highscoreFileName) {
     })
   )
 
-  removeScoreFromScoresArrayByFileName(allMapsScores, highscoreFileName)
+  const hasDeletedScoreFromAllMaps = removeScoreFromScoresArrayByFileName(allMapsScores, highscoreFileName)
 
-  if (newLowestAllMapsHighscore) {
+  if (hasDeletedScoreFromAllMaps && newLowestAllMapsHighscore) {
     allMapsScores[allMapsScores.length] = newLowestAllMapsHighscore
   }
 
