@@ -4,7 +4,7 @@ import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, showMainWindow } from '../browserWindows/browserWindows'
 import { getLatestUpdate } from '../api/api'
 
@@ -140,6 +140,14 @@ export async function onGetLatestUpdateInfoRequest() {
   } catch(error) {
     console.error('ERROR GETTING LATEST UPDATE', error)
   }
+}
+
+export async function onOpenDirectoryDialogRequest() {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  });
+
+  return result.filePaths[0];
 }
 
 export function onShowMainWindowRequest() {
