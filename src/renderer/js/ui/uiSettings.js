@@ -2,6 +2,7 @@ import {
   requestSettingValue,
   requestSettingUpdate,
   requestSettingsRestart,
+  requestOpeningDirectoryDialog,
 } from '../events/outgoingIpcEvents'
 import { formatScore } from '../utils/helpers'
 import { resetHighscores, isPathWritable } from '../files/fileService'
@@ -202,8 +203,13 @@ function initScreenshotsPathInput() {
   const screenshotsPath = document.getElementById('settings-screenshots-path')
   const screenshotsPathError = document.getElementById('screenshots-path-error')
 
-  screenshotsPathBtn.addEventListener('change', (e) => {
-    const newPath = e.target.files[0].path;
+  screenshotsPathBtn.addEventListener('click', async (e) => {
+    const newPath = await requestOpeningDirectoryDialog()
+
+    if (!newPath) {
+      return;
+    }
+    
     if (isPathWritable(newPath)) {
       setItemDisplay(screenshotsPathError, 'none')
       screenshotsPath.textContent = newPath;

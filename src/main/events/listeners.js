@@ -8,7 +8,8 @@ import {
   onRequestAppExit,
   onSendBalanceToStickyTimersRequest,
   onGetLatestUpdateInfoRequest,
-  onShowMainWindowRequest
+  onShowMainWindowRequest,
+  onOpenDirectoryDialogRequest
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
 // import { OverlayController } from 'electron-overlay-window'
@@ -27,6 +28,11 @@ export function initIpcEvents() {
     const info = await onGetLatestUpdateInfoRequest()
 
     return info
+  })
+
+  ipcMain.handle('open-directory-dialog', async () => {
+    const path = await onOpenDirectoryDialogRequest();
+    return path
   })
 
   ipcMain.on('display-toast-request', async (event, arg) => {
