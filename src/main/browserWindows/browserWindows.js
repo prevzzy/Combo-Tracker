@@ -38,8 +38,15 @@ function createBrowserWindow(config) {
   // needed for relative window position
   const display = electron.screen.getPrimaryDisplay()
 
-  let win = new BrowserWindow(config.getBrowserWindowConfig(display))
+  const windowConfig = config.getBrowserWindowConfig(display)
+
+  let win = new BrowserWindow(windowConfig)
   win.loadURL(url.format(config.url))
+
+  if (windowConfig.alwaysOnTop) {
+    win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    win.setAlwaysOnTop(true, 'screen-saver');
+  }
 
   if (config.showOnAppLaunch) {
     win.once('ready-to-show', () => {

@@ -49,7 +49,7 @@ function openProcess(gameProcessName) {
   return new Promise((resolve, reject) => {
     memoryjs.openProcess(gameProcessName, (error, processObject) => {
       if (error) {
-        reject(new CustomError(`Could not find THUG Pro or reTHAWed process.`, 1));
+        reject(new CustomError(`Could not find active THUG Pro or reTHAWed process.`, 1));
       } else {
         MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
         MemoryController.testInitializedAddresses(gameProcessName)
@@ -122,7 +122,7 @@ async function mainLoopLogic() {
     activeGameProcessName = scanProcessesForSupportedGame()
 
     if (!activeGameProcessName) {
-      setupGlobalError(true, 'Could not find THUG Pro or reTHAWed process.', 1);
+      setupGlobalError(true, 'Could not find active THUG Pro or reTHAWed process.', 1);
       setActiveMapData()
     }
 
