@@ -56,7 +56,7 @@ function buildPatchMetaDataHtml(version, date) {
 }
 
 function buildTitleAndDescriptionHtml(title, description) {
-  const titleHtml = title ? `<div class="text-secondary display-6 font-weight-semibold">${title}</div>` : ''
+  const titleHtml = title ? `<div class="section-title">${title}</div>` : ''
   const descriptionHtml = description ? `<div class="text-light">${description}</div>` : ''
 
   return `
@@ -108,7 +108,7 @@ function createChangelogSectionElement(section, i) {
   } = section;
   
   return `
-    <div class="display-6 text-secondary font-weight-semibold ${i === 0 ? 'mt-0' : 'mt-3'} mb-2">${sectionName}</div>
+    <div class="section-title ${i === 0 ? 'mt-0' : 'mt-3'} mb-2">${sectionName}</div>
     ${createChangelogChangesList(changes)}
   `
 

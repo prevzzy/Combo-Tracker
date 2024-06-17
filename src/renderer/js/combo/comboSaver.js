@@ -1,5 +1,5 @@
 import bs from 'binary-search'
-import { APP_CONFIG_VALUES, CREATE_A_PARK, COMBO_PAGE_INFO_MESSAGES } from '../utils/constants'
+import { APP_CONFIG_VALUES, CREATE_A_PARK, COMBO_PAGE_INFO_MESSAGES, GAMES_BY_PROCESS_NAME } from '../utils/constants'
 import { requestNewBestScoreToast } from '../events/outgoingIpcEvents'
 import * as FileService from '../files/fileService'
 import * as LastComboUI from '../ui/lastCombo/uiLastCombo'
@@ -63,6 +63,7 @@ async function saveNewCombo(game, mapScriptName, comboData, hasPassedBailedCombo
       generalBestScoreNumber,
       mapBestScoreNumber,
       mapName,
+      GAMES_BY_PROCESS_NAME[game],
     )
   }
 

@@ -97,6 +97,7 @@ function displayNewHighscoreInfo(payload) {
     generalBestScoreNumber,
     mapBestScoreNumber,
     mapName,
+    game,
     allHighscoresPeekHotkey,
     mapHighscoresPeekHotkey,
   } = payload
@@ -109,6 +110,7 @@ function displayNewHighscoreInfo(payload) {
 
   const newHighscoreToast = createElementFromTemplate('toast-new-highscore');
   const generalBestScoreElement = newHighscoreToast.querySelectorAll('.toast-general-best-score')[0]
+  const gameNameElement = newHighscoreToast.querySelectorAll('.toast-general-best-score-game-name')[0]
   const mapBestScoreElement = newHighscoreToast.querySelectorAll('.toast-map-best-score')[0]
   
   const bestNumbersData = [
@@ -121,6 +123,7 @@ function displayNewHighscoreInfo(payload) {
   newHighscoreToast.querySelectorAll('.all-highscores-peek-hotkey')[0].textContent = allHighscoresPeekHotkey
   newHighscoreToast.querySelectorAll('.map-highscores-peek-hotkey')[0].textContent = mapHighscoresPeekHotkey
 
+  gameNameElement.textContent = game;
   contentElement.appendChild(newHighscoreToast)
 }
 

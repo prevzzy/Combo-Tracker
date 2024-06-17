@@ -583,3 +583,9 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 #app-version:hover {
   cursor: pointer;
 }
+
+.section-title {
+  color: var(--secondary);
+  font-weight: 500 !important;
+  font-size: 1.2rem !important;
+}
