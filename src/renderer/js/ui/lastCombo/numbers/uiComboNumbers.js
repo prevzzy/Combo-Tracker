@@ -19,6 +19,7 @@ const mapElement = document.getElementById('combo-map')
 const mapDetailsElement = document.getElementById('combo-details-map')
 const mapBestScoreElement = document.getElementById('combo-map-best-score')
 const generalBestScoreElement = document.getElementById('combo-general-best-score')
+const generalBestScoreGameNameElement = document.getElementById('combo-general-best-score-game-name')
 const mapTrackedComboElement = document.getElementById('combo-map-tracked-combo')
 const generalTrackedComboElement = document.getElementById('combo-general-tracked-combo')
 const generalTrackedComboGameNameElement = document.getElementById('combo-general-tracked-combo-game-name')
@@ -100,14 +101,19 @@ function displayComboTrackingInfo(comboTrackingNumbers, game) {
 }
 
 function displayGameName(game) {
-  generalTrackedComboGameNameElement.className = ''
-  if (game === GAME_PROCESSES.RETHAWED) {
-    generalTrackedComboGameNameElement.classList.add('text-rethawed')
-    generalTrackedComboGameNameElement.textContent = GAMES.RETHAWED
-  } else if (!game || game === GAME_PROCESSES.THUGPRO) {
-    generalTrackedComboGameNameElement.classList.add('text-thugpro')
-    generalTrackedComboGameNameElement.textContent = GAMES.THUGPRO
-  }
+  const gameElements = [generalBestScoreGameNameElement, generalTrackedComboGameNameElement]
+
+  gameElements.forEach((gameElement) => {
+    gameElement.className = ''
+
+    if (game === GAME_PROCESSES.RETHAWED) {
+      gameElement.classList.add('text-rethawed')
+      gameElement.textContent = GAMES.RETHAWED
+    } else if (!game || game === GAME_PROCESSES.THUGPRO) {
+      gameElement.classList.add('text-thugpro')
+      gameElement.textContent = GAMES.THUGPRO
+    }
+  })
 }
 
 function getComboTrackingSkippedInfo(

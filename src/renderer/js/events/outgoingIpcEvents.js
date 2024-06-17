@@ -1,6 +1,6 @@
 
 import { ipcRenderer } from 'electron'
-import { ALL_MAPS } from '../utils/constants'
+import { ALL_MAPS, GAMES_BY_PROCESS_NAME } from '../utils/constants'
 import { HIGHSCORE_PEEK_TYPES, TOAST_EVENT_TYPES } from '../../../main/events/toastEventTypes'
 import * as SavedCombosService from '../combo/savedCombosService'
 
@@ -11,10 +11,10 @@ export function requestMapHighscoresToast(game, mapScriptName) {
     const allMapsData = SavedCombosService.getAllMapsData(game)
   
     payload = {
-      mapName: allMapsData.name,
+      mapName: GAMES_BY_PROCESS_NAME[game],
       scores: allMapsData.scores,
       shouldDisplayScoreMapName: true,
-      highscoresPeekType: HIGHSCORE_PEEK_TYPES.ALL_MAPS
+      highscoresPeekType: HIGHSCORE_PEEK_TYPES.ALL_MAPS,
     }
   } else {
     const mapCategory = SavedCombosService.getMapCategory(game, mapScriptName)
@@ -27,7 +27,7 @@ export function requestMapHighscoresToast(game, mapScriptName) {
       mapName: SavedCombosService.getMapName(game, mapScriptName),
       scores: SavedCombosService.getMapData(game, mapCategory, mapScriptName).scores,
       shouldDisplayScoreMapName: false,
-      highscoresPeekType: HIGHSCORE_PEEK_TYPES.CURRENT_MAP
+      highscoresPeekType: HIGHSCORE_PEEK_TYPES.CURRENT_MAP,
     }
   }
   
@@ -41,6 +41,7 @@ export function requestNewBestScoreToast(
   generalBestScoreNumber,
   mapBestScoreNumber,
   mapName,
+  game,
 ) {
   ipcRenderer.send('display-toast-request', {
     toastEventType: TOAST_EVENT_TYPES.NEW_BEST_SCORE,
@@ -48,6 +49,7 @@ export function requestNewBestScoreToast(
       generalBestScoreNumber,
       mapBestScoreNumber,
       mapName,
+      game,
     }
   })
 }
