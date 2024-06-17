@@ -17,18 +17,24 @@ function isMapPlacedInCorrectCategory(game, mapCategoryName, mapScriptName) {
     )
   }
 
-  return maps[game][mapCategoryName] && maps[game][mapCategoryName][mapScriptName]
+  // if a map is not found in any category, then it's a user added map and it should be left unchanged
+  const correctMapCategory = findTargetMapCategoryForMap(game, mapScriptName)
+
+  return !correctMapCategory || correctMapCategory === mapCategoryName
 }
 
 function isMapNameCorrect(game, mapName, mapCategoryName, mapScriptName) {
-  if (mapCategoryName === CUSTOM_LEVELS_CATEGORY) {
+  if (
+    mapCategoryName === CUSTOM_LEVELS_CATEGORY ||
+    !findTargetMapCategoryForMap(game, mapScriptName) // don't correct map names for user added maps with no category
+  ) {
     return true
   }
 
-    return maps[game][mapCategoryName] && mapName === maps[game][mapCategoryName][mapScriptName]
+  return maps[game][mapCategoryName] && mapName === maps[game][mapCategoryName][mapScriptName]
 }
 
-function sortMapCategoryInDefaultOrder(game, gameFileData, mapCategoryName) {
+function sortMapCategoryInDefaultOrder(game, highscoresFileData, mapCategoryName) {
   if (!maps[game][mapCategoryName]) {
     return
   }
@@ -37,22 +43,25 @@ function sortMapCategoryInDefaultOrder(game, gameFileData, mapCategoryName) {
 
   const sortedMapData = {}
   for (const mapScriptName of defaultMapOrder) {
-    sortedMapData[mapScriptName] = gameFileData.mapCategories[mapCategoryName][mapScriptName]
+    sortedMapData[mapScriptName] = highscoresFileData.mapCategories[mapCategoryName][mapScriptName]
   }
 
-  gameFileData.mapCategories[mapCategoryName] = sortedMapData
+  highscoresFileData.mapCategories[mapCategoryName] = {
+    ...sortedMapData,
+    ...highscoresFileData.mapCategories[mapCategoryName]
+  }
 }
 
 function moveMapToCorrectCategory(
-  gameFileData,
+  highscoresFileData,
   mapScriptName,
   oldMapCategory,
   targetMapCategory
 ) {
-  const mapData = gameFileData.mapCategories[oldMapCategory][mapScriptName]
-  gameFileData.mapCategories[targetMapCategory][mapScriptName] = mapData
+  const mapData = highscoresFileData.mapCategories[oldMapCategory][mapScriptName]
+  highscoresFileData.mapCategories[targetMapCategory][mapScriptName] = mapData
 
-  delete gameFileData.mapCategories[oldMapCategory][mapScriptName];
+  delete highscoresFileData.mapCategories[oldMapCategory][mapScriptName];
 }
 
 function setCorrectMapName(mapData, allMapsData, correctMapName) {
@@ -69,13 +78,13 @@ function setCorrectMapName(mapData, allMapsData, correctMapName) {
   })
 }
 
-function handleMovingMapToDifferentMapCategory(game, gameFileData, fileMapCategory, mapScriptName) {
+function handleMovingMapToDifferentMapCategory(game, highscoresFileData, fileMapCategory, mapScriptName) {
   const targetMapCategory = findTargetMapCategoryForMap(game, mapScriptName)
   log('incorrect category for map:', mapScriptName, 'in category', fileMapCategory, ', should go to:', targetMapCategory)
 
   if (targetMapCategory) {
     moveMapToCorrectCategory(
-      gameFileData,
+      highscoresFileData,
       mapScriptName,
       fileMapCategory,
       targetMapCategory,
@@ -85,18 +94,18 @@ function handleMovingMapToDifferentMapCategory(game, gameFileData, fileMapCatego
   return targetMapCategory
 }
 
-function correctMapData(game, gameFileData, mapCategories, mapCategory, mapScriptName) {
+function correctMapData(game, highscoresFileData, mapCategories, mapCategory, mapScriptName) {
   let isDataCorrected = false;
   let targetMapCategory = mapCategory;
-  const mapData = mapCategories[mapCategory][mapScriptName]
+  const mapData = highscoresFileData.mapCategories[mapCategory][mapScriptName]
 
   if (!isMapPlacedInCorrectCategory(game, mapCategory, mapScriptName)) {
-    targetMapCategory = handleMovingMapToDifferentMapCategory(game, gameFileData, mapCategory, mapScriptName)
+    targetMapCategory = handleMovingMapToDifferentMapCategory(game, highscoresFileData, mapCategory, mapScriptName)
     isDataCorrected = true
   }
 
   if (!isMapNameCorrect(game, mapData.name, targetMapCategory, mapScriptName)) {
-    setCorrectMapName(mapData, gameFileData.allMaps, maps[game][targetMapCategory][mapScriptName])
+    setCorrectMapName(mapData, highscoresFileData.allMaps, maps[game][targetMapCategory][mapScriptName])
     isDataCorrected = true
   }
 
@@ -105,18 +114,18 @@ function correctMapData(game, gameFileData, mapCategories, mapCategory, mapScrip
 
 function verifyCategoryContents(
   game,
-  gameFileData,
+  highscoresFileData,
   mapCategory,
-  fileMapScriptsForCategory,
-  allMapScriptsForCategory
+  highscoresFileMapScriptsForCategory,
+  applicationDefinedMapScriptsForCategory
 ) {
   let isDataCorrected = false
-  allMapScriptsForCategory.forEach(mapScriptName => {
-    if (!fileMapScriptsForCategory.includes(mapScriptName)) {
+  applicationDefinedMapScriptsForCategory.forEach(mapScriptName => {
+    if (!highscoresFileMapScriptsForCategory.includes(mapScriptName)) {
       log(`missing map in ${mapCategory}:`, mapScriptName)
 
-      gameFileData.mapCategories[mapCategory] = {
-        ...gameFileData.mapCategories[mapCategory],
+      highscoresFileData.mapCategories[mapCategory] = {
+        ...highscoresFileData.mapCategories[mapCategory],
         [mapScriptName]: createMapObject(game, mapCategory, mapScriptName)
       }
       isDataCorrected = true
@@ -126,16 +135,31 @@ function verifyCategoryContents(
   return isDataCorrected
 }
 
-export function correctHighscoresFile(gameFileData, game) {
+function ensureAllMapCategoriesExistInFile(highscoresFileData, game) {
+  let hasMissingCategories = false;
+  Object.keys(maps[game]).forEach(mapCategory => {
+    if (!highscoresFileData.mapCategories[mapCategory]) {
+      console.log(`missing map category for ${game}:`, mapCategory)
+      highscoresFileData.mapCategories[mapCategory] = {}
+      hasMissingCategories = true;
+    }
+  })
+
+  return hasMissingCategories
+}
+
+export function correctHighscoresFile(highscoresFileData, game) {
   let isDataCorrected = false
-  const { mapCategories } = gameFileData
+  const { mapCategories } = highscoresFileData
+  isDataCorrected = ensureAllMapCategoriesExistInFile(highscoresFileData, game)
+
   Object.keys(mapCategories).forEach(mapCategory => {
     let fileMapScripts = Object.keys(mapCategories[mapCategory])
     
     if (mapCategory !== CUSTOM_LEVELS_CATEGORY) {
       isDataCorrected = verifyCategoryContents(
         game,
-        gameFileData,
+        highscoresFileData,
         mapCategory,
         Object.keys(mapCategories[mapCategory]),
         Object.keys(maps[game][mapCategory])
@@ -143,13 +167,13 @@ export function correctHighscoresFile(gameFileData, game) {
     }
 
     fileMapScripts.forEach(mapScriptName => {
-      isDataCorrected = correctMapData(game, gameFileData, mapCategories, mapCategory, mapScriptName) || isDataCorrected
+      isDataCorrected = correctMapData(game, highscoresFileData, mapCategories, mapCategory, mapScriptName) || isDataCorrected
     })
 
-    sortMapCategoryInDefaultOrder(game, gameFileData, mapCategory)
+    sortMapCategoryInDefaultOrder(game, highscoresFileData, mapCategory)
   })
 
   if (isDataCorrected) {
-    return gameFileData
+    return highscoresFileData
   }
 }
