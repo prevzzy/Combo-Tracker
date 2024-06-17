@@ -64,9 +64,9 @@ function readHighscoresJson(game) {
           parsedData = correctedData;
           await saveHighscoresJson(game, correctedData);
         }
-      } catch {
+      } catch(error) {
         // It's hard to predict all scenarios that can result in throwing an error here, but having an uncorrected highscores file isn't the end of the world anyway. There is no reason to stop the entire application from running, so just catch the error and move on.
-        console.error('an error occured when correcting highscores file')
+        console.error('an error occured when correcting highscores file', error)
       }
 
       try {
