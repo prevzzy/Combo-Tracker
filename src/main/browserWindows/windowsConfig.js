@@ -1,5 +1,7 @@
 // import { OVERLAY_WINDOW_OPTS } from "electron-overlay-window"
 
+import { isAppInDebugMode } from "../utils/helpers"
+
 export const mainWindowConfig = {
   getBrowserWindowConfig(display) {
     return {
@@ -8,14 +10,14 @@ export const mainWindowConfig = {
       minWidth: 600,
       minHeight: 500,
       show: false,
-      frame: process.env.APP_MODE === 'DEBUG',
+      frame: isAppInDebugMode(),
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
         enableRemoteModule: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         backgroundThrottling: false,
-        devTools: process.env.APP_MODE === 'DEBUG'
+        devTools: isAppInDebugMode()
       },
     }
   },
@@ -44,7 +46,7 @@ export const toastWindowConfig = {
         contextIsolation: false,
         enableRemoteModule: true,
         preload: TOAST_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        devTools: process.env.APP_MODE === 'DEBUG'
+        devTools: isAppInDebugMode()
       },
     }
   },
@@ -74,7 +76,7 @@ export const stickyWindowConfig = {
         enableRemoteModule: true,
         preload: STICKY_WINDOW_PRELOAD_WEBPACK_ENTRY,
         backgroundThrottling: true,
-        devTools: process.env.APP_MODE === 'DEBUG'
+        devTools: isAppInDebugMode()
       },
     }
   },
@@ -94,7 +96,7 @@ export const stickyWindowConfig = {
 //         contextIsolation: false,
 //         enableRemoteModule: true,
 //         preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
-//         devTools: process.env.APP_MODE === 'DEBUG'
+//         devTools: isAppInDebugMode()
 //       },
 //       ...OVERLAY_WINDOW_OPTS,
 //     }

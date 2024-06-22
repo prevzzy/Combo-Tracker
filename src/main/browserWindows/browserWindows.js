@@ -5,6 +5,7 @@ import { mainWindowConfig, stickyWindowConfig, toastWindowConfig } from './windo
 import { startMinimized } from '../autoLaunch/autoLaunch';
 import { isAppQuitting } from '../appService/appService';
 import { onStickyWindowVisibilityChange } from '../events/ipcEventHandlers';
+import { pipeLogsToRenderer } from '../utils/helpers';
 
 let mainWindow
 let toastWindow
@@ -81,6 +82,8 @@ export function showMainWindow() {
 }
 
 function setupWindowEventHandlers() {
+  pipeLogsToRenderer(mainWindow)
+
   mainWindow.on('close', (event) => {
     if (!isAppQuitting()) {
       event.preventDefault();
