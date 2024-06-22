@@ -19,8 +19,8 @@ function shouldCheckForUpdate() {
   // return true
   return (
     hasNewUpdateAvailableNote() ||
-    currentDate !== getLastUpdateCheckDate()
-    || isAppInDebugMode() 
+    currentDate !== getLastUpdateCheckDate() ||
+    isAppInDebugMode() 
   )
 }
 
