@@ -5,6 +5,7 @@ import { requestMapHighscoresToast } from './outgoingIpcEvents'
 import { ALL_MAPS } from '../utils/constants'
 import { onSettingsRequestResponse } from '../ui/uiSettings'
 import { setIsStickyWindowVisible } from '../combo/trackerBridge/helpers'
+import { logWithMethod } from '../debug/debugHelpers'
 
 export function initIncomingIpcEventListeners() {
   ipcRenderer.on('display-all-maps-highscores', () => {
@@ -30,4 +31,9 @@ export function initIncomingIpcEventListeners() {
   ipcRenderer.on('sticky-window-visibility-change', (event, arg) => {
     setIsStickyWindowVisible(arg)
   })
+
+  ipcRenderer.on('console-message', (event, arg) => {
+    const { method, args } = arg;
+    logWithMethod(method, args)
+  });
 }
