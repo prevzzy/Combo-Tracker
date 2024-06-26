@@ -35,7 +35,7 @@ let activeMapData = {
   categoryName: null,
 }
 
-let displayedGame = GAME_PROCESSES.THUGPRO;
+let displayedGame;
 
 const highscoreStatElementsConfig = {
   score: {
@@ -559,6 +559,9 @@ function initGameSelect() {
 }
 
 function onGameClick(game) {
+  if (displayedGame && displayedGame === game) {
+    return
+  }
   displayedGame = game;
   resetMapCategoriesMenu()
   highscoresContainerElement.parentElement.scrollTo(0, 0)
