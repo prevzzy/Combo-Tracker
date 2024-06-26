@@ -12,8 +12,8 @@ export function setupApp() {
     app.quit();
   }
 
-    app.allowRendererProcessReuse = false
-    const gotTheLock = app.requestSingleInstanceLock()
+  app.allowRendererProcessReuse = false
+  const gotTheLock = app.requestSingleInstanceLock()
       
   if (!gotTheLock) {
     app.quit()

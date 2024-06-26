@@ -209,12 +209,15 @@ function readSavedComboFile(game, fileName) {
 }
 
 function deleteSavedComboFile(game, fileName) {
-  if (!fileName) {
-    return
-  }
-
   return new Promise((resolve, reject) => {
-    fs.unlink(path.join(savedCombosFolderPaths[game], `${fileName}.json`), (error) => {
+    const filePath = path.join(savedCombosFolderPaths[game], `${fileName}.json`)
+
+    if (!fileName || !fs.existsSync(filePath)) {
+      reject(`Error deleting saved combo. Path ${filePath} not found.`)
+      return
+    }
+
+    fs.unlink(filePath, (error) => {
       if (error) {
         reject(error)
         return;

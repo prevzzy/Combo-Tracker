@@ -158,16 +158,20 @@ async function listenForComboStart() {
   }
 
   setTimeout(async () => {
-    // log('base: ', MemoryController.getBasePoints())
-    // log('multi: ', MemoryController.getMultiplier())
-    // log('grind: ', MemoryController.getGrindTime())
-    // log('manual: ', MemoryController.getManualTime())
-
-    if (isComboInProgress()) {
-      log('start')
-      await startTracking(Date.now())
-    } else {
-      await listenForComboStart()
+    try {
+      // log('base: ', MemoryController.getBasePoints())
+      // log('multi: ', MemoryController.getMultiplier())
+      // log('grind: ', MemoryController.getGrindTime())
+      // log('manual: ', MemoryController.getManualTime())
+  
+      if (isComboInProgress()) {
+        log('start')
+        await startTracking(Date.now())
+      } else {
+        await listenForComboStart()
+      }
+    } catch(error) {
+      console.error(error)
     }
   }, 16)
 }

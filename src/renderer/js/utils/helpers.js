@@ -68,6 +68,12 @@ export function getNumberWithOrdinal(n) {
   return ERROR_STRINGS.STANDARD_ERROR_TEXT
 }
 
+export function hasSpecialUnicodeCharacter(str) {
+  const specialCharsRegex = /[^\u0020-\u007E\u00A0-\u00FF\u0100-\u017F]/;
+
+  return specialCharsRegex.test(str);
+}
+
 export function getUniqueComboId(game, finalScore, mapName, comboStartTime) {
   let gameName = game.replace('.exe', '');
 

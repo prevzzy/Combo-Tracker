@@ -25,6 +25,7 @@ import {
 } from './offsets'
 import { getActiveGameProcessName } from './gameProcessService'
 import { isInMainMenu } from './interGameUtils'
+import { hasSpecialUnicodeCharacter } from '../utils/helpers'
 
 let gameHandle
 let processBaseAddress
@@ -122,7 +123,7 @@ function testInitializedAddresses(gameProcessName) {
       GrindTimeAddress ${grindTimeAddress.toString(16)}
       ManualTimeAddress ${manualTimeAddress.toString(16)}
       LipTimeAddress ${lipTimeAddress.toString(16)}
-      CurrentMapScriptAddress ${getCurrentMapScript()}
+      CurrentMapScriptAddress ${currentMapAddress.toString(16)}
       MultiplierAddress ${multiplierAddress.toString(16)}
       BasePointsAddress ${basePointsAddress.toString(16)}
       GameScoreAddress ${gameScoreAddress.toString(16)}
@@ -160,7 +161,13 @@ function testInitializedAddresses(gameProcessName) {
     throw new CustomError('Game loading...', 2)
   }
 
-  if (currentMultiplier === 0 && !hasValidIntegerAddresses && currentMapScript && !isInMainMenu(currentMapScript)) {
+  if (
+    currentMultiplier === 0 &&
+    !hasValidIntegerAddresses &&
+    currentMapScript &&
+    !isInMainMenu(currentMapScript) &&
+    !hasSpecialUnicodeCharacter(currentMapScript) // happens for about 0.1 second after launching rethawed
+  ) {
     throw new CustomError('Exit observer mode to start combo tracking.', 1)
   }
 
@@ -170,9 +177,11 @@ function testInitializedAddresses(gameProcessName) {
       (currentMultiplier % 1 !== 0 && currentMultiplier % 1 !== 0.5)
     ) ||
     !hasValidFloatAddresses ||
-    !hasValidIntegerAddresses
+    !hasValidIntegerAddresses ||
+    getTrickCount() > 300 || // max is 250
+    getSpecialMeterNumericValue() > 3500 // max is 3000
   ) {
-    throw new CustomError('An error occured when reading game data. Reinitializing. Restart the game if the problem persists.', 1)
+    throw new CustomError('Reinitializing addresses. Restart the game if the problem persists.', 1)
   }
 }
 

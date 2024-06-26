@@ -163,7 +163,7 @@ function saveNewComboToScoresArray(game, scores, comboData, fullDataFileName, sh
   if (scores.length > APP_CONFIG_VALUES.MAX_SCORES_PER_MAP) {
     const { fullDataFileName } = scores.pop()
     if (fullDataFileName && shouldRemoveOldScoreFile) {
-      FileService.deleteSavedComboFile(game, fullDataFileName)
+      FileService.deleteSavedComboFile(game, fullDataFileName).catch(error => console.error(error))
     }
   }
 
