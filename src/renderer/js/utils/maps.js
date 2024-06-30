@@ -1,4 +1,4 @@
-import { GAME_PROCESSES } from "./constants"
+import { GAMES, GAME_PROCESSES } from "./constants"
 
 export const maps = {
   [GAME_PROCESSES.RETHAWED]: {
@@ -19,12 +19,17 @@ export const maps = {
     },
     THPS4: {
       sch: 'COLLEGE',
+      kon: 'KONA SKATEPARK'
     },
     THUG: {
+      nj: 'NEW JERSEY',
       ny: 'MANHATTAN',
+      hi: 'HAWAII',
     },
     THUG2: {
       tr: 'TRAINING',
+      BO: 'BOSTON',
+      ba: 'BARCELONA',
       AU: 'AUSTRALIA',
       st: 'SKATOPIA',
     },
@@ -41,13 +46,19 @@ export const maps = {
       SZ: 'SANTA CRUZ',
       JA: 'KYOTO',
       SV2: 'THE RUINS',
-      AT: 'ATLANTA'
+      AT: 'ATLANTA',
     },
     THP8: {
+      houses: 'SUBURBS',
       shops: 'DOWNTOWN',
       Center: 'CITY CENTER',
+      inschool: 'HIGH SCHOOL',
       riod: 'DOWNHILL'
     },
+    "MISC LEVELS": {
+      canpsx: 'CANADA (PSX)',
+      pizza: 'PIZZA PLANET'
+    }
   },
   [GAME_PROCESSES.THUGPRO]: {
     THPS1: {
@@ -142,5 +153,43 @@ export const maps = {
     "MISC LEVELS": {
       toystory_bedroom: "ANDY'S ROOM"
     },
-  }
+  },
+  [GAME_PROCESSES.THUG2]: {
+    [GAMES.THUG2]: {
+      TR: 'TRAINING',
+      BO: 'BOSTON',
+      BA: 'BARCELONA',
+      BE: 'BERLIN',
+      AU: 'AUSTRALIA',
+      NO: 'NEW ORLEANS',
+      ST: 'SKATOPIA',
+      SE: 'PRO SKATER',
+      SE2: 'THE TRIANGLE',
+      SC: 'SCHOOL',
+      PH: 'PHILADELPHIA',
+      DJ: 'DOWNHILL JAM',
+      LA: 'LOS ANGELES',
+      CA: 'CANADA',
+      AP: 'AIRPORT',
+    }
+  },
+  [GAME_PROCESSES.THAW]: {
+    [GAMES.THAW]: {
+      HO: 'HOLLYWOOD',
+      BH: 'BEVERLY HILLS',
+      DT: 'DOWNTOWN',
+      EL: 'EAST LA',
+      SM: 'SANTA MONICA',
+      OI: 'OIL RIG',
+      SV: 'VANS PARK',
+      LV: 'CASINO',
+      SR: 'SKATE RANCH',
+      DN: 'MINNEAPOLIS',
+      SZ: 'SANTA CRUZ',
+      MA: 'THE MALL',
+      CH: 'CHICAGO',
+      JA: 'KYOTO',
+      SV2: 'THE RUINS',
+    }
+  },
 }

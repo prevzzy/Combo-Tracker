@@ -1,7 +1,7 @@
 import { log } from '../debug/debugHelpers'
 import { getTrickColorClass } from '../ui/lastCombo/tricks/uiTricks'
 import * as MemoryController from '../game/memory'
-import { isTrackingRethawed } from '../game/interGameUtils'
+import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
 
 const TRICK_CONSTANTS = {
   SWITCH: 'Switch',
@@ -144,7 +144,7 @@ class TrickHistory {
 
   shouldRescanLastTrickPointer(currentTrickCount, currentTrickCountNoGarbage, trickToReadPointer) {
     if (
-      !isTrackingRethawed() ||
+      (!isTrackingRethawed() && !isTrackingThaw()) ||
       this.isNewTrickPointerAfterLimit(trickToReadPointer)
     ) {
       return false

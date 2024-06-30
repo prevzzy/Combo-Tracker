@@ -18,6 +18,22 @@ export function isTrackingRethawed(game) {
   return game === GAME_PROCESSES.RETHAWED
 }
 
+export function isTrackingThug2(game) {
+  if (!game) {
+    game = getActiveGameProcessName()
+  }
+
+  return game === GAME_PROCESSES.THUG2
+}
+
+export function isTrackingThaw(game) {
+  if (!game) {
+    game = getActiveGameProcessName()
+  }
+
+  return game === GAME_PROCESSES.THAW
+}
+
 export function isInMainMenu(currentMapScript) {
   if (!currentMapScript) {
     currentMapScript = MemoryController.getCurrentMapScript()

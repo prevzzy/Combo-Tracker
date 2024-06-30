@@ -6,11 +6,13 @@ import * as MemoryController from './memory'
 import * as ComboTracker from '../combo/tracker'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
-import { updateActiveMapData, setActiveMapData } from '../ui/uiHighscores'
+import { updateActiveMapData, setActiveMapData, setPulsingBackgroundForActiveGame } from '../ui/uiHighscores'
 
 const supportedGames = [
   GAME_PROCESSES.THUGPRO,
-  GAME_PROCESSES.RETHAWED
+  GAME_PROCESSES.RETHAWED,
+  GAME_PROCESSES.THUG2,
+  GAME_PROCESSES.THAW,
 ]
 
 let activeGameProcessName
@@ -49,7 +51,7 @@ function openProcess(gameProcessName) {
   return new Promise((resolve, reject) => {
     memoryjs.openProcess(gameProcessName, (error, processObject) => {
       if (error) {
-        reject(new CustomError(`Could not find active THUG Pro or reTHAWed process.`, 1));
+        reject(new CustomError(`Could not find any active supported game process.`, 1));
       } else {
         MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
         MemoryController.testInitializedAddresses(gameProcessName)
@@ -122,11 +124,12 @@ async function mainLoopLogic() {
     activeGameProcessName = scanProcessesForSupportedGame()
 
     if (!activeGameProcessName) {
-      setupGlobalError(true, 'Could not find active THUG Pro or reTHAWed process.', 1);
+      setupGlobalError(true, 'Could not find any active supported game process.', 1);
       setActiveMapData()
     }
-
+    
     await handleHookingToGameProcess(activeGameProcessName || '')
+    setPulsingBackgroundForActiveGame()
   }
 }
 

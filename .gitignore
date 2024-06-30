@@ -92,6 +92,10 @@ out/
 src/renderer/js/game/offsets.js
 combos/
 combos-reTHAWed/
+combos-THUG2/
+combos-THAW/
 highscores.json
 highscores-reTHAWed.json
+highscores-THUG2.json
+highscores-THAW.json
 src/main/api/auth.js

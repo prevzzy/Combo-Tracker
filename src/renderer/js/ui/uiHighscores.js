@@ -67,11 +67,13 @@ const highscoreStatElementsConfig = {
 }
 
 function initHighscoresPage() {
-  initGameSelect()
+  const selectedGame = getActiveGameProcessName() || GAME_PROCESSES.THUGPRO
+
+  initGameSelect(selectedGame)
   sideDrawerTrigger.addEventListener('click', changeSideDrawerVisibility)
   document.getElementById('hs-backdrop')
     .addEventListener('click', changeSideDrawerVisibility)
-  onGameClick(getActiveGameProcessName() || GAME_PROCESSES.THUGPRO)
+  onGameClick(selectedGame)
 }
 
 function displayMapCategoriesMenuForGame(game) {
@@ -80,20 +82,30 @@ function displayMapCategoriesMenuForGame(game) {
   if (!allMapCategories) {
     return
   }
-  
+
   const allMaps = document.getElementById('hs-all-maps-category')
+  const hasOnlyOneMapCategory = Object.keys(allMapCategories).length === 1
 
-  allMaps.addEventListener('click', (e) => {
-    activeCategoryElement = allMaps;
-    handleHighscoresDisplay(undefined, undefined, true)
-    
-    handleOnMapClick(allMaps)
-  })
+  if (hasOnlyOneMapCategory) {
+    GlobalUI.setItemDisplay(allMaps, 'none')
+  } else {
+    GlobalUI.setItemDisplay(allMaps, 'block')
 
-  for (let mapCategory in allMapCategories) {
-    mapCategoriesMenu.appendChild(createMapCategory(mapCategory, allMapCategories[mapCategory]))
+    allMaps.addEventListener('click', (e) => {
+      activeCategoryElement = allMaps;
+      handleHighscoresDisplay(undefined, undefined, true)
+      handleOnMapClick(allMaps)
+    })
   }
 
+  for (let mapCategory in allMapCategories) {
+    mapCategoriesMenu.appendChild(createMapCategory(
+      mapCategory,
+      allMapCategories[mapCategory],
+      hasOnlyOneMapCategory
+    ))
+  }
+  
   refreshCurrentlyDisplayedHighscores();
 }
 
@@ -135,7 +147,7 @@ function createElementFromTemplate(templateId) {
   return document.importNode(template.content, true);
 }
 
-function createMapCategory(mapCategory, maps) {
+function createMapCategory(mapCategory, maps, isOnlyMapCategory) {
   const mapCategoryElement = createElementFromTemplate('hs-menu-map-accordion-template')
   const mapsListElement = mapCategoryElement.querySelector('.list-group')
 
@@ -144,33 +156,42 @@ function createMapCategory(mapCategory, maps) {
 
   mapCategoryElement.querySelector('.category-name').textContent = mapCategory
   
-  populateMapCategory(mapsListElement, mapCategory, maps)
+  populateMapCategory(mapsListElement, mapCategory, maps, isOnlyMapCategory)
+
   setupCollapse(
     mapCategoryElement,
     '.hs-map-acc-container',
     '.hs-map-acc-trigger',
     '.hs-map-acc-collapse',
     '.hs-map-acc-chevron',
-    mapCategoryElementId
+    mapCategoryElementId,
+    isOnlyMapCategory
   )
 
   return mapCategoryElement
 }
 
-function populateMapCategory(mapsListElement, mapCategory, maps) {
-  const mapCategoryDisplayedName = mapCategory.split(' ').shift()
-
-  mapsListElement.appendChild(
-    createMapCategoryElement(mapCategory, undefined, `ALL ${mapCategoryDisplayedName} LEVELS`)
-  )
+function appendMapListToElement(element, mapCategory, maps) {
 
   for (let mapScriptName in maps) {
-    mapsListElement.appendChild(createMapCategoryElement(mapCategory, mapScriptName, maps[mapScriptName].name))
+    element.appendChild(createMapCategoryElement(mapCategory, mapScriptName, maps[mapScriptName].name))
   }
+}
+
+function populateMapCategory(mapsListElement, mapCategory, maps, isOnlyMapCategory) {
+  const mapCategoryDisplayedName = mapCategory.split(' ').shift()
+  const allCategoryMapsElement = createMapCategoryElement(mapCategory, undefined, `ALL ${mapCategoryDisplayedName} LEVELS`)
+
+  mapsListElement.appendChild(allCategoryMapsElement)
+  appendMapListToElement(mapsListElement, mapCategory, maps)
 
   const gapElement = document.createElement('li')
   gapElement.className = 'list-group-item map-menu-item border-0 py-1'
   mapsListElement.appendChild(gapElement)
+
+  if (isOnlyMapCategory) {
+    allCategoryMapsElement.click()
+  }
 
   return mapsListElement
 }
@@ -193,7 +214,7 @@ function createMapCategoryElement(mapCategory, mapScriptName, text) {
 
     handleOnMapClick(element)
   })
-  
+
   return element
 }
 
@@ -383,7 +404,7 @@ function drawSingleHighscoreStat(parentElement, statName, value) {
   }
 }
     
-function setupCollapse(parentElement, accordionContainerSelector, triggerSelector, collapseSelector, chevronSelector, uniqueId) {
+function setupCollapse(parentElement, accordionContainerSelector, triggerSelector, collapseSelector, chevronSelector, uniqueId, createExpanded) {
   uniqueId = uniqueId.match(/[\d\w]+/g).join('');
 
   const accordionContainerElement = parentElement.querySelector(accordionContainerSelector)
@@ -404,6 +425,9 @@ function setupCollapse(parentElement, accordionContainerSelector, triggerSelecto
   collapseElement.setAttribute('aria-labelledby', triggerId)
   collapseElement.setAttribute('data-parent', `#${accordionContainerId}`)
 
+  if (createExpanded) {
+    collapseElement.classList.add('show')
+  }
 
   if (!chevronElement) {
     collapseElement.addEventListener('click', () => {
@@ -478,9 +502,20 @@ function changeSideDrawerVisibility() {
   }
 }
 
-function updateActiveMapData() {
+function setPulsingBackgroundForActiveGame() {
   const activeGame = getActiveGameProcessName()
 
+  Array.from(gameSelect.children).forEach(element => {
+    if (activeGame === GAME_PROCESSES[element.attributes['data-game'].value]) {
+      element.classList.add('active-game')
+    } else {
+      element.classList.remove('active-game')
+    }
+  })
+}
+
+function updateActiveMapData() {
+  const activeGame = getActiveGameProcessName()
   if (!activeGame || activeGame !== displayedGame) {
     setActiveMapData()
     return;
@@ -549,12 +584,21 @@ function setActiveMapData(game, categoryIcon, mapIcon, mapName, categoryName) {
   }
 }
 
-function initGameSelect() {
+function initGameSelect(selectedGame) {
   Array.from(gameSelect.children).forEach(element => {
     const game = GAME_PROCESSES[element.attributes['data-game'].value]
+
     element.addEventListener('click', (e) => {
+      const selectedGameElement = document.getElementById('selected-game-img')
+      const imgElement = element.querySelector('img');
+      selectedGameElement.src = imgElement.src;
+      selectedGameElement.style.marginTop = imgElement.style.marginTop;
       onGameClick(game)
     })
+
+    if (selectedGame === game) {
+      element.click()
+    }
   })
 }
 
@@ -585,4 +629,5 @@ export {
   refreshCurrentlyDisplayedHighscores,
   updateActiveMapData,
   setActiveMapData,
+  setPulsingBackgroundForActiveGame,
 }
