@@ -11,7 +11,7 @@ import { mapKeyToAccelerator } from '../utils/hotkeyMapper'
 import * as OverlayUI from './uiOverlay'
 import * as HighscoresUI from './uiHighscores'
 import _ from 'lodash'
-import { GAMES, GAME_PROCESSES } from '../utils/constants'
+import { GAMES_BY_PROCESS_NAME, GAME_PROCESSES } from '../utils/constants'
 import { setAndShowPatchNotesModal } from './generalPurposeModal/uiGeneralPurposeModal'
 
 const settingFields = document.querySelectorAll('.user-setting')
@@ -159,16 +159,12 @@ function initResetAllModal() {
 }
 
 function initGameOptionsForResetModal() {
-  const games = [
-    {
-      value: GAME_PROCESSES.THUGPRO,
-      text: GAMES.THUGPRO
-    },
-    {
-      value: GAME_PROCESSES.RETHAWED,
-      text: GAMES.RETHAWED
-    }
-  ]
+  const games = Object.values(GAME_PROCESSES).map(gameProcessName => {
+    return {
+      value: gameProcessName,
+      text: GAMES_BY_PROCESS_NAME[gameProcessName]
+    }  
+  })
   
   games.forEach(({ value, text }) => {
     const gameItem = document.createElement('option')

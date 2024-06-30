@@ -12,8 +12,11 @@
   --scrollbar-color-hover: #433a54;
   --rethawed-color: #f700b5;
   --thugpro-color: #ffd21a;
-  --gradient-top-color: #4b39669a;
-  --gradient-top-color-hover: #6147889a;
+  --thug2-color: #ff9624;
+  --thaw-color: #ec008b;
+  --gradient-top-color: #362b4a;
+  --gradient-top-color-active: #44335e;
+  --gradient-top-color-hover: #4f3c6b;
   --muted: #868e96;
 }
 
@@ -405,8 +408,8 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 
 #hs-map-categories-menu {
   border-top:  1px solid var(--nav-dark);
-  max-height: calc(100vh - 32px - 160px - 32px); /* 160px for map name container, 32px for game select */
-  min-height: calc(100vh - 32px - 160px - 32px);
+  max-height: calc(100vh - 32px - 160px - 40px); /* 160px for map name container, 40px for game select */
+  min-height: calc(100vh - 32px - 160px - 40px);
 }
 
 .hover-only-scrollbar {
@@ -421,10 +424,6 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   display: none;
 }
 
-#thug-pro-game-select{
-  border-right: solid 2px var(--nav-dark)
-}
-
 #thug-pro-game-select:hover, #thug-pro-game-select.active {
   color: var(--thugpro-color);
 }
@@ -433,24 +432,17 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   color: var(--rethawed-color);
 }
 
-#hs-game-select {
-  border-bottom: solid 2px var(--nav-dark);
+#thug2-game-select:hover, #thug2-game-select.active {
+  color: var(--thugpro-color);
 }
 
-.game-select-button {
-  width: 50%;
-  font-weight: 400 !important;
-  padding: 0.2rem 0.5rem;
-  border-radius: 0 !important;
-  color: var(--muted);
-}
-
-.game-select-button.active {
-  background: var(--gradient-top-color);
+#thaw-game-select:hover, #thaw-game-select.active {
+  color: var(--rethawed-color);
 }
 
 .game-select-button:hover, .game-select-button.active:hover {
   background: var(--gradient-top-color-hover);
+  color: var(--secondary);
 }
 
 @media (max-width: 991px) {
@@ -563,6 +555,14 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   color: var(--rethawed-color);
 }
 
+.text-thug2 {
+  color: var(--thug2-color);
+}
+
+.text-thaw {
+  color: var(--thaw-color);
+}
+
 .font-weight-semibold {
   font-weight: 500 !important;
 }
@@ -588,4 +588,70 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   color: var(--secondary);
   font-weight: 500 !important;
   font-size: 1.2rem !important;
+}
+
+.game-select-button {
+  font-weight: 400 !important;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0 !important;
+  color: var(--secondary);
+  background: var(--gradient-top-color);
+}
+
+#hs-map-summary {
+  border-top: solid 2px var(--nav-dark)
+}
+
+#hs-game-select {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  border-radius: 0;
+  border: 0px !important;
+  border-top: 1px solid var(--nav-dark);
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  background: var(--gradient-top-color);
+  overflow: hidden;
+}
+
+.hs-game-select-item:first-of-type {
+  border-top: 2px solid var(--primary-dark) !important;
+}
+
+.hs-game-select-item {
+  padding: 0.37rem 0rem;
+  height: 40px;
+  border: 1px solid var(--primary-dark);
+  transition: background-color 0.1s ease-out;
+}
+
+.game-select-button:before {
+  content: '';
+  height: 1px;
+  width: 12px;
+  display: inline-block;
+}
+
+.hs-game-select-item.active {
+  cursor: pointer;
+  background: var(--gradient-top-color-active);
+}
+
+.hs-game-select-item:hover {
+  cursor: pointer;
+  background: var(--gradient-top-color-hover);
+}
+
+.hs-game-select-item.active-game {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: inset 0px 0px 23px -10px var(--secondary);
+  }
+  50% {
+    box-shadow: inset 0px 0px 23px -10px var( --gradient-top-color);
+  }
 }
