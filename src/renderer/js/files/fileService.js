@@ -23,10 +23,14 @@ function setSavingPaths(paths) {
   highscoresJsonPaths = {
     [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'highscores.json'),
     [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'highscores-reTHAWed.json'),
+    [GAME_PROCESSES.THUG2]: path.join(folderPathToUse, 'highscores-THUG2.json'),
+    [GAME_PROCESSES.THAW]: path.join(folderPathToUse, 'highscores-THAW.json'),
   }
   savedCombosFolderPaths = {
     [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'combos'),
-    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'combos-reTHAWed')
+    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'combos-reTHAWed'),
+    [GAME_PROCESSES.THUG2]: path.join(folderPathToUse, 'combos-THUG2'),
+    [GAME_PROCESSES.THAW]: path.join(folderPathToUse, 'combos-THAW'),
   }
 }
 
