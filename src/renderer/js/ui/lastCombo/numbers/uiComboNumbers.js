@@ -104,14 +104,25 @@ function displayGameName(game) {
   const gameElements = [generalBestScoreGameNameElement, generalTrackedComboGameNameElement]
 
   gameElements.forEach((gameElement) => {
-    gameElement.className = ''
+  gameElement.className = ''
 
-    if (game === GAME_PROCESSES.RETHAWED) {
-      gameElement.classList.add('text-rethawed')
-      gameElement.textContent = GAMES.RETHAWED
-    } else if (!game || game === GAME_PROCESSES.THUGPRO) {
-      gameElement.classList.add('text-thugpro')
-      gameElement.textContent = GAMES.THUGPRO
+    switch(game) {
+      case GAME_PROCESSES.RETHAWED:
+        gameElement.classList.add('text-rethawed')
+        gameElement.textContent = GAMES.RETHAWED
+        break;
+      case GAME_PROCESSES.THUG2:
+        gameElement.classList.add('text-thug2')
+        gameElement.textContent = GAMES.THUG2
+        break;
+      case GAME_PROCESSES.THAW:
+        gameElement.classList.add('text-thaw')
+        gameElement.textContent = GAMES.THAW
+        break;
+      default:
+        gameElement.classList.add('text-thugpro')
+        gameElement.textContent = GAMES.THUGPRO
+        break;
     }
   })
 }
@@ -172,7 +183,7 @@ function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, ta
 }
 
 function setTagLimitStatDisplay(game) {
-  if (game === GAME_PROCESSES.RETHAWED) {
+  if (game === GAME_PROCESSES.RETHAWED || game === GAME_PROCESSES.THAW) {
     GlobalUI.setItemDisplay(tagLimitStatElement, 'none')
   } else {
     GlobalUI.setItemDisplay(tagLimitStatElement, 'block')
