@@ -99,3 +99,11 @@ export function setupAppVersionLink(version) {
     shell.openExternal(e.target.href)
   })
 }
+
+export function setupExternalLinks() {
+  const troubleShootingLink = document.getElementById('troubleshooting-link')
+  troubleShootingLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    shell.openExternal(e.target.href)
+  })
+}

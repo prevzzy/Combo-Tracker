@@ -644,7 +644,7 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 }
 
 .hs-game-select-item.active-game {
-  animation: pulse 2s infinite;
+  animation: pulse 1.75s infinite;
 }
 
 @keyframes pulse {
