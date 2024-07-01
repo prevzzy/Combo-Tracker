@@ -51,6 +51,8 @@ function openProcess(gameProcessName) {
   return new Promise((resolve, reject) => {
     memoryjs.openProcess(gameProcessName, (error, processObject) => {
       if (error) {
+        console.error(error)
+        activeGameProcessName = ''
         reject(new CustomError(`Could not find any active supported game process.`, 1));
       } else {
         MemoryController.initAddresses(processObject.handle, processObject.modBaseAddr, gameProcessName)
@@ -121,14 +123,14 @@ async function mainLoopLogic() {
     await checkMemoryControllerHealth()
     updateActiveMapData(activeGameProcessName)
   } else {
-    activeGameProcessName = scanProcessesForSupportedGame()
+    const gameProcessName = scanProcessesForSupportedGame()
 
-    if (!activeGameProcessName) {
+    if (!gameProcessName) {
       setupGlobalError(true, 'Could not find any active supported game process.', 1);
       setActiveMapData()
     }
     
-    await handleHookingToGameProcess(activeGameProcessName || '')
+    await handleHookingToGameProcess(gameProcessName || '')
     setPulsingBackgroundForActiveGame()
   }
 }

@@ -9,7 +9,7 @@ import * as FileService from './files/fileService'
 import { setupGlobalError } from './ui/globalError'
 import { app } from '@electron/remote'
 import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
-import { setupAppVersionLink } from './utils/helpers'
+import { setupAppVersionLink, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
 
 let isRunning = false
@@ -28,6 +28,7 @@ async function startApp() {
   })
 
   setupAppVersionLink(app.getVersion())
+  setupExternalLinks()
 }
 
 function runCoreLogic(paths) {
