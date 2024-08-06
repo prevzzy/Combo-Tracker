@@ -11,11 +11,11 @@ import {
   formatSecondsToHours,
 } from '../utils/helpers'
 import * as ComboSaver from '../combo/comboSaver'
-import * as GlobalUI from './uiGlobal'
 import * as SavedCombosService from '../combo/savedCombosService'
 import * as LastComboUI from './lastCombo/uiLastCombo'
 import * as MemoryController from '../game/memory'
 import { getActiveGameProcessName } from '../game/gameProcessService'
+import { colorComboPropertyText, setItemDisplay } from './uiHelpers'
 
 const mapCategoriesMenu = document.getElementById('hs-map-categories-menu')
 const mapNameElement = document.getElementById('hs-map')
@@ -87,9 +87,9 @@ function displayMapCategoriesMenuForGame(game) {
   const hasOnlyOneMapCategory = Object.keys(allMapCategories).length === 1
 
   if (hasOnlyOneMapCategory) {
-    GlobalUI.setItemDisplay(allMaps, 'none')
+    setItemDisplay(allMaps, 'none')
   } else {
-    GlobalUI.setItemDisplay(allMaps, 'block')
+    setItemDisplay(allMaps, 'block')
 
     allMaps.addEventListener('click', (e) => {
       activeCategoryElement = allMaps;
@@ -374,7 +374,7 @@ function drawSingleHighscoreStat(parentElement, statName, value) {
         let formattedValue = value
         
         if (statConfig.colorPropertyConfig) {
-          GlobalUI.colorComboPropertyText(
+          colorComboPropertyText(
             statElement,
             value,
             statConfig.colorPropertyConfig.dangerThreshold,
