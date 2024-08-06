@@ -70,6 +70,8 @@ function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   trickCountWithNoGarbageAddress = getAddress(gameHandle, processBaseAddress, trickCountWithNoGarbageAddressData[gameProcessName])
   currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData[gameProcessName])
   specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData[gameProcessName])
+  balanceTrickComponentAddress = getAddress(gameHandle, processBaseAddress, balanceTrickComponentAddressData[gameProcessName])
+  observedPlayerInfoAddress = getAddress(gameHandle, processBaseAddress, observedPlayerInfoAddressData[gameProcessName])
 }
 
 // It's hard to predict whether this function will always work. Current checks depend only on relations between incorrectly initialized values that I noticed.
@@ -306,12 +308,30 @@ function getCurrentStance() {
   return memoryjs.readMemory(gameHandle, currentStanceAddress, memoryjs.INT)
 }
 
+function getBalanceTrickType() {
+  return memoryjs.readMemory(gameHandle, getBalanceComponent() + 0x18, memoryjs.UINT32)
+}
+
+function getBalanceComponent() {
+  return memoryjs.readMemory(gameHandle, balanceTrickComponentAddress, memoryjs.PTR);
+}
+
 function getSpecialMeterNumericValue() {
   return memoryjs.readMemory(gameHandle, specialMeterNumericValueAddress, memoryjs.INT)
 }
 
 function getGrindBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, grindBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function bounceBalance(value) {
+  if (!isAppInDebugMode()) {
+    return;
+  }
+  memoryjs.writeMemory(gameHandle, grindBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, grindTimeAddress, 0, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualTimeAddress, 0, memoryjs.FLOAT)
 }
 
 function getManualBalanceArrowPosition() {
@@ -322,12 +342,27 @@ function getLipBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, lipBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
+function getObservedPlayerName() {
+  return memoryjs.readMemory(gameHandle, getObservedPlayer() + 0x38, memoryjs.STRING)
+}
+
+function getObservedPlayerFlags() {
+  return memoryjs.readMemory(gameHandle, getObservedPlayer() + 0x1D0, memoryjs.INT)
+}
+
+function getObservedPlayer() {
+  return memoryjs.readMemory(gameHandle, observedPlayerInfoAddress, memoryjs.PTR);
+}
+
 export {
   initAddresses,
   testInitializedAddresses,
   getGrindTime,
   getManualTime,
   getLipTime,
+  getGrindBalanceArrowPosition,
+  getManualBalanceArrowPosition,
+  getLipBalanceArrowPosition,
   getCurrentMapScript,
   getMultiplier,
   getBasePoints,
@@ -345,4 +380,10 @@ export {
   getTrickName,
   getTrickFlags,
   getSpecialMeterNumericValue,
+  getObservedPlayerName,
+  getObservedPlayerFlags,
+  getBalanceTrickType,
+
+  // debug helpers
+  bounceBalance
 }
