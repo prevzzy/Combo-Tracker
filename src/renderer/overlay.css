@@ -1,0 +1,113 @@
+body, html {
+  overflow: hidden;
+}
+
+#vertical-balance-arc-svg-container, #horizontal-balance-arc-svg-container {
+  position: absolute;
+}
+
+.balance-arrow-svg-container, #score-display-container {
+  height: 0px;
+  width: 0px;
+  position: absolute;
+  transform-box: fill-box;
+  transform-origin: center center;
+}
+
+.balance-arrow-svg {
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+.balance-arrow-g {
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+.arrow-shadow {
+  -webkit-filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+  filter: drop-shadow( 0px 125px 20px rgba(0, 0, 0, 0.45));
+}
+
+#score-display {
+  height: 100vh;
+  width: 100vw;
+  text-align: center;
+  position: relative;
+}
+
+#score-text-position {
+  position: absolute;
+  top: 81%;
+  width: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@font-face {
+  font-family: 'Gunplay';
+  src: url('../static/gunplay\ rg.otf');
+}
+
+#calculated-score, #score-base-x-multiplier-text {
+  font-family: 'Gunplay';
+  font-weight: 800;
+  -webkit-text-stroke: 1.25px var(--primary-dark);
+  color: var(--secondary-light);
+  letter-spacing: 2px;
+  text-shadow: 2.5px 2.5px var(--nav-dark);
+  word-spacing: -3px;
+}
+
+#score-base-x-multiplier-text {
+  color: var(--secondary);
+}
+
+.combo-landed {
+  animation: comboLanded 5s 1;
+}
+
+.combo-landed > div {
+  color: rgb(61, 148, 211) !important;
+  -webkit-text-stroke: 1.25px var(--nav-dark) !important;
+}
+
+.combo-bailed {
+  animation: comboBailed 5s 1;
+}
+
+.combo-bailed > div {
+  color: rgb(182, 59, 60) !important;
+  -webkit-text-stroke: 1.25px var(--nav-dark) !important;
+}
+
+@keyframes comboLanded {
+  2% { transform: scale(1.6) }
+  3% { transform: scale(1) }
+  5% { transform: scale(1.25) }
+  6% { transform: scale(1) }
+  8% { transform: scale(1.1) }
+  9% { transform: scale(1.025) }
+  93% { transform: scale(1.025) }
+  100% { transform: scale(0) }
+}
+
+@keyframes comboBailed {
+  0% { transform: translate(0, 200%) scale(0); opacity: 0 }
+  4% { transform: translate(0, -5%) scale(0.95); opacity: 1 }
+  7% { transform: translate(0, -15%) scale(1.05); }
+  8% { transform: translate(0, -10%); }
+  12% { transform: translate(0); }
+  73% { transform: translate(0) }
+  75% { transform: translate(0.05%, 0.3%) }
+  79% { transform: translate(-0.05%, -0.5%) }
+  85% { transform: translate(0.25%, 3%) }
+  87% { transform: translate(-0.35%, -2%) }
+  90% { transform: translate(0.2%, 3%) }
+  91% { transform: translate(0.11%, -2%) }
+  92% { transform: translate(-0.2%, 2%) }
+  93% { transform: translate(0.4%, -3%) }
+  94% { transform: translate(0.3%, 3%) }
+  95% { transform: translate(-0.11%, 5%) scale(1.05) }
+  100% { transform: translateY(400%) scale(0) }
+}
