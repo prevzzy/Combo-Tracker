@@ -1,5 +1,5 @@
 import { TRICK_FILTERS, TrickFilteringService } from './trickFiltering'
-import * as GlobalUI from '../../uiGlobal'
+import { initNavigation } from '../../uiNavigation'
 
 let tricksInComboArray = []
 
@@ -101,7 +101,7 @@ function displayComboHistory(comboHistoryHtml) {
 
 function init() {
   initFilters()
-  GlobalUI.initNavigation(navElementsArray, tabContentContainersArray)
+  initNavigation(navElementsArray, tabContentContainersArray)
 }
 
 export {

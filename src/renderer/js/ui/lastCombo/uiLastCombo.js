@@ -1,15 +1,16 @@
-import * as GlobalUI from '../uiGlobal'
 import * as ComboNumbersUI from './numbers/uiComboNumbers'
 import * as TricksUI from './tricks/uiTricks'
 import * as GraphsUI from './graphs/uiGraphs'
 import { APP_CONFIG_VALUES, COMBO_PAGE_INFO_MESSAGES } from '../../utils/constants'
 import * as FileService from '../../files/fileService'
 import { Trick } from '../../combo/trickHistory'
-import { setErrorIconByStatus, setupGlobalError } from '../globalError'
+import { setErrorIconByStatus } from '../globalError'
 import { hasActiveGameInstance } from '../../game/gameProcessService'
 import { deleteHighscoreFromAppSavedCombos } from '../../combo/savedCombosService'
 import { refreshCurrentlyDisplayedHighscores } from '../uiHighscores'
 import { isComboInProgress } from '../../combo/tracker'
+import { setItemDisplay } from '../uiHelpers'
+import { initNavigation } from '../uiNavigation'
 
 const lastComboPage = document.getElementById('last-combo-page')
 const newComboTextElement = document.getElementById('new-combo-text')
@@ -99,21 +100,21 @@ function setLastComboPageInfo(isVisible, message = COMBO_PAGE_INFO_MESSAGES.GENE
   const infoTextElement = document.getElementById('last-combo-error-text')
 
   if (isVisible && !isInfoSameAsLastDismissed(message, status)) {
-    GlobalUI.setItemDisplay(lastComboPageContent, 'none')
-    GlobalUI.setItemDisplay(lastComboPageInfo, 'initial')
+    setItemDisplay(lastComboPageContent, 'none')
+    setItemDisplay(lastComboPageInfo, 'initial')
     setErrorIconByStatus(iconElement, status)
     setLastDismissedInfo()
     setLastDisplayedInfo(message, status)
   } else {
-    GlobalUI.setItemDisplay(lastComboPageContent, 'initial')
-    GlobalUI.setItemDisplay(lastComboPageInfo, 'none')
+    setItemDisplay(lastComboPageContent, 'initial')
+    setItemDisplay(lastComboPageInfo, 'none')
 
     setLastDisplayedInfo()
   }
 
   isInfoDismissable
-    ? GlobalUI.setItemDisplay(infoDismissButton, 'initial')
-    : GlobalUI.setItemDisplay(infoDismissButton, 'none')
+    ? setItemDisplay(infoDismissButton, 'initial')
+    : setItemDisplay(infoDismissButton, 'none')
     
   infoTextElement.textContent = message
 }
@@ -152,7 +153,7 @@ function restoreDefaultUI(shouldDisplayActions) {
   TricksUI.resetTrickTabsScrollbars()
 
   if (!shouldDisplayActions) {
-    GlobalUI.setItemDisplay(deleteHighscoreActionsElement, 'none')
+    setItemDisplay(deleteHighscoreActionsElement, 'none')
   }
 }
 
@@ -160,13 +161,13 @@ function dismissInfoPage() {
   setLastDismissedInfo(lastDisplayedInfo.message, lastDisplayedInfo.status)
   setLastDisplayedInfo()
 
-  GlobalUI.setItemDisplay(lastComboPageInfo, 'none')
-  GlobalUI.setItemDisplay(infoDismissButton, 'none')
-  GlobalUI.setItemDisplay(lastComboPageContent, 'initial')
+  setItemDisplay(lastComboPageInfo, 'none')
+  setItemDisplay(infoDismissButton, 'none')
+  setItemDisplay(lastComboPageContent, 'initial')
 }
 
 function init() {
-  GlobalUI.initNavigation(navElementsArray, tabContentContainersArray)
+  initNavigation(navElementsArray, tabContentContainersArray)
   TricksUI.init()
   GraphsUI.init()
 }
@@ -191,7 +192,7 @@ async function displayComboFromFile(game, fileName) {
 }
 
 function setupHighscoreActions(game, fileName) {
-  GlobalUI.setItemDisplay(deleteHighscoreActionsElement, 'block')
+  setItemDisplay(deleteHighscoreActionsElement, 'block')
 
   if (deleteHighscoreListener) {
     deleteHighscoreButtonElement.removeEventListener('click', deleteHighscoreListener)
@@ -214,7 +215,7 @@ async function deleteHighscore(game, fileName) {
     await FileService.saveHighscoresJson(game, newScores)
 
     refreshCurrentlyDisplayedHighscores()
-    GlobalUI.setItemDisplay(deleteHighscoreActionsElement, 'none')
+    setItemDisplay(deleteHighscoreActionsElement, 'none')
 
     const successMessage = COMBO_PAGE_INFO_MESSAGES.HIGHSCORE_DELETE_SUCCESS
     const messageStatus = 0

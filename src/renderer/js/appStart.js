@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
-import * as GlobalUI from './ui/uiGlobal'
 import * as SettingsUI from './ui/uiSettings'
 import * as GameProcessService from './game/gameProcessService'
 import * as LastComboUI from './ui/lastCombo/uiLastCombo'
@@ -11,6 +10,7 @@ import { app } from '@electron/remote'
 import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
 import { setupAppVersionLink, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
+import { blockHighscoresPage, setupToolbarListeners, showApp } from './ui/uiNavigation'
 
 let isRunning = false
 
@@ -40,7 +40,7 @@ function runCoreLogic(paths) {
       isRunning = true
 
       LastComboUI.init()
-      GlobalUI.setupToolbarListeners()
+      setupToolbarListeners()
       await GameProcessService.mainLoop()
       HighscoresUI.initHighscoresPage()
 
@@ -57,10 +57,10 @@ function runCoreLogic(paths) {
         false
       )
 
-      GlobalUI.blockHighscoresPage()
+      blockHighscoresPage()
     })
     .finally(() => {
-      GlobalUI.showApp()
+      showApp()
     })
 }
 

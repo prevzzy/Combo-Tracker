@@ -1,6 +1,6 @@
 import Chart from 'chart.js'
 import { config } from './graphConfig'
-import * as GlobalUI from '../../uiGlobal'
+import { initNavigation } from '../../uiNavigation'
 
 const allTabsContainer = document.getElementById('combo-details-graphs-tabs-container')
 const allNavElementsContainer = document.getElementById('combo-details-graphs-nav-container')
@@ -143,7 +143,7 @@ function drawRevertPenaltyChart(revertPenaltyDataset) {
 }
 
 function init() {
-  GlobalUI.initNavigation(navElementsArray, tabContentContainersArray)
+  initNavigation(navElementsArray, tabContentContainersArray)
 }
 
 export {
