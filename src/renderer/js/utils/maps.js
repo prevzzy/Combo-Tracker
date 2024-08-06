@@ -12,6 +12,7 @@ export const maps = {
       hn: 'HANGAR',
       sc2: 'SCHOOL II',
       MS: 'MARSEILLES',
+      Skatestreet: 'SKATESTREET VENTURA',
       chopper: 'CHOPPER DROP',
     },
     THPS3: {
@@ -25,11 +26,13 @@ export const maps = {
       nj: 'NEW JERSEY',
       ny: 'MANHATTAN',
       hi: 'HAWAII',
+      sj: 'SLAM CITY JAM',
     },
     THUG2: {
       tr: 'TRAINING',
       BO: 'BOSTON',
       ba: 'BARCELONA',
+      BE: 'BERLIN',
       AU: 'AUSTRALIA',
       st: 'SKATOPIA',
     },
