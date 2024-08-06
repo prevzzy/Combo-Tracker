@@ -1,5 +1,7 @@
 import { log } from '../debug/debugHelpers'
+import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
 import * as MemoryController from '../game/memory'
+import { GAME_CONSTANTS } from '../utils/constants'
 
 const BALANCE_PENALTIES = {
   CHEESE: 'CHEESE',
@@ -85,6 +87,7 @@ class Balance {
     this.manualTimeDataset = []
     this.grindTimeDataset = []
     this.lipTimeDataset = []
+    this.score = null
   }
 
   assumePenaltyRange(balancePenaltyRangeObject, timeDiff) {
@@ -96,7 +99,8 @@ class Balance {
     }
   }
 
-  update() {
+  update(scoreObject) {
+    this.score = scoreObject
     this.updateGrindTime()
     this.updateManualTime()
     this.lipTime = MemoryController.getLipTime()
@@ -162,10 +166,21 @@ class Balance {
   }
 
   updateNewGrindsAmount() {
-    if (this.isNewGrindStarted()) {
-      log('-------- NEW GRIND ---------')
-      this.newGrindsAmount++
+    if (!this.isNewGrindStarted()) {
+      return
     }
+
+    if (
+      this.score &&
+      (isTrackingThaw() || isTrackingRethawed()) && 
+      this.score.getCurrentComboScore() > GAME_CONSTANTS.MAX_INT32_VALUE
+    ) {
+      // in THAW and reTHAWed new grinds don't subtract time after MAX_INT32_VALUE, so simply stop incrementing them
+      return
+    }
+  
+    log('-------- NEW GRIND ---------')
+    this.newGrindsAmount++
   }
 
   isNewGrindStarted() {

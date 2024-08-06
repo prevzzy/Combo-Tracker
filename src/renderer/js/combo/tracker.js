@@ -412,8 +412,8 @@ function checkComboScreenshotCondition(score, mapBestScoreNumber, generalBestSco
 }
 
 function updateComboValues() {
-  balance.update()
   score.update()
+  balance.update(score)
   trickHistory.update()
 
   updateComboTime(Date.now())
