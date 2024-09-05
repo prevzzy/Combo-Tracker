@@ -1,4 +1,4 @@
-import { ipcMain, app } from 'electron'
+import { ipcMain, app, globalShortcut } from 'electron'
 import {
   onDisplayToastRequest,
   onGetSettingRequest,
@@ -9,14 +9,19 @@ import {
   onSendBalanceToStickyTimersRequest,
   onGetLatestUpdateInfoRequest,
   onShowMainWindowRequest,
-  onOpenDirectoryDialogRequest
+  onOpenDirectoryDialogRequest,
+  onDrawBalanceRequest,
+  onDrawScoreNumbersRequest,
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
-// import { OverlayController } from 'electron-overlay-window'
+import { OverlayController } from 'electron-overlay-window'
 
 export function initIpcEvents() {
   ipcMain.on('user-data-path-request', () => {
     const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
+    globalShortcut.register('Alt+.', showOverlay)
+    globalShortcut.register('Alt+,', focusOverlay)
+
 
     mainWindow.webContents.send('user-data-path-request-response', {
       appDataPath: app.getPath('userData'),
@@ -65,44 +70,29 @@ export function initIpcEvents() {
     onRequestAppExit(event, arg)
   })
 
+  ipcMain.on('draw-balance-request', (event, arg) => {
+    onDrawBalanceRequest(event, arg);
+  })
+
+  ipcMain.on('draw-score-numbers-request', (event, arg) => {
+    onDrawScoreNumbersRequest(event, arg);
+  })
+
   ipcMain.handle('get-primary-display-id-request', async (event, arg) => {
     const displayId = await onGetPrimaryDisplayIdRequest()
     return displayId
   })
 
-  ipcMain.on('host-server-request', (event, arg) => {
-    // onHostServerRequest(event, arg, mainWindow);
-  });
-
-  ipcMain.on('connect-to-server-request', (event, arg) => {
-    console.log('connecting to server')
-    // onConnectToServerRequest(event, arg, mainWindow);
-  });
-
-  ipcMain.on('shutdown-server-request', (event, arg) => {
-    // onShutdownServerRequest(event, arg, mainWindow);
-  });
-
-  ipcMain.on('disconnect-from-server-request', (event, arg) => {
-    console.log('disconnecting from server')
-    // onDisconnectFromServerRequest(event, arg, mainWindow);
-  });
-
-  ipcMain.on('send-ws-client-message', (event, arg) => {
-    // onSendWsClientMessageRequest(event, arg, mainWindow)
+  ipcMain.on('show-overlay-request', () => {
+    const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+    
+    // if mainWindow is passed, then mainWindow is displayed - might be useful
+    OverlayController.attachByTitle(
+      overlayWindow,
+      process.platform === 'darwin' ? 'Untitled' : "Tony Hawk's Underground 2",
+      { hasTitleBarOnMac: true }
+    )
   })
-
-  ipcMain.on('send-ws-server-message', (event, arg) => {
-    // onSendWsServerMessageRequest(event, arg, mainWindow)
-  })
-
-  // ipcMain.on('show-overlay-request', () => {
-  //   OverlayController.attachByTitle(
-  //     overlayWindow,
-  //     process.platform === 'darwin' ? 'Untitled' : 'THUG Pro',
-  //     { hasTitleBarOnMac: true }
-  //   )
-  // })
 
   ipcMain.on('send-balance-to-sticky-timers', (event, arg) => {
     onSendBalanceToStickyTimersRequest(event, arg)
@@ -111,4 +101,20 @@ export function initIpcEvents() {
   ipcMain.on('show-main-window-request', () => {
     onShowMainWindowRequest()
   })
+}
+
+function showOverlay() {
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+    
+  // if mainWindow is passed, then mainWindow is displayed - might be useful
+  OverlayController.attachByTitle(
+    overlayWindow,
+    process.platform === 'darwin' ? 'Untitled' : "THUG Pro",
+    { hasTitleBarOnMac: true }
+  )
+}
+
+function focusOverlay() {
+  OverlayController.focusTarget();
+  OverlayController.activateOverlay();
 }

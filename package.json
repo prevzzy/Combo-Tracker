@@ -45,6 +45,7 @@
     "dotenv-webpack": "^7.1.0",
     "electron-settings": "^4.0.2",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-overlay-window": "^3.3.0",
     "eslint": "^7.3.0",
     "file-loader": "^6.2.0",
     "jquery": "^3.5.1",

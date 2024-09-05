@@ -22,6 +22,8 @@ import {
   grindBalanceArrowPositionAddressData,
   manualBalanceArrowPositionAddressData,
   lipBalanceArrowPositionAddressData,
+  balanceTrickComponentAddressData,
+  observedPlayerInfoAddressData
 } from './offsets'
 import { getActiveGameProcessName } from './gameProcessService'
 import { isInMainMenu } from './interGameUtils'
@@ -47,6 +49,8 @@ let trickCountAddress
 let trickCountWithNoGarbageAddress
 let currentStanceAddress
 let specialMeterNumericValueAddress
+let balanceTrickComponentAddress
+let observedPlayerInfoAddress
 
 function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   gameHandle = _gameHandle

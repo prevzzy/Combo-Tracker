@@ -43,5 +43,5 @@ module.exports = {
     //   },
     // },
   ],
-  // externals: ['electron-overlay-window']
+  externals: ['electron-overlay-window']
 };

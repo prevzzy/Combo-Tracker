@@ -153,3 +153,15 @@ export async function onOpenDirectoryDialogRequest() {
 export function onShowMainWindowRequest() {
   showMainWindow()
 }
+
+export function onDrawBalanceRequest(event, arg) {
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+
+  overlayWindow.webContents.send('draw-balance', arg)
+}
+
+export function onDrawScoreNumbersRequest(event, arg) {
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+
+  overlayWindow.webContents.send('draw-score-numbers', arg)
+}
