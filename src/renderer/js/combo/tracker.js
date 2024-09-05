@@ -20,6 +20,7 @@ import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { getActiveGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
+import { requestDrawingBalance, requestDrawingScoreNumbers } from '../events/outgoingIpcEvents'
 
 let finalScore = null
 let comboStartTime = 0
@@ -81,6 +82,25 @@ function getMiscData() {
     maxRevertPenalty: score.maxRevertPenalty,
     multiplierFromGaps: trickHistory.gapsHit,
     graffitiTags: score.graffitiTags,
+  }
+}
+
+function getOverlayComboData() {
+  const {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    balanceTrickType,
+  } = balance;
+
+  return {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    balanceTrickType,
+    multiplier: score.getMultiplier(),
+    basePoints: score.getBasePoints(),
+    score: score.getFinalScore(),
   }
 }
 
@@ -219,12 +239,32 @@ async function track() {
 }
 
 async function finishTrackingCurrentCombo(isIdle) {
+  // TODO: condition for clearing the combo display
+  if (true) {
+    cleanOverlayComboDisplay();
+  }
+
   if (isComboLongEnoughToDisplay() && !isComboTrackingSuspended()) {
     handleSendingDataToListeners()
     await handleComboFinish(isIdle)
   } else {
     restart()
   }
+}
+
+function cleanOverlayComboDisplay() {
+  const { score, multiplier, basePoints } = getOverlayComboData();
+  requestDrawingScoreNumbers({
+    score,
+    isLanded: isComboLanded(),
+    multiplier,
+    basePoints,
+  })
+
+  requestDrawingBalance({
+    horizontal: null,
+    vertical: null
+  })
 }
 
 async function handleComboFinish(isIdle) {
@@ -412,9 +452,43 @@ function checkComboScreenshotCondition(score, mapBestScoreNumber, generalBestSco
 }
 
 function updateComboValues() {
+  const previousBalanceTrickType = balance.balanceTrickType;
+
   score.update()
   balance.update(score)
   trickHistory.update()
+
+  const {
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    manualBalanceArrowPosition,
+    balanceTrickType
+  } = balance;
+
+  const isVerticalBalance = balanceTrickType === 'MANUAL'
+
+  requestDrawingScoreNumbers({
+    score: score.getScore(),
+    multiplier: score.multiplier,
+    basePoints: score.basePoints,
+  })
+
+  // TODO: of course this should be moved elsewhere
+  if (!balanceTrickType && previousBalanceTrickType) {
+    requestDrawingBalance({
+      horizontal: null,
+      vertical: null
+    })
+  } else if (balanceTrickType) {
+    requestDrawingBalance({
+      horizontal: isVerticalBalance
+        ? null
+        : balanceTrickType === 'GRIND'
+          ? grindBalanceArrowPosition
+          : lipBalanceArrowPosition,
+      vertical: isVerticalBalance ? manualBalanceArrowPosition : null
+    })
+  }
 
   updateComboTime(Date.now())
 }

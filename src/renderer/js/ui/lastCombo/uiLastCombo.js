@@ -11,6 +11,7 @@ import { refreshCurrentlyDisplayedHighscores } from '../uiHighscores'
 import { isComboInProgress } from '../../combo/tracker'
 import { setItemDisplay } from '../uiHelpers'
 import { initNavigation } from '../uiNavigation'
+import { requestShowingOverlay } from '../../events/outgoingIpcEvents';
 
 const lastComboPage = document.getElementById('last-combo-page')
 const newComboTextElement = document.getElementById('new-combo-text')
@@ -22,8 +23,10 @@ const allTabsContainer = document.getElementById('combo-details-tabs-container')
 const allNavElementsContainer = document.getElementById('combo-details-nav-container')
 const deleteHighscoreActionsElement = document.getElementById('combo-details-actions-container')
 const deleteHighscoreButtonElement = document.getElementById('combo-details-delete-score-button')
-
+const overlayButton = document.getElementById('overlay-window-button')
 infoDismissButton.addEventListener('click', dismissInfoPage)
+
+overlayButton.addEventListener('click', requestShowingOverlay)
 
 let hasComboDetails = false
 let deleteHighscoreListener;

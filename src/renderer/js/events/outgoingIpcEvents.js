@@ -108,29 +108,8 @@ export async function requestOpeningDirectoryDialog() {
   return path;
 }
 
-export function requestServerHosting(username) {
-  ipcRenderer.send('host-server-request', { username });
-}
-
-export function requestConnectingToServer(username) {
-  ipcRenderer.send('connect-to-server-request', { username });
-}
-
-export function requestServerShutdown() {
-  ipcRenderer.send('shutdown-server-request');
-}
-
-export function requestDisconnectingFromServer() {
-  ipcRenderer.send('disconnect-from-server-request');
-}
-
-// export function requestShowingOverlay() {
-//   ipcRenderer.send('show-overlay-request');
-// }
-
-export function requestSendingWsMessage(message, isHost) {
-  const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
-  ipcRenderer.send(event, message);
+export function requestShowingOverlay() {
+  ipcRenderer.send('show-overlay-request');
 }
 
 export function sendBalanceToStickyTimers(data) {
@@ -147,4 +126,12 @@ export function minimizeSticky() {
 
 export function requestShowingMainWindow() {
   ipcRenderer.send('show-main-window-request')
+}
+
+export function requestDrawingBalance(balanceData) {
+  ipcRenderer.send('draw-balance-request', balanceData)
+}
+
+export function requestDrawingScoreNumbers(scoreData) {
+  ipcRenderer.send('draw-score-numbers-request', scoreData)
 }

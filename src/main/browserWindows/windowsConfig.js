@@ -1,4 +1,4 @@
-// import { OVERLAY_WINDOW_OPTS } from "electron-overlay-window"
+import { OVERLAY_WINDOW_OPTS } from "electron-overlay-window"
 
 import { isAppInDebugMode } from "../utils/helpers"
 
@@ -86,23 +86,23 @@ export const stickyWindowConfig = {
   preventMultiple: true,
 }
 
-// export const overlayWindowConfig = {
-//   getBrowserWindowConfig(display) {
-//     return {
-//       height: 400,
-//       width: 300,
-//       webPreferences: {
-//         nodeIntegration: true,
-//         contextIsolation: false,
-//         enableRemoteModule: true,
-//         preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
-//         devTools: isAppInDebugMode()
-//       },
-//       ...OVERLAY_WINDOW_OPTS,
-//     }
-//   },
-//   url: {
-//     pathname: OVERLAY_WEBPACK_ENTRY,
-//   },
-//   preventMultiple: true,
-// }
+export const overlayWindowConfig = {
+  getBrowserWindowConfig(display) {
+    return {
+      height: 400,
+      width: 300,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        enableRemoteModule: true,
+        preload: OVERLAY_PRELOAD_WEBPACK_ENTRY,
+        devTools: isAppInDebugMode()
+      },
+      ...OVERLAY_WINDOW_OPTS,
+    }
+  },
+  url: {
+    pathname: OVERLAY_WEBPACK_ENTRY,
+  },
+  preventMultiple: true,
+}
