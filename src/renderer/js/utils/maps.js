@@ -34,7 +34,10 @@ export const maps = {
       ba: 'BARCELONA',
       BE: 'BERLIN',
       AU: 'AUSTRALIA',
+      no: 'NEW ORLEANS',
       st: 'SKATOPIA',
+      SE: 'PRO SKATER',
+      SE2: 'THE TRIANGLE'
     },
     THAW: {
       HO: 'HOLLYWOOD',
