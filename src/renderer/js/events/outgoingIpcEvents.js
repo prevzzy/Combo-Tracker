@@ -135,3 +135,31 @@ export function requestDrawingBalance(balanceData) {
 export function requestDrawingScoreNumbers(scoreData) {
   ipcRenderer.send('draw-score-numbers-request', scoreData)
 }
+
+export async function requestCtObserverRegister(id) {
+  const status = await ipcRenderer.invoke('request-ct-observer-register', id)
+
+  return status;
+}
+
+export async function requestCtObserverUnregister() {
+  const status = await ipcRenderer.invoke('request-ct-observer-unregister')
+
+  return status;
+}
+
+export async function requestSubscribingToPlayer(id) {
+  const status = await ipcRenderer.invoke('request-ct-observer-subscribe', id)
+
+  return status;
+}
+
+export async function requestUnsubscribingFromPlayer() {
+  const status = await ipcRenderer.invoke('request-ct-observer-unsubscribe')
+
+  return status;
+}
+
+export function requestCtObserverSendMessage(data) {
+  ipcRenderer.send('request-ct-observer-send-message', data)
+}

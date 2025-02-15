@@ -107,3 +107,7 @@ export function setupExternalLinks() {
     shell.openExternal(e.target.href)
   })
 }
+
+export function testFlag(playerFlags, flagToTest) {
+  return (playerFlags & flagToTest) !== 0;
+}

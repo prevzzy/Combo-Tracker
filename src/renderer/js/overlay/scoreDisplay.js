@@ -48,7 +48,7 @@ export class ScoreDisplay {
   clearFinalScore() {
     clearTimeout(this.finalScoreAnimationTimeoutId);
     this.finalScoreAnimationTimeoutId = null;
-    this.scoreTextContainer.classList.remove([...this.scoreTextContainer.classList]);
+    this.scoreTextContainer.classList.remove(...[...this.scoreTextContainer.classList]);
     this.calculatedScoreElement.innerText = '';
     this.basePointsXMultiplierElement.innerText = '';
   }
