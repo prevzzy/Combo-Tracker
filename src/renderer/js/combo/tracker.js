@@ -20,7 +20,8 @@ import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { getActiveGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
-import { requestDrawingBalance, requestDrawingScoreNumbers } from '../events/outgoingIpcEvents'
+import { requestDrawingBalance, requestDrawingScoreNumbers, requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
+import { shouldSendCtObserverMessage } from '../online/ctObserver'
 
 let finalScore = null
 let comboStartTime = 0
@@ -30,6 +31,7 @@ let balance = new Balance()
 let score = new Score()
 let trickHistory = new TrickHistory()
 let datasetsUpdatingInterval = null
+let sendDataToCtObserverInterval = null
 let trackingInterval = null
 let mapScriptName = null
 let comboTrackingNumbers = {
@@ -170,6 +172,7 @@ function resetTracker() {
   game = null,
   clearInterval(trackingInterval)
   clearInterval(datasetsUpdatingInterval)
+  clearInterval(sendDataToCtObserverInterval)
 }
 
 async function listenForComboStart() {
@@ -215,6 +218,55 @@ async function startTracking(startTime = Date.now()) {
   startDatasetUpdating()
   runIdleDetector(null, null, null, null, comboStartTime)
   await track()
+
+  return
+
+  // TODO: unused for now
+  sendDataToCtObserver()
+}
+
+function sendDataToCtObserver() {
+  return
+
+  // TODO: unused for now
+  sendDataToCtObserverInterval = setInterval(() => {
+    if (!shouldSendCtObserverMessage()) {
+      return;
+    }
+
+    const {
+      grindBalanceArrowPosition,
+      lipBalanceArrowPosition,
+      manualBalanceArrowPosition,
+      balanceTrickType,
+      score,
+      multiplier,
+      basePoints
+    } = getOverlayComboData();
+
+    let balancePosition
+    switch(balanceTrickType) {
+      case 'GRIND':
+        balancePosition = grindBalanceArrowPosition
+        break;
+      case 'MANUAL':
+        balancePosition = manualBalanceArrowPosition
+        break;
+      case 'LIP':
+        balancePosition = lipBalanceArrowPosition
+        break;
+      default:
+        break;
+    }
+  
+    requestCtObserverSendMessage({
+      score,
+      multiplier,
+      basePoints,
+      balanceTrickType,
+      balancePosition
+    })
+  }, 34)
 }
 
 function startDatasetUpdating() {
@@ -231,6 +283,7 @@ async function track() {
       updateComboValues()
       handleSendingDataToListeners()
     } else {
+      clearInterval(sendDataToCtObserverInterval)
       clearInterval(trackingInterval)
       clearInterval(datasetsUpdatingInterval)
       await finishTrackingCurrentCombo()
@@ -239,10 +292,10 @@ async function track() {
 }
 
 async function finishTrackingCurrentCombo(isIdle) {
-  // TODO: condition for clearing the combo display
-  if (true) {
-    cleanOverlayComboDisplay();
-  }
+  // TODO: condition for clearing the combo display; unused for now
+  // if (true) {
+  //   cleanOverlayComboDisplay();
+  // }
 
   if (isComboLongEnoughToDisplay() && !isComboTrackingSuspended()) {
     handleSendingDataToListeners()
@@ -254,16 +307,11 @@ async function finishTrackingCurrentCombo(isIdle) {
 
 function cleanOverlayComboDisplay() {
   const { score, multiplier, basePoints } = getOverlayComboData();
-  requestDrawingScoreNumbers({
+  requestCtObserverSendMessage({
     score,
-    isLanded: isComboLanded(),
     multiplier,
     basePoints,
-  })
-
-  requestDrawingBalance({
-    horizontal: null,
-    vertical: null
+    isLanded: isComboLanded()
   })
 }
 
@@ -452,43 +500,9 @@ function checkComboScreenshotCondition(score, mapBestScoreNumber, generalBestSco
 }
 
 function updateComboValues() {
-  const previousBalanceTrickType = balance.balanceTrickType;
-
   score.update()
   balance.update(score)
   trickHistory.update()
-
-  const {
-    grindBalanceArrowPosition,
-    lipBalanceArrowPosition,
-    manualBalanceArrowPosition,
-    balanceTrickType
-  } = balance;
-
-  const isVerticalBalance = balanceTrickType === 'MANUAL'
-
-  requestDrawingScoreNumbers({
-    score: score.getScore(),
-    multiplier: score.multiplier,
-    basePoints: score.basePoints,
-  })
-
-  // TODO: of course this should be moved elsewhere
-  if (!balanceTrickType && previousBalanceTrickType) {
-    requestDrawingBalance({
-      horizontal: null,
-      vertical: null
-    })
-  } else if (balanceTrickType) {
-    requestDrawingBalance({
-      horizontal: isVerticalBalance
-        ? null
-        : balanceTrickType === 'GRIND'
-          ? grindBalanceArrowPosition
-          : lipBalanceArrowPosition,
-      vertical: isVerticalBalance ? manualBalanceArrowPosition : null
-    })
-  }
 
   updateComboTime(Date.now())
 }

@@ -74,4 +74,34 @@ ipcRenderer.on('draw-score-numbers', (event, arg) => {
   }
 })
 
+ipcRenderer.on('ct-observer-new-message', (event, arg) => {
+  const {
+    score,
+    multiplier,
+    basePoints,
+    balanceTrickType,
+    balancePosition,
+    isLanded
+  } = arg;
+
+  const isVerticalBalance = balanceTrickType === 'MANUAL'
+
+  if (typeof isLanded === 'boolean') {
+    scoreDisplay.displayFinalScore(basePoints, multiplier, score, isLanded)
+  } else {
+    scoreDisplay.updateScoreText(basePoints, multiplier, score);
+  }
+
+  let horizontalBalance = null;
+  let verticalBalance = null;
+
+  if (balanceTrickType) {
+    horizontalBalance = isVerticalBalance ? null : balancePosition;
+    verticalBalance = isVerticalBalance ? balancePosition : null;
+  }
+
+  handleDrawingBalance(horizontalBalanceDisplay, horizontalBalance);
+  handleDrawingBalance(verticalBalanceDisplay, verticalBalance);
+})
+
 enableInspectingHtml()

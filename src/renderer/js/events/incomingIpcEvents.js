@@ -36,4 +36,8 @@ export function initIncomingIpcEventListeners() {
     const { method, args } = arg;
     logWithMethod(method, args)
   });
+
+  ipcRenderer.on('ct-observer-new-message', (event, arg) => {
+    console.log('ct-observer-new-message', arg)
+  });
 }

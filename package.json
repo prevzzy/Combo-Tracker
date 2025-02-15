@@ -31,6 +31,7 @@
     "electron": "18.0.0",
     "native-ext-loader": "^2.3.0",
     "style-loader": "^3.3.1",
+    "twilio-sync": "^3.3.5",
     "utf-8-validate": "^6.0.3"
   },
   "dependencies": {
@@ -43,9 +44,9 @@
     "bootswatch": "4.5.0",
     "chart.js": "2.9.4",
     "dotenv-webpack": "^7.1.0",
+    "electron-overlay-window": "^3.3.0",
     "electron-settings": "^4.0.2",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-overlay-window": "^3.3.0",
     "eslint": "^7.3.0",
     "file-loader": "^6.2.0",
     "jquery": "^3.5.1",

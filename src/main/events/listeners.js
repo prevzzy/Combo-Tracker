@@ -12,6 +12,11 @@ import {
   onOpenDirectoryDialogRequest,
   onDrawBalanceRequest,
   onDrawScoreNumbersRequest,
+  onCtObserverRegisterRequest,
+  onCtObserverUnregisterRequest,
+  onCtObserverSubscribeRequest,
+  onCtObserverUnsubscribeRequest,
+  onCtObserverSendMessageRequest,
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
 import { OverlayController } from 'electron-overlay-window'
@@ -100,6 +105,34 @@ export function initIpcEvents() {
 
   ipcMain.on('show-main-window-request', () => {
     onShowMainWindowRequest()
+  })
+
+  ipcMain.handle('request-ct-observer-register', async (event, arg) => {
+    const status = await onCtObserverRegisterRequest(arg)
+
+    return status
+  })
+
+  ipcMain.handle('request-ct-observer-unregister', async (event, arg) => {
+    const status = await onCtObserverUnregisterRequest()
+
+    return status
+  })
+
+  ipcMain.handle('request-ct-observer-subscribe', async (event, arg) => {
+    const status = await onCtObserverSubscribeRequest(arg)
+
+    return status;
+  })
+
+  ipcMain.handle('request-ct-observer-unsubscribe', async (event, arg) => {
+    const status = await onCtObserverUnsubscribeRequest()
+
+    return status;
+  })
+
+  ipcMain.on('request-ct-observer-send-message', (event, arg) => {
+    onCtObserverSendMessageRequest(arg);
   })
 }
 

@@ -7,6 +7,7 @@ import * as ComboTracker from '../combo/tracker'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { updateActiveMapData, setActiveMapData, setPulsingBackgroundForActiveGame } from '../ui/uiHighscores'
+import { runCtObserver, stopCtObserver } from '../online/ctObserver'
 
 const supportedGames = [
   GAME_PROCESSES.THUGPRO,
@@ -49,6 +50,7 @@ function scanProcessesForSupportedGame() {
 
 function openProcess(gameProcessName) {
   return new Promise((resolve, reject) => {
+    // memoryjs.openProcess(Number(process.env.GAME_PROCESS_NAME), (error, processObject) => {
     memoryjs.openProcess(gameProcessName, (error, processObject) => {
       if (error) {
         console.error(error)
@@ -79,6 +81,9 @@ async function handleHookingToGameProcess(gameProcessName) {
       await ComboTracker.resumeComboTracking()
     }
 
+    // TODO: unused for now
+    // runCtObserver();
+
     return gameProcessName;
   } catch (error) {
     if (!ComboTracker.isComboTrackingSuspended()) {
@@ -86,6 +91,8 @@ async function handleHookingToGameProcess(gameProcessName) {
     }
 
     ComboTracker.shouldSuspendComboTracking(true)
+    // TODO: unused for now
+    // stopCtObserver();
     log(`openProcess ${gameProcessName} FAIL`)
     console.error(error)
     setupGlobalError(true, error.message, error.status)
