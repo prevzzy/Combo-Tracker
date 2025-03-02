@@ -18,10 +18,11 @@ const newComboTextElement = document.getElementById('new-combo-text')
 const newComboTextTimerElement = document.getElementById('new-combo-text-timer')
 const lastComboPageContent = document.getElementById('last-combo-page-content')
 const lastComboPageInfo = document.getElementById('last-combo-page-info');
+const deleteHighscorePageInfoButtonElement = document.getElementById('last-combo-page-info-delete-score-button');
 const infoDismissButton = document.getElementById('last-combo-page-info-dismiss-button')
 const allTabsContainer = document.getElementById('combo-details-tabs-container')
 const allNavElementsContainer = document.getElementById('combo-details-nav-container')
-const deleteHighscoreActionsElement = document.getElementById('combo-details-actions-container')
+const comboDetailsActionsContainerElement = document.getElementById('combo-details-actions-container')
 const deleteHighscoreButtonElement = document.getElementById('combo-details-delete-score-button')
 const overlayButton = document.getElementById('overlay-window-button')
 infoDismissButton.addEventListener('click', dismissInfoPage)
@@ -118,6 +119,10 @@ function setLastComboPageInfo(isVisible, message = COMBO_PAGE_INFO_MESSAGES.GENE
   isInfoDismissable
     ? setItemDisplay(infoDismissButton, 'initial')
     : setItemDisplay(infoDismissButton, 'none')
+
+  if (message !== COMBO_PAGE_INFO_MESSAGES.READING_FILE_FAILED) {
+    setItemDisplay(deleteHighscorePageInfoButtonElement, 'none')
+  }
     
   infoTextElement.textContent = message
 }
@@ -156,7 +161,7 @@ function restoreDefaultUI(shouldDisplayActions) {
   TricksUI.resetTrickTabsScrollbars()
 
   if (!shouldDisplayActions) {
-    setItemDisplay(deleteHighscoreActionsElement, 'none')
+    setItemDisplay(comboDetailsActionsContainerElement, 'none')
   }
 }
 
@@ -191,34 +196,45 @@ async function displayComboFromFile(game, fileName) {
   } catch (error) {
     console.error(error)
     setLastComboPageInfo(true, COMBO_PAGE_INFO_MESSAGES.READING_FILE_FAILED, 1, hasDisplayedComboDetails());
+    setupDeleteHighscoreButton(deleteHighscorePageInfoButtonElement, () => deleteHighscore(game, fileName, true))
   }
+}
+
+function setupDeleteHighscoreButton(buttonElement, onClick) {
+  setItemDisplay(buttonElement, 'inline-block')
+
+  if (deleteHighscoreListener) {
+    buttonElement.removeEventListener('click', deleteHighscoreListener)
+  }
+  
+  deleteHighscoreListener = function() {
+    buttonElement.removeEventListener('click', deleteHighscoreListener)
+    onClick()
+    setItemDisplay(buttonElement, 'none')
+  }
+
+  buttonElement.addEventListener('click', deleteHighscoreListener)
 }
 
 function setupHighscoreActions(game, fileName) {
-  setItemDisplay(deleteHighscoreActionsElement, 'block')
+  setItemDisplay(comboDetailsActionsContainerElement, 'block')
 
-  if (deleteHighscoreListener) {
-    deleteHighscoreButtonElement.removeEventListener('click', deleteHighscoreListener)
-  }
-  
-  deleteHighscoreListener = function () {
-    deleteHighscoreButtonElement.removeEventListener('click', deleteHighscoreListener)
-    deleteHighscore(game, fileName)
-  }
-
-  deleteHighscoreButtonElement.addEventListener('click', deleteHighscoreListener)
+  setupDeleteHighscoreButton(deleteHighscoreButtonElement, () => deleteHighscore(game, fileName, false));
 }
 
-async function deleteHighscore(game, fileName) {
+async function deleteHighscore(game, fileName, skipJson) {
   try {
     setLastComboPageInfo(true, '', 2, false)
     
     const newScores = deleteHighscoreFromAppSavedCombos(game, fileName)
-    await FileService.deleteSavedComboFile(game, fileName)
+
+    if (!skipJson) {
+      await FileService.deleteSavedComboFile(game, fileName)
+    }
     await FileService.saveHighscoresJson(game, newScores)
 
     refreshCurrentlyDisplayedHighscores()
-    setItemDisplay(deleteHighscoreActionsElement, 'none')
+    setItemDisplay(comboDetailsActionsContainerElement, 'none')
 
     const successMessage = COMBO_PAGE_INFO_MESSAGES.HIGHSCORE_DELETE_SUCCESS
     const messageStatus = 0
