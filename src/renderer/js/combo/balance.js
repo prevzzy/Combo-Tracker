@@ -189,7 +189,7 @@ class Balance {
     if (
       this.score &&
       (isTrackingThaw() || isTrackingRethawed()) && 
-      this.score.getCurrentComboScore() > GAME_CONSTANTS.MAX_INT32_VALUE
+      this.score.getComboScore() > GAME_CONSTANTS.MAX_INT32_VALUE
     ) {
       // in THAW and reTHAWed new grinds don't subtract time after MAX_INT32_VALUE, so simply stop incrementing them
       return

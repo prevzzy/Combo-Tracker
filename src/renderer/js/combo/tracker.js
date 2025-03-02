@@ -20,7 +20,7 @@ import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
 import { getActiveGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
-import { requestDrawingBalance, requestDrawingScoreNumbers, requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
+import { requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
 import { shouldSendCtObserverMessage } from '../online/ctObserver'
 
 let finalScore = null
@@ -52,10 +52,10 @@ function shouldSuspendComboTracking(value) {
   isSuspended = value
 }
 
-function getFinalNumbersData() {
+function getFinalNumbersData(isLanded) {
   return {
     score: finalScore,
-    basePoints: score.getBasePoints(),
+    basePoints: score.calculateFinalBasePoints(isLanded),
     multiplier: score.getMultiplier(),
     comboTime,
     date: new Date().toLocaleString(),
@@ -84,6 +84,7 @@ function getMiscData() {
     maxRevertPenalty: score.maxRevertPenalty,
     multiplierFromGaps: trickHistory.gapsHit,
     graffitiTags: score.graffitiTags,
+    bonusBasePoints: score.getBonusBasePoints(),
   }
 }
 
@@ -106,13 +107,14 @@ function getOverlayComboData() {
   }
 }
 
-function getComboNumbersData(isIdle) {
+function getComboNumbersData(isIdle, isLanded) {
   const { grindData, manualData } = getFinalBalanceData()
   const miscData = getMiscData()
   const mainComboData = {
     game,
-    ...getFinalNumbersData(),
+    ...getFinalNumbersData(isLanded),
     isIdle,
+    isLanded: isLanded,
     mapName: SavedCombosService.getMapName(game, mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP
   }
 
@@ -340,17 +342,17 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
     return
   }
   
-  finalScore = score.getFinalScore()
-  score.scoreDataset[score.scoreDataset.length - 1] = (finalScore / 1000000)
+  const isLanded = isComboLanded()
+  finalScore = score.finishCombo(isComboLanded())
 
   const comboData = {
-    stats: getComboNumbersData(isIdle),
+    stats: getComboNumbersData(isIdle, isLanded),
     tricks: getTricksData(),
     graphs: getGraphData()
   }
 
   if (!isIdle && shouldSaveCombo && isComboBigEnoughToSave()) {
-    await handleSavingComboData(game, comboData, shouldScreenshotCombo)
+    await handleSavingComboData(game, comboData, shouldScreenshotCombo, isLanded)
   }
 
   LastComboUI.handleLastComboDisplay(
@@ -363,8 +365,8 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
   restart()
 }
 
-async function handleSavingComboData(game, comboData, shouldScreenshotCombo) {
-  const finalNumbersData = getFinalNumbersData()
+async function handleSavingComboData(game, comboData, shouldScreenshotCombo, isLanded) {
+  const finalNumbersData = getFinalNumbersData(isLanded)
 
   try {
     let comboSaverResponse = await ComboSaver.saveNewCombo(
@@ -475,7 +477,7 @@ function isComboBigEnoughToDisplay() {
 }
 
 function isComboLanded() {
-  // Note that this won't work with 'Always special' cheat turned on.
+  // Note that this won't always work with 'Always special' cheat turned on (although it still works most of the time, because bailing a combo resets special combo meter for a few frames anyway)
   const specialMeterNumericValue = MemoryController.getSpecialMeterNumericValue()
   
   return specialMeterNumericValue > 0 && specialMeterNumericValue <= 3000

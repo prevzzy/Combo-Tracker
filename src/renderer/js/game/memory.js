@@ -30,7 +30,8 @@ import {
   observedPlayerObjectOffsets,
   skaterObjectOffsets,
   ownSkaterScanningStartAddressData,
-  ownSkaterAddressMatchingParts
+  ownSkaterAddressMatchingParts,
+  bonusBasePointsAddressData
 } from './offsets'
 import { getActiveGameProcessName } from './gameProcessService'
 import { isInMainMenu } from './interGameUtils'
@@ -62,6 +63,7 @@ let joinStateAddress
 let ownJoinIdAddress
 let observedPlayerObjectAddress
 let ownSkaterScanningStartAddress
+let bonusBasePointsAddress
 
 function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   gameHandle = _gameHandle
@@ -86,11 +88,13 @@ function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData[gameProcessName])
   specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData[gameProcessName])
   balanceTrickComponentAddress = getAddress(gameHandle, processBaseAddress, balanceTrickComponentAddressData[gameProcessName])
-  joinIdAddress = getAddress(gameHandle, processBaseAddress, joinIdAddressData[gameProcessName])
-  joinStateAddress = getAddress(gameHandle, processBaseAddress, joinStateAddressData[gameProcessName])
-  ownJoinIdAddress = getAddress(gameHandle, processBaseAddress, ownJoinIdAddressData[gameProcessName])
-  observedPlayerObjectAddress = getAddress(gameHandle, processBaseAddress, observedPlayerObjectAddressData[gameProcessName])
-  ownSkaterScanningStartAddress = getAddress(gameHandle, processBaseAddress, ownSkaterScanningStartAddressData[gameProcessName])
+  bonusBasePointsAddress = getAddress(gameHandle, processBaseAddress, bonusBasePointsAddressData[gameProcessName])
+
+  // joinIdAddress = getAddress(gameHandle, processBaseAddress, joinIdAddressData[gameProcessName])
+  // joinStateAddress = getAddress(gameHandle, processBaseAddress, joinStateAddressData[gameProcessName])
+  // ownJoinIdAddress = getAddress(gameHandle, processBaseAddress, ownJoinIdAddressData[gameProcessName])
+  // observedPlayerObjectAddress = getAddress(gameHandle, processBaseAddress, observedPlayerObjectAddressData[gameProcessName])
+  // ownSkaterScanningStartAddress = getAddress(gameHandle, processBaseAddress, ownSkaterScanningStartAddressData[gameProcessName])
 }
 
 // It's hard to predict whether this function will always work. Current checks depend only on relations between incorrectly initialized values that I noticed.
@@ -153,15 +157,16 @@ function testInitializedAddresses(gameProcessName) {
     `
   )
 
-  try {
-    console.log(`
-      getJoinId(): ${getJoinId()}
-      getOwnJoinId(): ${getOwnJoinId()}
-      getJoinState(): ${getJoinState()}
-    `)
-  } catch(error) {
-    console.error(error)
-  }
+  // unused for now
+  // try {
+  //   console.log(`
+  //     getJoinId(): ${getJoinId()}
+  //     getOwnJoinId(): ${getOwnJoinId()}
+  //     getJoinState(): ${getJoinState()}
+  //   `)
+  // } catch(error) {
+  //   console.error(error)
+  // }
 
   const currentMultiplier = getMultiplier()
   const currentBasePoints = getBasePoints()
@@ -386,6 +391,10 @@ function getLipBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, lipBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
+function getBonusBasePoints() {
+  return memoryjs.readMemory(gameHandle, bonusBasePointsAddress, memoryjs.INT)
+}
+
 function getJoinId() {
   return memoryjs.readMemory(gameHandle, joinIdAddress, memoryjs.UINT32);
 }
@@ -537,6 +546,7 @@ export {
   getOwnSkaterAddress,
   getObservedPlayerObjectAddress,
   isSkaterInWorld,
+  getBonusBasePoints,
   // debug helpers
   bounceBalance
 }

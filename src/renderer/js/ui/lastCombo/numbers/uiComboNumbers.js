@@ -26,7 +26,6 @@ const generalTrackedComboGameNameElement = document.getElementById('combo-genera
 const comboTrackingSkippedInfo = document.getElementById('combo-tracking-skipped')
 
 const finalTimeElement = document.getElementById('combo-time')
-const finalTimeDetailsElement = document.getElementById('combo-details-time')
 const grindTimeElement = document.getElementById('combo-grind-time')
 const tagLimitElement = document.getElementById('combo-tag-limit')
 const tagLimitStatElement = document.getElementById('combo-tag-limit-stat')
@@ -41,13 +40,14 @@ const lipTimeElement = document.getElementById('combo-lip-time')
 const revertPenaltyElement = document.getElementById('combo-revert-penalty')
 const multiplierFromGapsElement = document.getElementById('combo-multi-from-gaps')
 const graffitiTagsElement = document.getElementById('combo-graffiti-tags')
+const bonusBasePointsElement = document.getElementById('combo-bonus-base-points')
 
 function displayComboNumbers({ mainComboData, grindData, manualData, miscData, comboTrackingNumbers }, shouldDisplayDate) { 
-  const { game } = mainComboData
+  const { game, isLanded } = mainComboData
   displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayDate)
   displayGrind(grindData, game)
   displayManual(manualData)
-  displayMisc(miscData)
+  displayMisc(miscData, isLanded)
 }
 
 function displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayDate) {
@@ -61,13 +61,11 @@ function displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayD
     game,
   } = mainComboData
 
-
   finalScoreElement.textContent = formatScore(score)
   finalNumbersElement.textContent = `${formatScore(basePoints)} x ${multiplier}`
 
   const finalTime = formatTimestamp(comboTime)
   finalTimeElement.textContent = finalTime
-  finalTimeDetailsElement.textContent = finalTime
   
   setComboTrackingSkippedInfoElement(comboTrackingNumbers, mapName)
 
@@ -199,13 +197,33 @@ function displayManual({ manualTime, manualCheeseAddedTime, pivotsAddedTime }) {
   pivotPenaltyElement.textContent = formatBalancePropertyTime(pivotsAddedTime, true)
 }
 
-function displayMisc({ lipTime, maxRevertPenalty, multiplierFromGaps, graffitiTags }) {
+function displayMisc(miscData, isLanded) {
+  const {
+    lipTime,
+    maxRevertPenalty,
+    multiplierFromGaps,
+    graffitiTags,
+    bonusBasePoints,
+  } = miscData;
   colorComboPropertyText(revertPenaltyElement, maxRevertPenalty, 5, 4)
 
   lipTimeElement.textContent = formatBalancePropertyTime(lipTime)
   revertPenaltyElement.textContent = maxRevertPenalty
   multiplierFromGapsElement.textContent = multiplierFromGaps
   graffitiTagsElement.textContent = graffitiTags
+
+  if (bonusBasePoints) {
+    setItemDisplay(bonusBasePointsElement.parentElement, 'flex');
+    bonusBasePointsElement.textContent = formatScore(bonusBasePoints);
+
+    const fakeThreshold = isLanded ? bonusBasePoints + 1 : -1;
+    colorComboPropertyText(bonusBasePointsElement, bonusBasePoints, fakeThreshold, fakeThreshold);
+
+    bonusBasePointsElement.style.textDecoration = isLanded ? 'none' : 'line-through'
+    bonusBasePointsElement.previousElementSibling.style.textDecoration = isLanded ? 'none' : 'line-through'
+  } else {
+    setItemDisplay(bonusBasePointsElement.parentElement, 'none')
+  }
 }
 
 export {
