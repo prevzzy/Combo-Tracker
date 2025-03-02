@@ -109,6 +109,8 @@ export async function requestOpeningDirectoryDialog() {
 }
 
 export function requestShowingOverlay() {
+  return;
+  // unused for now
   ipcRenderer.send('show-overlay-request');
 }
 
