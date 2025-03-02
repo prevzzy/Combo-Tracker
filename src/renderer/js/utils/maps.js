@@ -3,10 +3,13 @@ import { GAMES, GAME_PROCESSES } from "./constants"
 export const maps = {
   [GAME_PROCESSES.RETHAWED]: {
     THPS1: {
+      ware: 'WAREHOUSE',
       sc: 'SCHOOL',
       MA: 'THE MALL',
       CH: 'CHICAGO',
       DN: 'MINNEAPOLIS',
+      Burnside: 'BURNSIDE',
+      ros: 'ROSWELL'
     },
     THPS2: {
       hn: 'HANGAR',
@@ -17,16 +20,23 @@ export const maps = {
     },
     THPS3: {
       ap: 'AIRPORT',
+      si: 'SKATER ISLAND'
     },
     THPS4: {
       sch: 'COLLEGE',
+      alc: 'ALCATRAZ',
       kon: 'KONA SKATEPARK'
     },
     THUG: {
       nj: 'NEW JERSEY',
       ny: 'MANHATTAN',
+      fl: 'TAMPA',
+      sd: 'SAN DIEGO',
       hi: 'HAWAII',
+      vc: 'VANCOUVER',
       sj: 'SLAM CITY JAM',
+      ru: 'MOSCOW',
+      se3: 'HOTTER THAN HELL'
     },
     THUG2: {
       tr: 'TRAINING',
@@ -55,16 +65,19 @@ export const maps = {
       AT: 'ATLANTA',
     },
     THP8: {
+      training: 'TRAINING',
       houses: 'SUBURBS',
       shops: 'DOWNTOWN',
       Center: 'CITY CENTER',
       inschool: 'HIGH SCHOOL',
+      cretepark: 'CRETE PARK',
       riod: 'DOWNHILL'
     },
     "MISC LEVELS": {
       canpsx: 'CANADA (PSX)',
       pizza: 'PIZZA PLANET'
-    }
+    },
+    "CUSTOM LEVELS": {}
   },
   [GAME_PROCESSES.THUGPRO]: {
     THPS1: {
@@ -159,6 +172,7 @@ export const maps = {
     "MISC LEVELS": {
       toystory_bedroom: "ANDY'S ROOM"
     },
+    "CUSTOM LEVELS": {}
   },
   [GAME_PROCESSES.THUG2]: {
     [GAMES.THUG2]: {
