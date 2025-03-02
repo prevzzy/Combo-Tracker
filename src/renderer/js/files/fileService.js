@@ -133,7 +133,6 @@ function createNewHighscoresJson(game) {
       },
       mapCategories: {
         ...mapCategoriesJson,
-        ...(isTrackingThugPro(game) ? { 'CUSTOM LEVELS': {} } : undefined)
       } 
     }
 
