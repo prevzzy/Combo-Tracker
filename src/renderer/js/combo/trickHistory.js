@@ -73,9 +73,7 @@ class Trick {
   
   To avoid really complex logic and dealing with many edge cases, TrickHistory class mimicks the in-game trick history array. Given that there is quite a lot of logic based just on observations, saved trick history might not be 100% the same as the in-game trick history, although the differences should be rare and minimal.
 
-  trickCountNoGarbage is needed for failover THAW trick reading. This value tracks trick count differently from "normal" trickCount as it skips "empty" tricks (ollies, sketchy/clean landings and maybe some other stuff). F.e. if in THAW you are doing three tricks in a row mid-air, the "normal" trickCount gets updated after the second trick is made instead of the first one. The trickCountNoGarbage value however gets updated immediately for every trick. This means that the new trick might not always increment trickCount but will still overwrite the last trick in trick history array (always(?) an "empty" trick). Checking this value assures that no tricks are skipped in trick reading.
-    
-  This value can't be used to directly index the trickPointerArray though, as its value can go higher than 250 (the hardcoded in-game trickCount limit). I'm not sure what is this used for in-game, but it resets on combo bail and persists on combo land.
+  trickCountNoGarbage is needed for failover THAW trick reading. This value tracks trick count differently from "normal" trickCount as it skips "empty" tricks (ollies, sketchy/clean landings and maybe some other stuff). F.e. if in THAW you are doing three tricks in a row mid-air, the "normal" trickCount gets updated after the second trick is made instead of the first one. The trickCountNoGarbage value however gets updated immediately for every trick. This means that the new trick might not always increment trickCount but will still overwrite the last trick in trick history array (always(?) an "empty" trick). Checking this value assures that no tricks are skipped in trick reading. This value can't be used to directly index the trickPointerArray though, as its value can go higher than 250 (the hardcoded in-game trickCount limit). I'm not sure what is this used for in-game, but it resets on combo bail and persists on combo land.
 */
 class TrickHistory {
   constructor() {
@@ -88,14 +86,24 @@ class TrickHistory {
     this.hasHitTrickCountLimit = false
   }
 
+  compareTricks(trickOne = {}, trickTwo = {}) {
+    return trickOne.name === trickTwo.name &&
+    trickOne.flags === trickTwo.flags
+  }
+
+  createTrickId(trickObject) {
+    return `${trickObject.name}_${trickObject.flags}`
+  }
+  
   updateTricksInCombo(newTricksArray) {
     newTricksArray.forEach((trickObject) => {
-      const existingTrickInCombo = this.tricksInCombo.get(trickObject.name)
-
-      if (existingTrickInCombo) {
+      const trickId = this.createTrickId(trickObject);
+      const existingTrickInCombo = this.tricksInCombo.get(trickId)
+      
+      if (existingTrickInCombo && this.compareTricks(trickObject, existingTrickInCombo)) {
         existingTrickInCombo.incrementTimesUsedCounter()
       } else {
-        this.tricksInCombo.set(trickObject.name, trickObject)
+        this.tricksInCombo.set(trickId, trickObject)
         trickObject.incrementTimesUsedCounter()
       }
     })

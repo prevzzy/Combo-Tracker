@@ -289,12 +289,17 @@
                   </div>
                 </div>
                 <div id="combo-details-tricks" style="display: none">
-                  <nav class="m-0 p-0 navbar navbar-dark navbar-expand mt-3 mb-4">
-                    <div id="combo-details-tricks-nav-container" class="navbar-nav">
-                      <a class="btn btn-sm nav-item nav-highlight mr-2 active" role="button">Usage</a>
-                      <a class="btn btn-sm nav-item nav-highlight mr-2" role="button">History</a>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <nav class="m-0 p-0 navbar navbar-dark navbar-expand mt-3 mb-4">
+                      <div id="combo-details-tricks-nav-container" class="navbar-nav">
+                        <a id="combo-details-trick-usage-button" class="btn btn-sm nav-item nav-highlight mr-2 active" role="button">Usage</a>
+                        <a id="combo-details-trick-history-button" class="btn btn-sm nav-item nav-highlight mr-2" role="button">History</a>
+                      </div>
+                    </nav>
+                    <div>
+                      Tricks total: <span id="combo-details-total-tricks-used" class="text-secondary">480</span>
                     </div>
-                  </nav>
+                  </div>
                   <div id="combo-details-tricks-tabs-container">
                     <div id="trick-usage">
                       <div class="row p-0 m-0 mb-3">
@@ -351,12 +356,12 @@
                             <span class="text-secondary">Trick name</span>
                             <span class="text-secondary">#</span>
                           </div>
-                          <div id="trick-usage-container" style="overflow-y: overlay; max-height: 408px">
+                          <div id="trick-usage-container" style="overflow-y: overlay; max-height: 500px">
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div id="trick-history" class="text-center" style="max-height: 480px; overflow-y: overlay; display: none">
+                    <div id="trick-history" class="text-center" style="max-height: 500px; overflow-y: overlay; display: none">
                       <div id="trick-history-container" class="mr-3"></div>
                     </div>
                   </div>
