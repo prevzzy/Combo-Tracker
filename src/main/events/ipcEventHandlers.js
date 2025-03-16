@@ -1,11 +1,11 @@
 import { TOASTS_CONFIG } from '../utils/constants'
-import { getSetting, setSetting, restoreDefaultSettings } from '../settings/settings'
+import { getSetting, setSettings, restoreDefaultSettings, registerAllShortcuts, unregisterAllShortcuts } from '../settings/settings'
 import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 import { app, dialog } from 'electron'
-import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, showMainWindow } from '../browserWindows/browserWindows'
+import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, hideStickyWindow, showMainWindow } from '../browserWindows/browserWindows'
 import { getLatestUpdate } from '../api/api'
 import ctObserverService from '../online/ctObserver/CtObserverService'
 
@@ -91,9 +91,9 @@ export async function onGetSettingRequest(event, arg) {
 }
 
 export function onSetSettingRequest(event, arg) {
-  const { settingsToUpdate } = arg.payload
+  const { settingsToUpdate, params } = arg.payload
 
-  setSetting(settingsToUpdate)
+  setSettings(settingsToUpdate, params)
 }
 
 export async function onRestartSettingsRequest() {
@@ -213,4 +213,13 @@ export function onCtObserverSendMessageRequest(data) {
 
   // TODO: unused for now
   ctObserverService.sendMessage(data)
+}
+
+export function onCleanupAllShortcutsRequest() {
+  hideStickyWindow();
+  unregisterAllShortcuts();
+}
+
+export function onRegisterAllShortcutsRequest() {
+  registerAllShortcuts();
 }

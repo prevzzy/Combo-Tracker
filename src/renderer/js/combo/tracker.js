@@ -18,7 +18,7 @@ import * as MemoryController from '../game/memory'
 import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
-import { getActiveGameProcessName } from '../game/gameProcessService'
+import { getHookedGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
 import { requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
 import { shouldSendCtObserverMessage } from '../online/ctObserver'
@@ -43,6 +43,7 @@ let comboTrackingNumbers = {
 let isSuspended = true
 let shouldRunIdleDetector = true
 let game = null
+let isTrackerRunning = false
 
 function isComboTrackingSuspended() {
   return isSuspended
@@ -179,6 +180,7 @@ function resetTracker() {
 
 async function listenForComboStart() {
   if (isComboTrackingSuspended()) {
+    isTrackerRunning = false;
     return
   }
 
@@ -213,7 +215,7 @@ function displayInProgressInfoWithDelay(lastComboStart) {
 async function startTracking(startTime = Date.now()) {
   comboStartTime = startTime
   mapScriptName = MemoryController.getCurrentMapScript()
-  game = getActiveGameProcessName()
+  game = getHookedGameProcessName()
 
   LastComboUI.setNewComboTextDisplay(true)
   displayInProgressInfoWithDelay(comboStartTime)
@@ -341,7 +343,7 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
     restart()
     return
   }
-  
+
   const isLanded = isComboLanded()
   finalScore = score.finishCombo(isComboLanded())
 
@@ -518,14 +520,17 @@ function updateComboTime(timestamp) {
 }
 
 async function resumeComboTracking() {
-  if (!isSuspended) {
+  if (!isSuspended || isTrackerRunning) {
     return
   }
+
+  log('resuming ComboTracker')
 
   shouldSuspendComboTracking(false)
   await listenForComboStart()
   setupGlobalError(false)
   LastComboUI.displayDefaultComboPageInfo()
+  isTrackerRunning = true;
 }
 
 export function getBalance() {

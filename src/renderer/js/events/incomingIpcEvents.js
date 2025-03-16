@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { getCurrentMapScript } from '../game/memory'
-import { getActiveGameProcessName } from '../game/gameProcessService'
+import { getHookedGameProcessName } from '../game/gameProcessService'
 import { requestMapHighscoresToast } from './outgoingIpcEvents'
 import { ALL_MAPS } from '../utils/constants'
 import { onSettingsRequestResponse } from '../ui/uiSettings'
@@ -9,14 +9,14 @@ import { logWithMethod } from '../debug/debugHelpers'
 
 export function initIncomingIpcEventListeners() {
   ipcRenderer.on('display-all-maps-highscores', () => {
-    const activeGame = getActiveGameProcessName();
+    const activeGame = getHookedGameProcessName();
     if (activeGame) {
       requestMapHighscoresToast(activeGame, ALL_MAPS)
     }
   })
 
   ipcRenderer.on('display-current-map-highscores', () => {
-    const activeGame = getActiveGameProcessName();
+    const activeGame = getHookedGameProcessName();
     if (activeGame) {
       const currentMapScriptName = getCurrentMapScript()
       

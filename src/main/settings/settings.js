@@ -28,7 +28,7 @@ async function setDefaultValuesToSettingsMissingInJson() {
   }
 
   if (Object.keys(missingSettings).length !== 0) {
-    await setSetting(missingSettings)
+    await setSettings(missingSettings)
   }
 }
 
@@ -78,7 +78,7 @@ function createDefaultScreenshotsFolder() {
   }
 }
 
-export async function runSettingChangeHandlers(settingsToUpdate) {
+export async function runSettingChangeHandlers(settingsToUpdate, params = {}) {
   const settingKeys = Object.keys(settingsToUpdate)
   const shortcutsToUpdate = settingKeys.filter(key =>
     Object.values(SHORTCUT_SETTING_NAMES).some(shortcutSettingName =>
@@ -86,11 +86,19 @@ export async function runSettingChangeHandlers(settingsToUpdate) {
     )
   )
 
-  if (shortcutsToUpdate) {
+  const { skipRegisteringShortcuts } = params;
+
+  if (shortcutsToUpdate && !skipRegisteringShortcuts) {
     await unregisterShortcuts(shortcutsToUpdate)
   }
 
   for (const key of settingKeys) {
+    const isShortcutSetting = Object.values(SHORTCUT_SETTING_NAMES).find(shortcutKey => shortcutKey === key);
+
+    if (isShortcutSetting && skipRegisteringShortcuts) {
+      continue;
+    }
+
     const handler = settingChangeHandlers.get(key)
 
     if (!!handler) {
@@ -103,8 +111,8 @@ export async function runSettingChangeHandlers(settingsToUpdate) {
   }
 }
 
-export async function setSetting(newSettings) {
-  await runSettingChangeHandlers(newSettings);
+export async function setSettings(newSettings, params) {
+  await runSettingChangeHandlers(newSettings, params);
   
   const currentSettings = await electronSettings.get()
   
@@ -141,11 +149,27 @@ async function syncAutoLaunchValueWithSystem() {
     const appSetting = await getSetting(SETTINGS_STRINGS.LAUNCH_AT_STARTUP);
 
     if (appSetting !== systemSetting) {
-      await setSetting(systemSetting)
+      await setSettings(systemSetting)
     }
   } catch(error) {
     console.error(error)
   }
+}
+
+export async function unregisterAllShortcuts() {
+  await unregisterShortcuts(Object.values(SHORTCUT_SETTING_NAMES));
+}
+
+export async function registerAllShortcuts() {
+  const shortcutSettings = {}
+
+  for (const shortcutName of Object.values(SHORTCUT_SETTING_NAMES)) {
+    const shortcut = await getSetting(shortcutName);
+
+    shortcutSettings[shortcutName] = shortcut;
+  }
+
+  await setSettings(shortcutSettings);
 }
 
 createDefaultScreenshotsFolder()

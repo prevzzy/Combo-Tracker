@@ -69,10 +69,11 @@ export function requestSettingValue(key) {
   })
 }
 
-export function requestSettingUpdate(settingsToUpdate) {
+export function requestSettingUpdate(settingsToUpdate, params) {
   ipcRenderer.send('set-setting-request', {
     payload: {
-      settingsToUpdate
+      settingsToUpdate,
+      params
     }
   })
 }
@@ -164,4 +165,12 @@ export async function requestUnsubscribingFromPlayer() {
 
 export function requestCtObserverSendMessage(data) {
   ipcRenderer.send('request-ct-observer-send-message', data)
+}
+
+export function requestCleaningUpAllShortcuts() {
+  ipcRenderer.send('cleanup-all-shortcuts');
+}
+
+export function requestRegisteringAllShortcuts() {
+  ipcRenderer.send('register-all-shortcuts');
 }

@@ -14,7 +14,7 @@ import * as ComboSaver from '../combo/comboSaver'
 import * as SavedCombosService from '../combo/savedCombosService'
 import * as LastComboUI from './lastCombo/uiLastCombo'
 import * as MemoryController from '../game/memory'
-import { getActiveGameProcessName } from '../game/gameProcessService'
+import { getHookedGameProcessName } from '../game/gameProcessService'
 import { colorComboPropertyText, setItemDisplay } from './uiHelpers'
 
 const mapCategoriesMenu = document.getElementById('hs-map-categories-menu')
@@ -67,7 +67,7 @@ const highscoreStatElementsConfig = {
 }
 
 function initHighscoresPage() {
-  const selectedGame = getActiveGameProcessName() || GAME_PROCESSES.THUGPRO
+  const selectedGame = getHookedGameProcessName() || GAME_PROCESSES.THUGPRO
 
   initGameSelect(selectedGame)
   sideDrawerTrigger.addEventListener('click', changeSideDrawerVisibility)
@@ -503,7 +503,7 @@ function changeSideDrawerVisibility() {
 }
 
 function setPulsingBackgroundForActiveGame() {
-  const activeGame = getActiveGameProcessName()
+  const activeGame = getHookedGameProcessName()
 
   Array.from(gameSelect.children).forEach(element => {
     if (activeGame === GAME_PROCESSES[element.attributes['data-game'].value]) {
@@ -515,7 +515,7 @@ function setPulsingBackgroundForActiveGame() {
 }
 
 function updateActiveMapData() {
-  const activeGame = getActiveGameProcessName()
+  const activeGame = getHookedGameProcessName()
   if (!activeGame || activeGame !== displayedGame) {
     setActiveMapData()
     return;

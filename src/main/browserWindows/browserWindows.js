@@ -75,7 +75,8 @@ export function createAppWindows() {
   stickyWindow = createBrowserWindow(stickyWindowConfig)
   overlayWindow = createBrowserWindow(overlayWindowConfig)
 
-  makeDemoInteractive(overlayWindow)
+  // TODO: unused for now
+  // makeDemoInteractive(overlayWindow)
 
   setupWindowEventHandlers()
 }
@@ -110,12 +111,16 @@ function setupWindowEventHandlers() {
   stickyWindow.on('close', (event) => {
     if (!isAppQuitting()) {
       event.preventDefault();
-      stickyWindow.hide();
-      onStickyWindowVisibilityChange(false)
+      hideStickyWindow()
     }
   })
 
   setupStickyWindowContextMenu()
+}
+
+export function hideStickyWindow() {
+  stickyWindow.hide();
+  onStickyWindowVisibilityChange(false)
 }
 
 function setupStickyWindowContextMenu() {
