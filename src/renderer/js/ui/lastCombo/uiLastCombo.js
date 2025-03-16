@@ -5,7 +5,7 @@ import { APP_CONFIG_VALUES, COMBO_PAGE_INFO_MESSAGES } from '../../utils/constan
 import * as FileService from '../../files/fileService'
 import { Trick } from '../../combo/trickHistory'
 import { setErrorIconByStatus } from '../globalError'
-import { hasActiveGameInstance } from '../../game/gameProcessService'
+import { isAppHookedToGame } from '../../game/gameProcessService'
 import { deleteHighscoreFromAppSavedCombos } from '../../combo/savedCombosService'
 import { refreshCurrentlyDisplayedHighscores } from '../uiHighscores'
 import { isComboInProgress } from '../../combo/tracker'
@@ -268,7 +268,7 @@ function displayDefaultComboPageInfo() {
   let message = COMBO_PAGE_INFO_MESSAGES.TRACKER_NOT_READY
   let status = 3;
 
-  if (hasActiveGameInstance()) {
+  if (isAppHookedToGame()) {
     message = isComboInProgress()
       ?  COMBO_PAGE_INFO_MESSAGES.TRACKER_IN_PROGRESS
       :  COMBO_PAGE_INFO_MESSAGES.TRACKER_READY

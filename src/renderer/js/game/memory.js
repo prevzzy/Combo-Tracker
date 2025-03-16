@@ -33,7 +33,7 @@ import {
   ownSkaterAddressMatchingParts,
   bonusBasePointsAddressData
 } from './offsets'
-import { getActiveGameProcessName } from './gameProcessService'
+import { getHookedGameProcessName } from './gameProcessService'
 import { isInMainMenu } from './interGameUtils'
 import { hasSpecialUnicodeCharacter } from '../utils/helpers'
 
@@ -255,13 +255,13 @@ function getTrickHistoryArrayAddress() {
     throw new Error('Can\'t read memory without gameHandle.')
   }
 
-  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData[getActiveGameProcessName()])
+  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData[getHookedGameProcessName()])
 
   return trickHistoryArrayAddress
 }
 
 function getOffset(offsetsObject, property) {
-  const activeGameProcessName = getActiveGameProcessName()
+  const activeGameProcessName = getHookedGameProcessName()
   if (!activeGameProcessName) {
     return
   }
@@ -497,7 +497,7 @@ function getOwnSkaterAddress() {
 }
 
 function hasMatchingOwnSkaterAddress(hexAddress) {
-  const offsetsToCheck = ownSkaterAddressMatchingParts[getActiveGameProcessName()]
+  const offsetsToCheck = ownSkaterAddressMatchingParts[getHookedGameProcessName()]
 
   if (!offsetsToCheck) {
     return false;

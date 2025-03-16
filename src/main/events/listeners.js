@@ -17,6 +17,8 @@ import {
   onCtObserverSubscribeRequest,
   onCtObserverUnsubscribeRequest,
   onCtObserverSendMessageRequest,
+  onCleanupAllShortcutsRequest,
+  onRegisterAllShortcutsRequest,
 } from './ipcEventHandlers'
 import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
 import { OverlayController } from 'electron-overlay-window'
@@ -24,8 +26,9 @@ import { OverlayController } from 'electron-overlay-window'
 export function initIpcEvents() {
   ipcMain.on('user-data-path-request', () => {
     const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
-    globalShortcut.register('Alt+.', showOverlay)
-    globalShortcut.register('Alt+,', focusOverlay)
+    // unused for now:
+    // globalShortcut.register('Alt+.', showOverlay)
+    // globalShortcut.register('Alt+,', focusOverlay)
 
 
     mainWindow.webContents.send('user-data-path-request-response', {
@@ -134,6 +137,14 @@ export function initIpcEvents() {
   ipcMain.on('request-ct-observer-send-message', (event, arg) => {
     onCtObserverSendMessageRequest(arg);
   })
+
+  ipcMain.on('cleanup-all-shortcuts', () => {
+    onCleanupAllShortcutsRequest()
+  });
+
+  ipcMain.on('register-all-shortcuts', () => {
+    onRegisterAllShortcutsRequest()
+  });
 }
 
 function showOverlay() {

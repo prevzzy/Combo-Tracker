@@ -11,6 +11,7 @@ import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
 import { setupAppVersionLink, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
 import { blockHighscoresPage, setupToolbarListeners, showApp } from './ui/uiNavigation'
+import { requestCleaningUpAllShortcuts } from './events/outgoingIpcEvents'
 
 let isRunning = false
 
@@ -57,6 +58,7 @@ function runCoreLogic(paths) {
         false
       )
 
+      requestCleaningUpAllShortcuts()
       blockHighscoresPage()
     })
     .finally(() => {

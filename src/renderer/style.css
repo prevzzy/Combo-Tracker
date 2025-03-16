@@ -650,9 +650,9 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: inset 0px 0px 23px -10px var(--secondary);
+    box-shadow: inset 0px 0px 23px -10px var(--gradient-top-color);
   }
   50% {
-    box-shadow: inset 0px 0px 23px -10px var( --gradient-top-color);
+    box-shadow: inset 0px 0px 23px -10px var(--secondary);
   }
 }

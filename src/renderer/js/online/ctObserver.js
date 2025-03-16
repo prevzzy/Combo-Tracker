@@ -1,6 +1,6 @@
 import { isComboInProgress } from '../combo/tracker';
 import { log } from '../debug/debugHelpers';
-import { getActiveGameProcessName } from '../game/gameProcessService';
+import { getHookedGameProcessName } from '../game/gameProcessService';
 import { isTrackingRethawed, isTrackingThugPro } from '../game/interGameUtils';
 import * as MemoryController from '../game/memory'
 import { isConnectedToGameServer, isLocalPlayer } from './onlineUtils';
@@ -83,7 +83,7 @@ function getCtObserverNonPlayerId(game, joinId) {
 }
 
 function getCtObserverId(skaterObject) {
-  const game = GAMES_BY_PROCESS_NAME[getActiveGameProcessName()];
+  const game = GAMES_BY_PROCESS_NAME[getHookedGameProcessName()];
   const joinId = MemoryController.getJoinId();
 
   const id = skaterObject

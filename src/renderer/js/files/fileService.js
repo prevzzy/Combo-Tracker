@@ -7,7 +7,6 @@ import { correctHighscoresFile } from './highscoresFileValidation'
 import { log } from '../debug/debugHelpers'
 import * as OverlayUI from '../ui/uiOverlay'
 import * as SavedCombosService from '../combo/savedCombosService'
-import { isTrackingThugPro } from '../game/interGameUtils'
 
 let highscoresJsonPaths
 let savedCombosFolderPaths
