@@ -581,8 +581,8 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   cursor: pointer;
 }
 
-#app-version:hover {
-  cursor: pointer;
+.external-link:hover {
+  cursor: pointer !important;
 }
 
 .section-title {

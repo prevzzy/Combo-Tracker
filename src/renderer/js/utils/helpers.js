@@ -90,21 +90,19 @@ export function hasDismissedUpdate(version) {
   return storedVersion === version;
 }
 
-export function setupAppVersionLink(version) {
+export function setAppVersionText(version) {
   const appVersionLink = document.getElementById('app-version')
 
   appVersionLink.textContent = `v${version}`
-  appVersionLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    shell.openExternal(e.target.href)
-  })
 }
 
 export function setupExternalLinks() {
-  const troubleShootingLink = document.getElementById('troubleshooting-link')
-  troubleShootingLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    shell.openExternal(e.target.href)
+  const links = document.querySelectorAll('.external-link')
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      shell.openExternal(e.target.href)
+    })
   })
 }
 
