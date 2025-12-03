@@ -6,7 +6,8 @@ import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
 const TRICK_CONSTANTS = {
   SWITCH: 'Switch',
   GRIND_GARBAGE_SUFFIXES: ['bonk', 'ding', 'tap', 'kiss', 'clip'],
-  BONK_TRICKS: ['Tapped The Rail', 'Clipped The Rail', 'Dinged The Rail', 'Bonked The Rail', 'Kissed The Rail']
+  BONK_TRICKS: ['Tapped The Rail', 'Clipped The Rail', 'Dinged The Rail', 'Bonked The Rail', 'Kissed The Rail'],
+  TRANSFERS: ['Spine Transfer', 'Acid Drop', 'Hip Transfer', 'Acid Bomb', 'Bank Drop'],
 }
 
 const spacesRe = /\\_/g // spaces in trick names are represented by \_
@@ -49,8 +50,13 @@ class Trick {
     this.timesUsed++
   }
 
+  isTransferTrick() {
+    const baseTrickName = `${this.name}`.replace(`${TRICK_CONSTANTS.SWITCH} `, '')
+    return TRICK_CONSTANTS.TRANSFERS.some(transferTrickName => transferTrickName === baseTrickName)
+  }
+
   isDegradeable() {
-    return !(this.isGap() || this.isNonMultiTrick())
+    return !(this.isGap() || this.isNonMultiTrick() || this.isTransferTrick())
   }
 
   isNonMultiTrick() {
@@ -97,6 +103,10 @@ class TrickHistory {
   
   updateTricksInCombo(newTricksArray) {
     newTricksArray.forEach((trickObject) => {
+      if (trickObject.isGap()) {
+        this.gapsHit++;
+      }
+
       const trickId = this.createTrickId(trickObject);
       const existingTrickInCombo = this.tricksInCombo.get(trickId)
       
@@ -209,7 +219,7 @@ class TrickHistory {
 
       const newTrick = this.readSingleTrick(trickToReadPointer)
       if (newTrick) {
-        this.processNewTrick(newTricksArray, newTrick)
+        newTricksArray.push(newTrick);
       }
       
       this.trickPointerArray[trickToReadIndex] = trickToReadPointer
@@ -225,14 +235,6 @@ class TrickHistory {
     }
 
     return newTricksArray
-  }
-
-  processNewTrick(newTricksArray, newTrick) {
-    newTricksArray.push(newTrick);
-
-    if (newTrick.isGap()) {
-      this.gapsHit++;
-    }
   }
 
   isTrickPointerScanned(index, pointer) {
