@@ -8,7 +8,7 @@ import * as FileService from './files/fileService'
 import { setupGlobalError } from './ui/globalError'
 import { app } from '@electron/remote'
 import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
-import { setupAppVersionLink, setupExternalLinks } from './utils/helpers'
+import { setAppVersionText, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
 import { blockHighscoresPage, setupToolbarListeners, showApp } from './ui/uiNavigation'
 import { requestCleaningUpAllShortcuts } from './events/outgoingIpcEvents'
@@ -28,7 +28,7 @@ async function startApp() {
     ipcRenderer.removeAllListeners('user-data-path-request-response')
   })
 
-  setupAppVersionLink(app.getVersion())
+  setAppVersionText(app.getVersion())
   setupExternalLinks()
 }
 
