@@ -6,8 +6,35 @@ import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
 const TRICK_CONSTANTS = {
   SWITCH: 'Switch',
   GRIND_GARBAGE_SUFFIXES: ['bonk', 'ding', 'tap', 'kiss', 'clip'],
-  BONK_TRICKS: ['Tapped The Rail', 'Clipped The Rail', 'Dinged The Rail', 'Bonked The Rail', 'Kissed The Rail'],
-  TRANSFERS: ['Spine Transfer', 'Acid Drop', 'Hip Transfer', 'Acid Bomb', 'Bank Drop'],
+  BONK_TRICKS: [
+    'Tapped The Rail',
+    'Clipped The Rail',
+    'Dinged The Rail',
+    'Bonked The Rail',
+    'Kissed The Rail'
+  ],
+  TRANSFERS: [
+    'Spine Transfer',
+    'Acid Drop',
+    'Hip Transfer',
+    'Acid Bomb',
+    'Bank Drop'
+  ],
+  FLIPS_AND_ROLLS: [
+    'Backflip',
+    'Frontflip',
+    'FS Roll',
+    'BS Roll',
+    'Double Roll',
+    'Double Backflip',
+    'Double Frontflip'
+  ]
+}
+
+const FLAGS = {
+  SWITCH: 4,
+  GAP: 16,
+  SPECIAL: 32,
 }
 
 const spacesRe = /\\_/g // spaces in trick names are represented by \_
@@ -16,9 +43,12 @@ const allowedNameSymbolsRe = /[a-zA-Z0-9-!().'\s]/g
 
 class Trick {
   constructor(name = '', flags = 0, timesUsed = 0) {
-    this.timesUsed = timesUsed
     this.flags = flags
-    this.name = this.parseTrickName(name)
+    this.timesUsed = timesUsed
+    
+    const trickName = this.parseTrickName(name)
+    this.id = `${trickName}_${flags}`
+    this.name = trickName
   }
 
   parseTrickName(name) {
@@ -34,16 +64,33 @@ class Trick {
     return parsedName
   }
 
+  getStancelessTrickName() {
+    return `${this.name}`.replace(`${TRICK_CONSTANTS.SWITCH} `, '');
+  }
+
   isSwitch() {
-    return this.flags & 4
+    return this.flags & FLAGS.SWITCH
   }
 
   isGap() {
-    return this.flags & 16
+    return this.flags & FLAGS.GAP
   }
 
   isSpecial() {
-    return this.flags & 32
+    // In THUG2 and THAW doing special tricks in combination with transfer or flips/rolls often results in marking the wrong trick as a special.
+    if (this.flags & FLAGS.SPECIAL) {
+      const nonSpecialTricks = [
+        ...TRICK_CONSTANTS.FLIPS_AND_ROLLS,
+        ...TRICK_CONSTANTS.TRANSFERS,
+        ...TRICK_CONSTANTS.BONK_TRICKS
+      ];
+      
+      const trickName = this.getStancelessTrickName();
+      
+      return !nonSpecialTricks.some(trick => trick === trickName);
+    }
+
+    return false;
   }
   
   incrementTimesUsedCounter() {
@@ -51,8 +98,8 @@ class Trick {
   }
 
   isTransferTrick() {
-    const baseTrickName = `${this.name}`.replace(`${TRICK_CONSTANTS.SWITCH} `, '')
-    return TRICK_CONSTANTS.TRANSFERS.some(transferTrickName => transferTrickName === baseTrickName)
+    const trickName = this.getStancelessTrickName();
+    return TRICK_CONSTANTS.TRANSFERS.some(transferTrickName => transferTrickName === trickName)
   }
 
   isDegradeable() {
@@ -97,8 +144,15 @@ class TrickHistory {
     trickOne.flags === trickTwo.flags
   }
 
-  createTrickId(trickObject) {
-    return `${trickObject.name}_${trickObject.flags}`
+  addTrickToHistory(trickObject) {
+    const existingTrickInCombo = this.tricksInCombo.get(trickObject.id)
+      
+    if (existingTrickInCombo && this.compareTricks(trickObject, existingTrickInCombo)) {
+      existingTrickInCombo.incrementTimesUsedCounter()
+    } else {
+      this.tricksInCombo.set(trickObject.id, trickObject)
+      trickObject.incrementTimesUsedCounter()
+    }
   }
   
   updateTricksInCombo(newTricksArray) {
@@ -107,15 +161,7 @@ class TrickHistory {
         this.gapsHit++;
       }
 
-      const trickId = this.createTrickId(trickObject);
-      const existingTrickInCombo = this.tricksInCombo.get(trickId)
-      
-      if (existingTrickInCombo && this.compareTricks(trickObject, existingTrickInCombo)) {
-        existingTrickInCombo.incrementTimesUsedCounter()
-      } else {
-        this.tricksInCombo.set(trickId, trickObject)
-        trickObject.incrementTimesUsedCounter()
-      }
+      this.addTrickToHistory(trickObject);
     })
   }
 
@@ -299,6 +345,45 @@ class TrickHistory {
     })
   
     return trickStringHTML
+  }
+
+  fixUnmarkedSpecials() {
+    const trickArray = Array.from(this.tricksInCombo.values());
+
+    trickArray.forEach((currentTrick, i) => {
+      if (!currentTrick.isSpecial()) {
+        return;
+      }
+
+      trickArray.find((trickToCheck, j) => {
+        if (
+          i === j ||
+          currentTrick.name !== trickToCheck.name ||
+          trickToCheck.isSpecial()
+        ) {
+          return;
+        }
+        log('Found unmarked special:', trickToCheck.id)
+        
+        const markedSpecial = new Trick(
+          trickToCheck.name,
+          trickToCheck.flags + FLAGS.SPECIAL,
+          trickToCheck.timesUsed
+        );
+        
+        const existingTrickInCombo = this.tricksInCombo.get(markedSpecial.id);
+
+        if (existingTrickInCombo) {
+          existingTrickInCombo.timesUsed += markedSpecial.timesUsed
+        } else {
+          this.tricksInCombo.set(markedSpecial.id, markedSpecial)
+        }
+      })
+    })
+  }
+
+  finishTrickReading() {
+    this.fixUnmarkedSpecials();
   }
 }
 

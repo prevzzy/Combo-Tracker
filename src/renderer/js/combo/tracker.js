@@ -344,6 +344,7 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
     return
   }
 
+  trickHistory.finishTrickReading();
   const isLanded = isComboLanded()
   finalScore = score.finishCombo(isComboLanded())
 
