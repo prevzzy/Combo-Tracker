@@ -94,8 +94,10 @@ export class Score {
   getComboScore(isComboLanded = false) {
     // calculatedScore is used only for combos over int32 limit, which are not properly displayed in game anyway.
     // bonusBasePoints are added to the score pot AFTER the combo is landed. It isn't added when the combo is bailed.
-    const basePoints = isComboLanded ? this.bonusBasePoints + this.basePoints : this.basePoints;
-    let calculatedScore = basePoints * this.multiplier 
+    const basePoints = isComboLanded
+      ? this.bonusBasePoints + this.basePoints
+      : this.basePoints;
+    let calculatedScore = basePoints * this.multiplier
     
     return calculatedScore < GAME_CONSTANTS.MAX_INT32_VALUE ? MemoryController.getGameScore() : calculatedScore
   }
@@ -109,13 +111,24 @@ export class Score {
   calculateFinalScoreManually(isComboLanded = false) {
     return this.getMultiplier() * this.calculateFinalBasePoints(isComboLanded);
   }
+  
+  checkForFinalScoreMismatch(gameScore, appCalculatedScore) {
+    // If the game crashes or player quits with ALT + F4 the in-game score is set to some garbage value before the game is fully unhooked from Combo Tracker. It's a huge edge case, so just assume that the in-game score and app-calculated score can't be different by more than 10 million. Should work™.
+
+    return Math.abs(gameScore - appCalculatedScore) > 10_000_000;
+  }
 
   getFinalScore(isComboLanded = false) {
     let finalScore = this.getComboScore(isComboLanded);
+    let appCalculatedScore = this.calculateFinalScoreManually(isComboLanded);
 
-    // score may be 0 if combo ended out of bounds
-    if (this.hasNewComboStartedUnnoticed() || finalScore === 0) {
-      return this.calculateFinalScoreManually(isComboLanded);
+    // score may be 0 if combo ended out of bounds.
+    if (
+      this.hasNewComboStartedUnnoticed() ||
+      finalScore === 0 ||
+      this.checkForFinalScoreMismatch(finalScore, appCalculatedScore)
+    ) {
+      return appCalculatedScore;
     } else {
       return finalScore || this.getScore() // fallback if finalScore is 0
     }
