@@ -132,6 +132,7 @@ function testInitializedAddresses(gameProcessName) {
     getCurrentMapScript, ${getCurrentMapScript()}
     getMultiplier,  ${getMultiplier()}
     getBasePoints,  ${getBasePoints()}
+    getBonusBasePoints, ${getBonusBasePoints()}
     getGameScore,  ${getGameScore()}
     getStateType,  ${getStateType()}
     getRevertPenalty,  ${getRevertPenalty()}
@@ -548,5 +549,5 @@ export {
   isSkaterInWorld,
   getBonusBasePoints,
   // debug helpers
-  bounceBalance
+  bounceBalance,
 }
