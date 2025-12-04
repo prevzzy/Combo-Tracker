@@ -8,24 +8,42 @@ export const maps = {
       MA: 'THE MALL',
       CH: 'CHICAGO',
       DN: 'MINNEAPOLIS',
+      dj: 'DOWNHILL JAM',
       Burnside: 'BURNSIDE',
       ros: 'ROSWELL'
     },
     THPS2: {
       hn: 'HANGAR',
       sc2: 'SCHOOL II',
-      MS: 'MARSEILLES',
+      MS: 'MARSEILLE',
+      nyc: 'NEW YORK',
       Skatestreet: 'SKATESTREET VENTURA',
+      Bullring: "THE BULLRING",
       chopper: 'CHOPPER DROP',
     },
     THPS3: {
-      ap: 'AIRPORT',
-      si: 'SKATER ISLAND'
+      found: 'FOUNDRY',
+      th3can: 'CANADA',
+      rio: 'RIO',
+      sub: 'SUBURBIA',
+      th3ap: 'AIRPORT',
+      si: 'SKATER ISLAND',
+      la: 'LOS ANGELES',
+      to: 'TOKYO',
+      crushp: 'CRUISE SHIP',
+      th3oil: 'OIL RIG'
     },
     THPS4: {
       sch: 'COLLEGE',
+      sf: 'SAN FRANCISCO',
       alc: 'ALCATRAZ',
-      kon: 'KONA SKATEPARK'
+      kon: 'KONA SKATEPARK',
+      jn: 'SHIPYARD',
+      lo: 'LONDON',
+      zo: 'ZOO',
+      cn: 'CARNIVAL',
+      ho: 'CHICAGO',
+      pr: 'PRACTICE',
     },
     THUG: {
       nj: 'NEW JERSEY',
@@ -47,13 +65,14 @@ export const maps = {
       no: 'NEW ORLEANS',
       st: 'SKATOPIA',
       SE: 'PRO SKATER',
-      SE2: 'THE TRIANGLE'
+      SE2: 'THE TRIANGLE',
+      ap: 'AIRPORT'
     },
     THAW: {
       HO: 'HOLLYWOOD',
       BH: 'BEVERLY HILLS',
-      DT: 'DOWNTOWN LA',
-      EL: 'EAST LA',
+      DT: 'DOWNTOWN L.A.',
+      EL: 'EAST L.A.',
       SM: 'SANTA MONICA',
       OI: 'OIL RIG',
       SV: 'VANS PARK',
@@ -70,14 +89,20 @@ export const maps = {
       shops: 'DOWNTOWN',
       Center: 'CITY CENTER',
       inschool: 'HIGH SCHOOL',
+      cf: 'CAR FACTORY',
       cretepark: 'CRETE PARK',
-      riod: 'DOWNHILL'
+      funpark: 'FUN PARK',
+      riod: 'DOWNHILL',
+    },
+    DESA: {
+      pizza: 'PIZZA PLANET'
     },
     "MISC LEVELS": {
       canpsx: 'CANADA (PSX)',
-      pizza: 'PIZZA PLANET'
+      ParisR: 'PARIS (RESURRECTED)'
     },
-    "CUSTOM LEVELS": {}
+    "CUSTOM LEVELS": {
+    }
   },
   [GAME_PROCESSES.THUGPRO]: {
     THPS1: {
@@ -141,7 +166,8 @@ export const maps = {
       NO: 'NEW ORLEANS',
       ST: 'SKATOPIA',
       SE: 'PRO SKATER',
-      SE2: 'THE TRIANGLE'
+      SE2: 'THE TRIANGLE',
+      ap: 'AIRPORT',
     },
     THAW: {
       z_ho: 'HOLLYWOOD',
