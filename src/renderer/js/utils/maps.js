@@ -71,8 +71,8 @@ export const maps = {
     THAW: {
       HO: 'HOLLYWOOD',
       BH: 'BEVERLY HILLS',
-      DT: 'DOWNTOWN L.A.',
-      EL: 'EAST L.A.',
+      DT: 'DOWNTOWN LA',
+      EL: 'EAST LA',
       SM: 'SANTA MONICA',
       OI: 'OIL RIG',
       SV: 'VANS PARK',

@@ -86,6 +86,10 @@ export function requestAppMinimize() {
   ipcRenderer.send('request-app-minimize')
 }
 
+export function requestAppFocus() {
+  ipcRenderer.send('request-app-focus')
+}
+
 export function requestAppFullscreen() {
   ipcRenderer.send('request-app-fullscreen')
 }

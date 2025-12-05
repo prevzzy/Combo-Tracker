@@ -82,6 +82,10 @@ export function createAppWindows() {
 }
 
 export function showMainWindow() {
+  if (!mainWindow) {
+    return;
+  }
+
   mainWindow.show()
   mainWindow.restore()
   mainWindow.focus()
