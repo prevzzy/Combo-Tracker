@@ -49,7 +49,11 @@ function runCoreLogic(paths) {
     })
     .catch((error) => {
       console.error(error)
-      setupGlobalError(true, 'Failed to read highscores data. Try resetting your highscores in the settings.', 1)
+      setupGlobalError(
+        true,
+        `${error}`,
+        1
+      )
 
       LastComboUI.setLastComboPageInfo(
         true,

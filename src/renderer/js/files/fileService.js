@@ -1,12 +1,13 @@
 const fs = require('fs')
 const path = require('path')
 import rimraf from 'rimraf'
-import { ALL_MAPS, GAME_PROCESSES } from '../utils/constants'
+import { ALL_MAPS, GAMES_BY_PROCESS_NAME, GAME_PROCESSES } from '../utils/constants'
 import { maps } from '../utils/maps'
 import { correctHighscoresFile } from './highscoresFileValidation'
 import { log } from '../debug/debugHelpers'
 import * as OverlayUI from '../ui/uiOverlay'
 import * as SavedCombosService from '../combo/savedCombosService'
+import { restoreHighscoresFileFromSavedCombos } from './highscoresFileRestore'
 
 let highscoresJsonPaths
 let savedCombosFolderPaths
@@ -41,25 +42,62 @@ function readAllHighscoreJsons() {
   return Promise.all(promises);
 }
 
+export function isFileBiggerThan(filePath, sizeInMegabytes) {
+  const stats = fs.statSync(filePath)
+  const fileSizeInMegabytes = stats.size / (1024 * 1024); // in megabytes
+
+  return fileSizeInMegabytes > sizeInMegabytes;
+}
+
+async function handleHighscoresRestoring(game, rejectCallback) {
+  try {
+    log(`Restoring highscores.json file for ${game}...`)
+    await restoreHighscoresFileFromSavedCombos(
+      game,
+      highscoresJsonPaths[game],
+      savedCombosFolderPaths[game]
+    );
+    log(`Restoring highscores.json for ${game} success`)
+
+    rejectCallback(`Your highscores for ${GAMES_BY_PROCESS_NAME[game]} were corrupted but have been partially restored. Restart Combo Tracker. Some data might be missing.`)
+  } catch(restoreError){
+    rejectCallback(`An error occured while fixing corrupted file - ${highscoresJsonPaths[game]} - ${error}`);
+  }
+}
+
 function readHighscoresJson(game) {
   return new Promise(async (resolve, reject) => {
     if (!fs.existsSync(highscoresJsonPaths[game])) {
       try {
-        log(`no highscores.json for ${game}`)
+        log(`No highscores.json for ${game}`)
         await createNewHighscoresJson(game)
       } catch(error) {
-        reject(error)
-        return
+        reject(`An error occured while creating highscores data - ${highscoresJsonPaths[game]} - ${error}`)
+        return;
       }
     }
 
+    if (isFileBiggerThan(highscoresJsonPaths[game], 2)) {
+      log(`highscores.json for ${game} is over 2MB`)
+      await handleHighscoresRestoring(game, reject);
+      return;
+    }
+    
     fs.readFile(highscoresJsonPaths[game], 'utf8', async (error, data) => {
       if (error) {
-        reject(error)
-        return
+        reject(`An error occured while reading the highscores data - ${highscoresJsonPaths[game]} - ${error}`)
+        return;
       }
 
-      let parsedData = JSON.parse(data);
+      let parsedData;
+      try {
+        parsedData = JSON.parse(data);
+      } catch(error) {
+        console.error(error);
+        await handleHighscoresRestoring(game, reject);
+        return;
+      }
+
       try {
         const correctedData = correctHighscoresFile(parsedData, game)
         if (correctedData) {
@@ -69,14 +107,14 @@ function readHighscoresJson(game) {
         }
       } catch(error) {
         // It's hard to predict all scenarios that can result in throwing an error here, but having an uncorrected highscores file isn't the end of the world anyway. There is no reason to stop the entire application from running, so just catch the error and move on.
-        console.error('an error occured when correcting highscores file', error)
+        console.error('An error occured when correcting highscores file', error)
       }
 
       try {
         SavedCombosService.setSavedCombos(game, parsedData);
         resolve()
       } catch {
-        reject(error)
+        reject(`An error occured while populating highscores data - ${highscoresJsonPaths[game]} - ${error}.`);
         return;
       }
     })
@@ -105,7 +143,7 @@ export function createMapObject(game, mapCategory, mapScriptName) {
   }
 }
 
-function createNewHighscoresJson(game) {
+export function createNewHighscoresJson(game) {
   return new Promise((resolve, reject) => {
     let mapCategoriesJson = {}
 

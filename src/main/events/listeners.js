@@ -20,7 +20,7 @@ import {
   onCleanupAllShortcutsRequest,
   onRegisterAllShortcutsRequest,
 } from './ipcEventHandlers'
-import { APP_WINDOW_NAMES, getAppWindow } from '../browserWindows/browserWindows'
+import { APP_WINDOW_NAMES, getAppWindow, showMainWindow } from '../browserWindows/browserWindows'
 import { OverlayController } from 'electron-overlay-window'
 
 export function initIpcEvents() {
@@ -67,6 +67,10 @@ export function initIpcEvents() {
   ipcMain.on('request-app-minimize', () => {
     const mainWindow = getAppWindow(APP_WINDOW_NAMES.MAIN)
     mainWindow.minimize()
+  })
+
+  ipcMain.on('request-app-focus', () => {
+    showMainWindow();
   })
 
   ipcMain.on('request-app-fullscreen', () => {
