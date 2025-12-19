@@ -378,6 +378,8 @@ class TrickHistory {
         } else {
           this.tricksInCombo.set(markedSpecial.id, markedSpecial)
         }
+
+        this.tricksInCombo.delete(trickToCheck.id)
       })
     })
   }
