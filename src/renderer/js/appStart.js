@@ -12,6 +12,7 @@ import { setAppVersionText, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
 import { blockHighscoresPage, setupToolbarListeners, showApp } from './ui/uiNavigation'
 import { requestCleaningUpAllShortcuts } from './events/outgoingIpcEvents'
+import { fixIncorrectGapsAmountInSavedCombos } from './files'
 
 let isRunning = false
 
@@ -36,6 +37,7 @@ function runCoreLogic(paths) {
   FileService.setSavingPaths(paths)
   FileService.readAllHighscoreJsons()
     .then(async () => {
+      await fixIncorrectGapsAmountInSavedCombos()
       LastComboUI.displayDefaultComboPageInfo()
 
       isRunning = true
