@@ -49,7 +49,7 @@ export function isFileBiggerThan(filePath, sizeInMegabytes) {
   return fileSizeInMegabytes > sizeInMegabytes;
 }
 
-async function handleHighscoresRestoring(game, rejectCallback) {
+async function handleHighscoresRestoring(game) {
   try {
     log(`Restoring highscores.json file for ${game}...`)
     await restoreHighscoresFileFromSavedCombos(
@@ -59,9 +59,9 @@ async function handleHighscoresRestoring(game, rejectCallback) {
     );
     log(`Restoring highscores.json for ${game} success`)
 
-    rejectCallback(`Your highscores for ${GAMES_BY_PROCESS_NAME[game]} were corrupted but have been partially restored. Restart Combo Tracker. Some data might be missing.`)
-  } catch(restoreError){
-    rejectCallback(`An error occured while fixing corrupted file - ${highscoresJsonPaths[game]} - ${error}`);
+    return `Your highscores for ${GAMES_BY_PROCESS_NAME[game]} were corrupted but have been partially restored. Restart Combo Tracker. Some data might be missing.`
+  } catch(error){
+    return `An error occured while fixing corrupted file - ${highscoresJsonPaths[game]} - ${error}`;
   }
 }
 
@@ -79,7 +79,8 @@ function readHighscoresJson(game) {
 
     if (isFileBiggerThan(highscoresJsonPaths[game], 2)) {
       log(`highscores.json for ${game} is over 2MB`)
-      await handleHighscoresRestoring(game, reject);
+      const highscoresRestoreMessage = await handleHighscoresRestoring(game);
+      reject(highscoresRestoreMessage);
       return;
     }
     
@@ -94,7 +95,8 @@ function readHighscoresJson(game) {
         parsedData = JSON.parse(data);
       } catch(error) {
         console.error(error);
-        await handleHighscoresRestoring(game, reject);
+        const highscoresRestoreMessage = await handleHighscoresRestoring(game);
+        reject(highscoresRestoreMessage);
         return;
       }
 
@@ -281,6 +283,8 @@ function deleteAllSavedCombos(game) {
 }
 
 export {
+  savedCombosFolderPaths,
+  highscoresJsonPaths,
   setSavingPaths,
   saveHighscoresJson,
   readAllHighscoreJsons,
