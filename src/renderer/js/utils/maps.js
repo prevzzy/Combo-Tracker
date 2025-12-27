@@ -18,6 +18,7 @@ export const maps = {
       MS: 'MARSEILLE',
       nyc: 'NEW YORK',
       Skatestreet: 'SKATESTREET VENTURA',
+      phl: "PHILADELPHIA",
       Bullring: "THE BULLRING",
       chopper: 'CHOPPER DROP',
     },
@@ -95,7 +96,8 @@ export const maps = {
       riod: 'DOWNHILL',
     },
     DESA: {
-      pizza: 'PIZZA PLANET'
+      andysroom: 'ANDY\'S ROOM',
+      pizza: 'PIZZA PLANET',
     },
     "MISC LEVELS": {
       canpsx: 'CANADA (PSX)',
