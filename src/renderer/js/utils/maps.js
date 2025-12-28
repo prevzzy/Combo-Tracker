@@ -3,35 +3,71 @@ import { GAMES, GAME_PROCESSES } from "./constants"
 export const maps = {
   [GAME_PROCESSES.RETHAWED]: {
     THPS1: {
+      ware: 'WAREHOUSE',
       sc: 'SCHOOL',
       MA: 'THE MALL',
       CH: 'CHICAGO',
       DN: 'MINNEAPOLIS',
+      dj: 'DOWNHILL JAM',
+      Burnside: 'BURNSIDE',
+      ros: 'ROSWELL'
     },
     THPS2: {
       hn: 'HANGAR',
       sc2: 'SCHOOL II',
-      MS: 'MARSEILLES',
+      MS: 'MARSEILLE',
+      nyc: 'NEW YORK',
+      Skatestreet: 'SKATESTREET VENTURA',
+      phl: "PHILADELPHIA",
+      Bullring: "THE BULLRING",
       chopper: 'CHOPPER DROP',
     },
     THPS3: {
-      ap: 'AIRPORT',
+      found: 'FOUNDRY',
+      th3can: 'CANADA',
+      rio: 'RIO',
+      sub: 'SUBURBIA',
+      th3ap: 'AIRPORT',
+      si: 'SKATER ISLAND',
+      la: 'LOS ANGELES',
+      to: 'TOKYO',
+      crushp: 'CRUISE SHIP',
+      th3oil: 'OIL RIG'
     },
     THPS4: {
       sch: 'COLLEGE',
-      kon: 'KONA SKATEPARK'
+      sf: 'SAN FRANCISCO',
+      alc: 'ALCATRAZ',
+      kon: 'KONA SKATEPARK',
+      jn: 'SHIPYARD',
+      lo: 'LONDON',
+      zo: 'ZOO',
+      cn: 'CARNIVAL',
+      ho: 'CHICAGO',
+      pr: 'PRACTICE',
     },
     THUG: {
       nj: 'NEW JERSEY',
       ny: 'MANHATTAN',
+      fl: 'TAMPA',
+      sd: 'SAN DIEGO',
       hi: 'HAWAII',
+      vc: 'VANCOUVER',
+      sj: 'SLAM CITY JAM',
+      ru: 'MOSCOW',
+      se3: 'HOTTER THAN HELL'
     },
     THUG2: {
       tr: 'TRAINING',
       BO: 'BOSTON',
       ba: 'BARCELONA',
+      BE: 'BERLIN',
       AU: 'AUSTRALIA',
+      no: 'NEW ORLEANS',
       st: 'SKATOPIA',
+      SE: 'PRO SKATER',
+      SE2: 'THE TRIANGLE',
+      ap: 'AIRPORT'
     },
     THAW: {
       HO: 'HOLLYWOOD',
@@ -49,15 +85,25 @@ export const maps = {
       AT: 'ATLANTA',
     },
     THP8: {
+      training: 'TRAINING',
       houses: 'SUBURBS',
       shops: 'DOWNTOWN',
       Center: 'CITY CENTER',
       inschool: 'HIGH SCHOOL',
-      riod: 'DOWNHILL'
+      cf: 'CAR FACTORY',
+      cretepark: 'CRETE PARK',
+      funpark: 'FUN PARK',
+      riod: 'DOWNHILL',
+    },
+    DESA: {
+      andysroom: 'ANDY\'S ROOM',
+      pizza: 'PIZZA PLANET',
     },
     "MISC LEVELS": {
       canpsx: 'CANADA (PSX)',
-      pizza: 'PIZZA PLANET'
+      ParisR: 'PARIS (RESURRECTED)'
+    },
+    "CUSTOM LEVELS": {
     }
   },
   [GAME_PROCESSES.THUGPRO]: {
@@ -122,7 +168,8 @@ export const maps = {
       NO: 'NEW ORLEANS',
       ST: 'SKATOPIA',
       SE: 'PRO SKATER',
-      SE2: 'THE TRIANGLE'
+      SE2: 'THE TRIANGLE',
+      ap: 'AIRPORT',
     },
     THAW: {
       z_ho: 'HOLLYWOOD',
@@ -153,6 +200,7 @@ export const maps = {
     "MISC LEVELS": {
       toystory_bedroom: "ANDY'S ROOM"
     },
+    "CUSTOM LEVELS": {}
   },
   [GAME_PROCESSES.THUG2]: {
     [GAMES.THUG2]: {

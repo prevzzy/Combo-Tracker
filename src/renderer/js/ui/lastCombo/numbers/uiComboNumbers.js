@@ -11,7 +11,7 @@ import {
   formatBalancePropertyTime,
   getNumberWithOrdinal,
 } from '../../../utils/helpers'
-import * as GlobalUI from '../../uiGlobal'
+import { colorComboPropertyText, setItemDisplay } from '../../uiHelpers'
 
 const finalScoreElement = document.getElementById('combo-final-score') 
 const finalNumbersElement  = document.getElementById('combo-final-numbers')
@@ -26,7 +26,6 @@ const generalTrackedComboGameNameElement = document.getElementById('combo-genera
 const comboTrackingSkippedInfo = document.getElementById('combo-tracking-skipped')
 
 const finalTimeElement = document.getElementById('combo-time')
-const finalTimeDetailsElement = document.getElementById('combo-details-time')
 const grindTimeElement = document.getElementById('combo-grind-time')
 const tagLimitElement = document.getElementById('combo-tag-limit')
 const tagLimitStatElement = document.getElementById('combo-tag-limit-stat')
@@ -41,13 +40,14 @@ const lipTimeElement = document.getElementById('combo-lip-time')
 const revertPenaltyElement = document.getElementById('combo-revert-penalty')
 const multiplierFromGapsElement = document.getElementById('combo-multi-from-gaps')
 const graffitiTagsElement = document.getElementById('combo-graffiti-tags')
+const bonusBasePointsElement = document.getElementById('combo-bonus-base-points')
 
 function displayComboNumbers({ mainComboData, grindData, manualData, miscData, comboTrackingNumbers }, shouldDisplayDate) { 
-  const { game } = mainComboData
+  const { game, isLanded } = mainComboData
   displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayDate)
   displayGrind(grindData, game)
   displayManual(manualData)
-  displayMisc(miscData)
+  displayMisc(miscData, isLanded)
 }
 
 function displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayDate) {
@@ -61,13 +61,11 @@ function displayFinalNumbers(mainComboData, comboTrackingNumbers, shouldDisplayD
     game,
   } = mainComboData
 
-
   finalScoreElement.textContent = formatScore(score)
   finalNumbersElement.textContent = `${formatScore(basePoints)} x ${multiplier}`
 
   const finalTime = formatTimestamp(comboTime)
   finalTimeElement.textContent = finalTime
-  finalTimeDetailsElement.textContent = finalTime
   
   setComboTrackingSkippedInfoElement(comboTrackingNumbers, mapName)
 
@@ -148,11 +146,11 @@ function setComboTrackingSkippedInfoElement(
 
   if (message) {
     comboTrackingSkippedInfo.textContent = message
-    GlobalUI.setItemDisplay(comboTrackingSkippedInfo, 'inline')
-    GlobalUI.setItemDisplay(generalTrackedComboGameNameElement, 'none')
+    setItemDisplay(comboTrackingSkippedInfo, 'inline')
+    setItemDisplay(generalTrackedComboGameNameElement, 'none')
   } else {
-    GlobalUI.setItemDisplay(comboTrackingSkippedInfo, 'none')
-    GlobalUI.setItemDisplay(generalTrackedComboGameNameElement, 'inline')
+    setItemDisplay(comboTrackingSkippedInfo, 'none')
+    setItemDisplay(generalTrackedComboGameNameElement, 'inline')
   }
 }
 
@@ -170,9 +168,9 @@ function displayComboDate(date) {
 }
 
 function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, tagLimitAddedTime }, game) {
-  GlobalUI.colorComboPropertyText(tagLimitElement, tagLimitAddedTime, 6)
-  GlobalUI.colorComboPropertyText(doubleGrindsElement, doubleGrindsAddedTime, 3 * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY)
-  GlobalUI.colorComboPropertyText(newGrindsElement, newGrindsSavedTime, 1, -0.0001)
+  colorComboPropertyText(tagLimitElement, tagLimitAddedTime, 6)
+  colorComboPropertyText(doubleGrindsElement, doubleGrindsAddedTime, 3 * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY)
+  colorComboPropertyText(newGrindsElement, newGrindsSavedTime, 1, -0.0001)
 
   grindTimeElement.textContent = formatBalancePropertyTime(grindTime)
   newGrindsElement.textContent = formatBalancePropertyTime(newGrindsSavedTime)
@@ -184,28 +182,48 @@ function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, ta
 
 function setTagLimitStatDisplay(game) {
   if (game === GAME_PROCESSES.RETHAWED || game === GAME_PROCESSES.THAW) {
-    GlobalUI.setItemDisplay(tagLimitStatElement, 'none')
+    setItemDisplay(tagLimitStatElement, 'none')
   } else {
-    GlobalUI.setItemDisplay(tagLimitStatElement, 'block')
+    setItemDisplay(tagLimitStatElement, 'block')
   }
 }
 
 function displayManual({ manualTime, manualCheeseAddedTime, pivotsAddedTime }) {
-  GlobalUI.colorComboPropertyText(cheesePenaltyElement, manualCheeseAddedTime, 3 * BALANCE_TIME_VALUES.MANUAL_CHEESE_TIME_PENALTY)
-  GlobalUI.colorComboPropertyText(pivotPenaltyElement, pivotsAddedTime, 5 * BALANCE_TIME_VALUES.PIVOT_TIME_PENALTY)
+  colorComboPropertyText(cheesePenaltyElement, manualCheeseAddedTime, 3 * BALANCE_TIME_VALUES.MANUAL_CHEESE_TIME_PENALTY)
+  colorComboPropertyText(pivotPenaltyElement, pivotsAddedTime, 5 * BALANCE_TIME_VALUES.PIVOT_TIME_PENALTY)
 
   manualTimeElement.textContent = formatBalancePropertyTime(manualTime)
   cheesePenaltyElement.textContent = formatBalancePropertyTime(manualCheeseAddedTime, true)
   pivotPenaltyElement.textContent = formatBalancePropertyTime(pivotsAddedTime, true)
 }
 
-function displayMisc({ lipTime, maxRevertPenalty, multiplierFromGaps, graffitiTags }) {
-  GlobalUI.colorComboPropertyText(revertPenaltyElement, maxRevertPenalty, 5, 4)
+function displayMisc(miscData, isLanded) {
+  const {
+    lipTime,
+    maxRevertPenalty,
+    multiplierFromGaps,
+    graffitiTags,
+    bonusBasePoints,
+  } = miscData;
+  colorComboPropertyText(revertPenaltyElement, maxRevertPenalty, 5, 4)
 
   lipTimeElement.textContent = formatBalancePropertyTime(lipTime)
   revertPenaltyElement.textContent = maxRevertPenalty
   multiplierFromGapsElement.textContent = multiplierFromGaps
   graffitiTagsElement.textContent = graffitiTags
+
+  if (bonusBasePoints) {
+    setItemDisplay(bonusBasePointsElement.parentElement, 'flex');
+    bonusBasePointsElement.textContent = formatScore(bonusBasePoints);
+
+    const fakeThreshold = isLanded ? bonusBasePoints + 1 : -1;
+    colorComboPropertyText(bonusBasePointsElement, bonusBasePoints, fakeThreshold, fakeThreshold);
+
+    bonusBasePointsElement.style.textDecoration = isLanded ? 'none' : 'line-through'
+    bonusBasePointsElement.previousElementSibling.style.textDecoration = isLanded ? 'none' : 'line-through'
+  } else {
+    setItemDisplay(bonusBasePointsElement.parentElement, 'none')
+  }
 }
 
 export {

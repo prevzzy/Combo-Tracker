@@ -52,6 +52,22 @@ function sortMapCategoryInDefaultOrder(game, highscoresFileData, mapCategoryName
   }
 }
 
+function sortCategoriesInDefaultOrder(game, highscoresFileData) {
+  if (!maps[game]) {
+    return
+  }
+
+  const defaultCategoryOrder = Object.keys(maps[game])
+  const sortedCategories = {}
+  for (const category of defaultCategoryOrder) {
+    sortedCategories[category] = highscoresFileData.mapCategories[category]
+  }
+
+  highscoresFileData.mapCategories = {
+    ...sortedCategories,
+  }
+}
+
 function moveMapToCorrectCategory(
   highscoresFileData,
   mapScriptName,
@@ -128,6 +144,7 @@ function verifyCategoryContents(
         ...highscoresFileData.mapCategories[mapCategory],
         [mapScriptName]: createMapObject(game, mapCategory, mapScriptName)
       }
+
       isDataCorrected = true
     }
   })
@@ -167,12 +184,20 @@ export function correctHighscoresFile(highscoresFileData, game) {
     }
 
     fileMapScripts.forEach(mapScriptName => {
-      isDataCorrected = correctMapData(game, highscoresFileData, mapCategories, mapCategory, mapScriptName) || isDataCorrected
+      isDataCorrected = correctMapData(
+        game,
+        highscoresFileData,
+        mapCategories,
+        mapCategory,
+        mapScriptName
+      ) || isDataCorrected
     })
 
     sortMapCategoryInDefaultOrder(game, highscoresFileData, mapCategory)
   })
 
+  sortCategoriesInDefaultOrder(game, highscoresFileData);
+  
   if (isDataCorrected) {
     return highscoresFileData
   }

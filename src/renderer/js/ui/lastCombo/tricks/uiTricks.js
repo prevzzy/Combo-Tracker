@@ -1,7 +1,10 @@
 import { TRICK_FILTERS, TrickFilteringService } from './trickFiltering'
-import * as GlobalUI from '../../uiGlobal'
+import { initNavigation } from '../../uiNavigation'
 
 let tricksInComboArray = []
+
+let trickHistoryClickListener;
+let trickUsageClickListener;
 
 const allTabsContainer = document.getElementById('combo-details-tricks-tabs-container')
 const allNavElementsContainer = document.getElementById('combo-details-tricks-nav-container')
@@ -9,9 +12,13 @@ const allNavElementsContainer = document.getElementById('combo-details-tricks-na
 const tabContentContainersArray = Array.from(allTabsContainer.children)
 const navElementsArray = Array.from(allNavElementsContainer.children)
 
+const trickUsageButtonElement = document.getElementById('combo-details-trick-usage-button')
+const trickHistoryButtonElement = document.getElementById('combo-details-trick-history-button')
+
 const trickUsageContainer = document.getElementById('trick-usage-container')
 const comboHistoryContainer = document.getElementById('trick-history-container')
 const trickSearchInput = document.getElementById('trick-search')
+const totalTricksUsedElement = document.getElementById('combo-details-total-tricks-used')
 
 const sortingRadioButtons = document.querySelectorAll('input[name="trick-sorting-radios"]')
 const filteringCheckBoxes = document.querySelectorAll('.trick-filtering-checkbox')
@@ -63,13 +70,47 @@ function getTrickColorClass(trickObject) {
   return 'text-light'
 }
 
+function setupDisplayingTricksTotalOnSubPageSwitch(buttonElement, oldListener, tricks) {
+  if (oldListener) {
+    buttonElement.removeEventListener('click', oldListener);
+  }
+  
+  const newListener = function() {
+    displayTricksTotalAmount(tricks)
+  }
+  buttonElement.addEventListener('click', newListener)
+
+  return newListener;
+}
+
 function displayTricks(tricksInCombo, comboHistoryHtml) {
   tricksInComboArray = [...tricksInCombo]
-  displayTrickUsage(trickFilteringService.filterTricks(undefined, tricksInComboArray))
-  displayComboHistory(comboHistoryHtml)
+  const filteredTricks = trickFilteringService.filterTricks(undefined, tricksInComboArray);
+
+  displayTrickUsage(filteredTricks)
+  displayComboHistory(comboHistoryHtml, tricksInComboArray)
+}
+
+function displayTricksTotalAmount(tricksInCombo = []) {
+  const totalTricks = tricksInCombo.reduce((currentSum, currentTrick) => {
+    if (!currentTrick?.timesUsed) {
+      return currentSum;
+    }
+
+    return currentSum + currentTrick.timesUsed;
+  }, 0)
+
+  totalTricksUsedElement.textContent = totalTricks;
 }
 
 function displayTrickUsage(tricksInCombo) {
+  trickUsageClickListener = setupDisplayingTricksTotalOnSubPageSwitch(
+    trickUsageButtonElement,
+    trickUsageClickListener,
+    tricksInCombo
+  );
+  displayTricksTotalAmount(tricksInCombo);
+
   trickUsageContainer.innerHTML = ''
   const template = document.getElementById('trick-usage-entry-template')
   const shouldColorTrickUsage = trickFilteringService.activeFilters[TRICK_FILTERS.SHOW_SWITCH]
@@ -95,13 +136,18 @@ function displayTrickUsage(tricksInCombo) {
   })
 }
 
-function displayComboHistory(comboHistoryHtml) {
+function displayComboHistory(comboHistoryHtml, tricksInCombo) {
   comboHistoryContainer.innerHTML = comboHistoryHtml;
+  trickHistoryClickListener = setupDisplayingTricksTotalOnSubPageSwitch(
+    trickHistoryButtonElement,
+    trickHistoryClickListener,
+    tricksInCombo
+  );
 }
 
 function init() {
   initFilters()
-  GlobalUI.initNavigation(navElementsArray, tabContentContainersArray)
+  initNavigation(navElementsArray, tabContentContainersArray)
 }
 
 export {

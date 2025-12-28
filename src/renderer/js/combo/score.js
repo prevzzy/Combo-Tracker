@@ -6,7 +6,9 @@ export class Score {
     this.basePoints = 0
     this.multiplier = 0
     this.score = 0
+    this.bonusBasePoints = 0
     this.basePointsDataset = []
+    this.bonusBasePointsDataset = []
     this.multiplierDataset = []
     this.scoreDataset = []
     this.revertPenaltyDataset = []
@@ -21,7 +23,6 @@ export class Score {
       return this.score
     }
 
-    // Fixing to 0 because math in js
     return parseInt((this.scoreDataset[this.scoreDataset.length - 1] * 1000000).toFixed(0), 10)
   }
 
@@ -38,16 +39,24 @@ export class Score {
       return this.basePoints
     }
 
-    // Fixing to 0 because math in js
     return parseInt((this.basePointsDataset[this.basePointsDataset.length - 1] * 1000).toFixed(0), 10)
+  }
+
+  getBonusBasePoints() {
+    if (this.bonusBasePoints !== 0 || !this.bonusBasePointsDataset.length) {
+      return this.bonusBasePoints
+    }
+
+    return parseInt((this.bonusBasePointsDataset[this.bonusBasePointsDataset.length - 1] * 1000).toFixed(0), 10)
   }
 
   update() {
     this.multiplier = MemoryController.getMultiplier()
     this.basePoints = MemoryController.getBasePoints()
-    this.score = this.getCurrentComboScore()
+    this.score = this.getComboScore(false)
     this.maxRevertPenalty = this.getMaxRevertPenalty()
     this.graffitiTags = MemoryController.getGraffitiTagsCount()
+    this.bonusBasePoints = MemoryController.getBonusBasePoints()
   }
 
   getMaxRevertPenalty() {
@@ -56,11 +65,20 @@ export class Score {
     return currentPenalty > this.maxRevertPenalty ? currentPenalty : this.maxRevertPenalty
   }
 
+  formatBasePointsForDataset(value) {
+    return (value / 1000).toFixed(3)
+  }
+
+  formatScoreForDataset(value) {
+    return (value / 1000000).toFixed(6)
+  }
+
   updateDatasets() {
-    this.basePointsDataset.push((MemoryController.getBasePoints() / 1000).toFixed(3))
+    this.basePointsDataset.push(this.formatBasePointsForDataset(MemoryController.getBasePoints()))
     this.multiplierDataset.push(MemoryController.getMultiplier())
-    this.scoreDataset.push((this.getCurrentComboScore() / 1000000).toFixed(6))
+    this.scoreDataset.push(this.formatScoreForDataset(this.getComboScore(false)))
     this.revertPenaltyDataset.push(MemoryController.getRevertPenalty())
+    this.bonusBasePointsDataset.push(this.formatBasePointsForDataset(MemoryController.getBonusBasePoints()))
   }
 
   hasNewComboStartedUnnoticed() {
@@ -73,18 +91,54 @@ export class Score {
     return false
   }
 
-  getCurrentComboScore() {
-    // In-game score isn't always exactly equal to basePoints * multiplier. Therefore, to match in-game displayed score of combos lower than 2.147+ billion, in-game score is used. calculatedScore is used only for combos over int32 limit, which are not properly displayed in game anyway.
-    let calculatedScore = this.basePoints * this.multiplier 
+  getComboScore(isComboLanded = false) {
+    // calculatedScore is used only for combos over int32 limit, which are not properly displayed in game anyway.
+    // bonusBasePoints are added to the score pot AFTER the combo is landed. It isn't added when the combo is bailed.
+    const basePoints = isComboLanded
+      ? this.bonusBasePoints + this.basePoints
+      : this.basePoints;
+    let calculatedScore = basePoints * this.multiplier
     
     return calculatedScore < GAME_CONSTANTS.MAX_INT32_VALUE ? MemoryController.getGameScore() : calculatedScore
   }
 
-  getFinalScore() {
-    if (this.hasNewComboStartedUnnoticed() || this.getCurrentComboScore() === 0) { // score may be 0 if combo ended out of bounds
-      return this.getMultiplier() * this.getBasePoints()
+  calculateFinalBasePoints(isComboLanded = false) {
+    const basePoints = this.getBasePoints();
+    const bonusBasePoints = this.getBonusBasePoints();
+    return isComboLanded ? basePoints + bonusBasePoints : basePoints;
+  }
+
+  calculateFinalScoreManually(isComboLanded = false) {
+    return this.getMultiplier() * this.calculateFinalBasePoints(isComboLanded);
+  }
+  
+  checkForFinalScoreMismatch(gameScore, appCalculatedScore) {
+    // If the game crashes or player quits with ALT + F4 the in-game score is set to some garbage value before the game is fully unhooked from Combo Tracker. It's a huge edge case, so just assume that the in-game score and app-calculated score can't be different by more than 10 million. Should work™.
+
+    return Math.abs(gameScore - appCalculatedScore) > 10_000_000;
+  }
+
+  getFinalScore(isComboLanded = false) {
+    let finalScore = this.getComboScore(isComboLanded);
+    let appCalculatedScore = this.calculateFinalScoreManually(isComboLanded);
+
+    // score may be 0 if combo ended out of bounds.
+    if (
+      this.hasNewComboStartedUnnoticed() ||
+      finalScore === 0 ||
+      this.checkForFinalScoreMismatch(finalScore, appCalculatedScore)
+    ) {
+      return appCalculatedScore;
     } else {
-      return this.getScore()
-    } 
+      return finalScore || this.getScore() // fallback if finalScore is 0
+    }
+  }
+
+  finishCombo(isComboLanded = false) {
+    const finalScore = this.getFinalScore(isComboLanded);
+    this.scoreDataset[this.scoreDataset.length - 1] = this.formatScoreForDataset(finalScore);
+    this.basePointsDataset[this.basePointsDataset.length - 1] = this.formatBasePointsForDataset(this.calculateFinalBasePoints(isComboLanded));
+
+    return finalScore;
   }
 }

@@ -1,20 +1,23 @@
 
 import url from 'url';
-import electron, { BrowserWindow, Menu, MenuItem } from 'electron';
-import { mainWindowConfig, stickyWindowConfig, toastWindowConfig } from './windowsConfig';
+import electron, { BrowserWindow, Menu, MenuItem, globalShortcut } from 'electron';
+import { mainWindowConfig, stickyWindowConfig, toastWindowConfig, overlayWindowConfig } from './windowsConfig';
 import { startMinimized } from '../autoLaunch/autoLaunch';
 import { isAppQuitting } from '../appService/appService';
 import { onStickyWindowVisibilityChange } from '../events/ipcEventHandlers';
 import { pipeLogsToRenderer } from '../utils/helpers';
+import { OverlayController } from 'electron-overlay-window'
 
 let mainWindow
 let toastWindow
 let stickyWindow
+let overlayWindow
 
 export const APP_WINDOW_NAMES = {
   MAIN: 'MAIN',
   TOAST: 'TOAST',
-  STICKY: 'STICKY'
+  STICKY: 'STICKY',
+  OVERLAY: 'OVERLAY'
 }
 
 export function getAppWindow(name) {
@@ -25,6 +28,8 @@ export function getAppWindow(name) {
       return toastWindow;
     case APP_WINDOW_NAMES.STICKY:
       return stickyWindow;
+    case APP_WINDOW_NAMES.OVERLAY:
+      return overlayWindow;
     default: 
       console.error(`Could not find '${name}' window`)
       return;
@@ -68,14 +73,19 @@ export function createAppWindows() {
   mainWindow = createBrowserWindow(mainWindowConfig)
   toastWindow = createBrowserWindow(toastWindowConfig)
   stickyWindow = createBrowserWindow(stickyWindowConfig)
-  // const overlayWindow = createBrowserWindow(overlayWindowConfig)
+  overlayWindow = createBrowserWindow(overlayWindowConfig)
 
-  
+  // TODO: unused for now
   // makeDemoInteractive(overlayWindow)
+
   setupWindowEventHandlers()
 }
 
 export function showMainWindow() {
+  if (!mainWindow) {
+    return;
+  }
+
   mainWindow.show()
   mainWindow.restore()
   mainWindow.focus()
@@ -105,12 +115,16 @@ function setupWindowEventHandlers() {
   stickyWindow.on('close', (event) => {
     if (!isAppQuitting()) {
       event.preventDefault();
-      stickyWindow.hide();
-      onStickyWindowVisibilityChange(false)
+      hideStickyWindow()
     }
   })
 
   setupStickyWindowContextMenu()
+}
+
+export function hideStickyWindow() {
+  stickyWindow.hide();
+  onStickyWindowVisibilityChange(false)
 }
 
 function setupStickyWindowContextMenu() {
@@ -146,31 +160,31 @@ function setupStickyWindowContextMenu() {
   }, false);
 }
 
-// function makeDemoInteractive(window) {
-//   const toggleMouseKey = 'CmdOrCtrl + J'
-//   const toggleShowKey = 'CmdOrCtrl + K'
-//   let isInteractable = false
+function makeDemoInteractive(window) {
+  const toggleMouseKey = 'CmdOrCtrl + J'
+  const toggleShowKey = 'CmdOrCtrl + K'
+  let isInteractable = false
 
-//   function toggleOverlayState () {
-//     if (isInteractable) {
-//       isInteractable = false
-//       OverlayController.focusTarget()
-//       window.webContents.send('focus-change', false)
-//     } else {
-//       isInteractable = true
-//       OverlayController.activateOverlay()
-//       window.webContents.send('focus-change', true)
-//     }
-//   }
+  function toggleOverlayState () {
+    if (isInteractable) {
+      isInteractable = false
+      OverlayController.focusTarget()
+      window.webContents.send('focus-change', false)
+    } else {
+      isInteractable = true
+      OverlayController.activateOverlay()
+      window.webContents.send('focus-change', true)
+    }
+  }
 
-//   window.on('blur', () => {
-//     isInteractable = false
-//     window.webContents.send('focus-change', false)
-//   })
+  window.on('blur', () => {
+    isInteractable = false
+    window.webContents.send('focus-change', false)
+  })
 
-//   globalShortcut.register(toggleMouseKey, toggleOverlayState)
+  globalShortcut.register(toggleMouseKey, toggleOverlayState)
 
-//   globalShortcut.register(toggleShowKey, () => {
-//     window.webContents.send('visibility-change', false)
-//   })
-// }
+  globalShortcut.register(toggleShowKey, () => {
+    window.webContents.send('visibility-change', false)
+  })
+}

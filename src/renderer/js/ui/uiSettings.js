@@ -6,13 +6,14 @@ import {
 } from '../events/outgoingIpcEvents'
 import { formatScore } from '../utils/helpers'
 import { resetHighscores, isPathWritable } from '../files/fileService'
-import { setItemDisplay } from './uiGlobal'
 import { mapKeyToAccelerator } from '../utils/hotkeyMapper'
 import * as OverlayUI from './uiOverlay'
 import * as HighscoresUI from './uiHighscores'
 import _ from 'lodash'
 import { GAMES_BY_PROCESS_NAME, GAME_PROCESSES } from '../utils/constants'
 import { setAndShowPatchNotesModal } from './generalPurposeModal/uiGeneralPurposeModal'
+import { setItemDisplay } from './uiHelpers'
+import { isAppHookedToGame } from '../game/gameProcessService'
 
 const settingFields = document.querySelectorAll('.user-setting')
 const pageContainer = document.getElementById('settings-page-container')
@@ -293,7 +294,7 @@ function handleNewHotkeyRegistering(accelerator, hotkeyElement, currentHotkey) {
     }
   }
     
-  requestSettingUpdate(hotkeysToUpdate)
+  requestSettingUpdate(hotkeysToUpdate, { skipRegisteringShortcuts: !isAppHookedToGame() })
 }
 
 function initRestoreSettingsButton() {

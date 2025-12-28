@@ -1,12 +1,13 @@
 import { TOASTS_CONFIG } from '../utils/constants'
-import { getSetting, setSetting, restoreDefaultSettings } from '../settings/settings'
+import { getSetting, setSettings, restoreDefaultSettings, registerAllShortcuts, unregisterAllShortcuts } from '../settings/settings'
 import { SETTINGS_STRINGS } from '../settings/defaultSettings'
 import { isToastTypeSettingsDependant } from './utils'
 import { TOAST_EVENT_TYPES } from './toastEventTypes'
 import { getPrimaryDisplayId } from '../desktopCapture/desktopCapture'
 import { app, dialog } from 'electron'
-import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, showMainWindow } from '../browserWindows/browserWindows'
+import { APP_WINDOW_NAMES, getAllAppWindowsArray, getAppWindow, hideStickyWindow, showMainWindow } from '../browserWindows/browserWindows'
 import { getLatestUpdate } from '../api/api'
+import ctObserverService from '../online/ctObserver/CtObserverService'
 
 let toastClosingTimeoutId
 let currentlyDisplayedHighscores
@@ -90,9 +91,9 @@ export async function onGetSettingRequest(event, arg) {
 }
 
 export function onSetSettingRequest(event, arg) {
-  const { settingsToUpdate } = arg.payload
+  const { settingsToUpdate, params } = arg.payload
 
-  setSetting(settingsToUpdate)
+  setSettings(settingsToUpdate, params)
 }
 
 export async function onRestartSettingsRequest() {
@@ -152,4 +153,73 @@ export async function onOpenDirectoryDialogRequest() {
 
 export function onShowMainWindowRequest() {
   showMainWindow()
+}
+
+export function onDrawBalanceRequest(event, arg) {
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+
+  overlayWindow.webContents.send('draw-balance', arg)
+}
+
+export function onDrawScoreNumbersRequest(event, arg) {
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+
+  overlayWindow.webContents.send('draw-score-numbers', arg)
+}
+
+export async function onCtObserverRegisterRequest(id) {
+  return
+
+  // TODO: unused for now
+  const overlayWindow = getAppWindow(APP_WINDOW_NAMES.OVERLAY)
+
+  const onMessageCallback = (data) => {
+    overlayWindow.webContents.send('ct-observer-new-message', data)
+  }
+
+  const status = await ctObserverService.register(
+    id,
+    onMessageCallback
+  )
+
+  return status;
+}
+
+export async function onCtObserverUnregisterRequest() {
+  const status = await ctObserverService.unregister()
+
+  return status;
+}
+
+export async function onCtObserverSubscribeRequest(id) {
+  return
+
+  // TODO: unused for now
+  
+  console.log('onCtObserverSubscribeRequest', id)
+  const status = await ctObserverService.subscribe(id)
+
+  return status;
+}
+
+export async function onCtObserverUnsubscribeRequest() {
+  const status = await ctObserverService.unsubscribe()
+
+  return status;
+}
+
+export function onCtObserverSendMessageRequest(data) {
+  return
+
+  // TODO: unused for now
+  ctObserverService.sendMessage(data)
+}
+
+export function onCleanupAllShortcutsRequest() {
+  hideStickyWindow();
+  unregisterAllShortcuts();
+}
+
+export function onRegisterAllShortcutsRequest() {
+  registerAllShortcuts();
 }

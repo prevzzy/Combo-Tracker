@@ -1,10 +1,10 @@
 import { GAME_PROCESSES, GAME_CONSTANTS } from '../utils/constants';
-import { getActiveGameProcessName } from './gameProcessService';
+import { getHookedGameProcessName } from './gameProcessService';
 import * as MemoryController from './memory';
 
 export function isTrackingThugPro(game) {
   if (!game) {
-    game = getActiveGameProcessName()
+    game = getHookedGameProcessName()
   }
 
   return game === GAME_PROCESSES.THUGPRO
@@ -12,7 +12,7 @@ export function isTrackingThugPro(game) {
 
 export function isTrackingRethawed(game) {
   if (!game) {
-    game = getActiveGameProcessName()
+    game = getHookedGameProcessName()
   }
 
   return game === GAME_PROCESSES.RETHAWED
@@ -20,7 +20,7 @@ export function isTrackingRethawed(game) {
 
 export function isTrackingThug2(game) {
   if (!game) {
-    game = getActiveGameProcessName()
+    game = getHookedGameProcessName()
   }
 
   return game === GAME_PROCESSES.THUG2
@@ -28,7 +28,7 @@ export function isTrackingThug2(game) {
 
 export function isTrackingThaw(game) {
   if (!game) {
-    game = getActiveGameProcessName()
+    game = getHookedGameProcessName()
   }
 
   return game === GAME_PROCESSES.THAW

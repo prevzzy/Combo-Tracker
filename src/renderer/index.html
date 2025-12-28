@@ -155,6 +155,7 @@
       </div>
   
       <div id="last-combo-page" class="main" style="display: block">
+        <button id="overlay-window-button" style="display: none">init overlay</button>
         <div id="last-combo-page-info">
           <div class="info-page">
             <div class="d-flex flex-column align-items-center justify-content-center">
@@ -163,7 +164,10 @@
                 </span>
                 <h3 id="last-combo-error-text" class="mb-0"></h3>
               </div>
-              <button id="last-combo-page-info-dismiss-button" type="button" class="btn btn-primary mt-3" data-dismiss="modal" style="display: none">Show last combo</button>
+              <div class="mt-3">
+                <button id="last-combo-page-info-dismiss-button" type="button" class="btn btn-primary mx-2" data-dismiss="modal" style="display: none">Show last combo</button>
+                <button id="last-combo-page-info-delete-score-button" type="button" class="btn btn-outline-danger mx-2" style="display: none">Delete highscore</button>
+              </div>
             </div>
           </div>
         </div>
@@ -251,16 +255,16 @@
                       <div class="mr-md-3">
                         <p class="mb-2 display-6 text-secondary">Other</p>
                         <div class="d-flex justify-content-between">
-                          <p class="mb-1">Combo time </p>
-                          <span id="combo-details-time" class="text-secondary"></span>
-                        </div>
-                        <div class="d-flex justify-content-between">
                           <p class="mb-1">Lip time </p>
                           <span id="combo-lip-time" class="text-secondary"></span>
                         </div>
                         <div class="d-flex justify-content-between">
                           <p class="mb-1">Multiplier from gaps </p>
                           <span id="combo-multi-from-gaps" class="text-secondary"></span>
+                        </div>
+                        <div class="justify-content-between">
+                          <p class="mb-1">Bonus base points </p>
+                          <span id="combo-bonus-base-points" class="text-secondary"></span>
                         </div>
                         <div class="d-flex justify-content-between">
                           <p class="mb-1">Graffiti tags </p>
@@ -285,12 +289,17 @@
                   </div>
                 </div>
                 <div id="combo-details-tricks" style="display: none">
-                  <nav class="m-0 p-0 navbar navbar-dark navbar-expand mt-3 mb-4">
-                    <div id="combo-details-tricks-nav-container" class="navbar-nav">
-                      <a class="btn btn-sm nav-item nav-highlight mr-2 active" role="button">Usage</a>
-                      <a class="btn btn-sm nav-item nav-highlight mr-2" role="button">History</a>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <nav class="m-0 p-0 navbar navbar-dark navbar-expand mt-3 mb-4">
+                      <div id="combo-details-tricks-nav-container" class="navbar-nav">
+                        <a id="combo-details-trick-usage-button" class="btn btn-sm nav-item nav-highlight mr-2 active" role="button">Usage</a>
+                        <a id="combo-details-trick-history-button" class="btn btn-sm nav-item nav-highlight mr-2" role="button">History</a>
+                      </div>
+                    </nav>
+                    <div>
+                      Tricks: <span id="combo-details-total-tricks-used" class="text-secondary">480</span>
                     </div>
-                  </nav>
+                  </div>
                   <div id="combo-details-tricks-tabs-container">
                     <div id="trick-usage">
                       <div class="row p-0 m-0 mb-3">
@@ -347,12 +356,12 @@
                             <span class="text-secondary">Trick name</span>
                             <span class="text-secondary">#</span>
                           </div>
-                          <div id="trick-usage-container" style="overflow-y: overlay; max-height: 408px">
+                          <div id="trick-usage-container" style="overflow-y: overlay; max-height: 500px">
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div id="trick-history" class="text-center" style="max-height: 480px; overflow-y: overlay; display: none">
+                    <div id="trick-history" class="text-center" style="max-height: 500px; overflow-y: overlay; display: none">
                       <div id="trick-history-container" class="mr-3"></div>
                     </div>
                   </div>
@@ -678,7 +687,7 @@
               <div class="col col-12 row no-gutters flex-column">
                 <div class="mb-3"><span class="font-weight-semibold">Make sure that the games' executable filenames match THUGPro.exe, reTHAWed.exe, THUG2.exe and THAW.exe.</span> If you're using any modifications for these games, you may need to change the filename accordingly.</div>
                 <div>
-                  Depending on the game version installed on your PC, you might experience issues with Combo Tracker failing to detect THUG2 and THAW games. The application has been tested to run with the executables provided at the bottom of <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases/tag/v1.1.0" class="btn-link text-secondary" style="cursor: pointer" id="troubleshooting-link">this page</a>. If your game is running but you're still encountering the error messages "Could not find any active supported game process." or "Reinitializing addresses. Restart the game if the problem persists.", then try swapping your .exe files with the ones found inside the link. If this doesn't help, try running Combo Tracker as an administrator.
+                  Depending on the game version installed on your PC, you might experience issues with Combo Tracker failing to detect THUG2 and THAW games. The application has been tested to run with the executables provided at the bottom of <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases/tag/v1.2.0" class="btn-link text-secondary external-link">this page</a>. If your game is running but you're still encountering the error messages "Could not find any active supported game process." or "Reinitializing addresses. Restart the game if the problem persists.", then try swapping your .exe files with the ones found inside the link. If this doesn't help, try running Combo Tracker as an administrator.
                 </div>
               </div>
             </div>
@@ -706,15 +715,21 @@
                 <div class="text-muted display-8 mt-2">Every trick will award the player a maximum of 9.5 multiplier - 1 for the first 9 times it's used, and a 0.5 for the 10th time it's used. After you reach that limit, the trick won't add any more multiplier.</div>
                 <div class="text-muted display-8 mt-2">These rules don't apply to gaps, which always award the player the same amount of base points and 1 multiplier.</div>
                 <div class="text-muted display-8 mt-2">The regular and switch variations of the same trick are distinguished and counted as different tricks - e.g. Kickflip and Switch Kickflip.</div>
+                <div class="mt-3">Bonus base points</div>
+                <div class="text-muted display-8">Points awarded for certain actions - e.g. for breaking glass. These points are added to your final base points pool only if you land your combo. If you bail, they will not be added.</div>
               </div>
             </div>
             <div class="row align-items-center my-3">
               <div class="col text-muted text-center">
                 <div>
-                  <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases" class="display-8 btn-link text-right text-secondary" id="app-version">Releases</a>
+                  <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases" class="display-8 btn-link text-secondary external-link" id="app-version"></a>
                 </div>
                 <div class="mt-2">Created by prevzzy</div>
                 <small class="mt-2 d-block">If you have any feedback, questions or problems regarding Combo Tracker, contact me on Discord - prevzzy#7045</small>
+                <div class="pt-4 d-flex align-items-center justify-content-center flex-column">
+                  <a class="display-8 mx-2 btn-link text-secondary external-link" target="_blank" href="https://thpspoint.com">thpspoint.com</a>
+                  <a class="display-8 mx-2 btn-link text-secondary external-link" target="_blank" href="https://github.com/prevzzy/HBT/releases">HBT</a>
+                </div>
               </div>
             </div>
           </div>

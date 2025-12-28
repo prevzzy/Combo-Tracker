@@ -1,5 +1,5 @@
 import memoryjs from 'memoryjs'
-import { log } from '../debug/debugHelpers'
+import { isAppInDebugMode, log } from '../debug/debugHelpers'
 import { CustomError } from '../utils/customError'
 import {
   grindTimeAddressData,
@@ -22,8 +22,18 @@ import {
   grindBalanceArrowPositionAddressData,
   manualBalanceArrowPositionAddressData,
   lipBalanceArrowPositionAddressData,
+  balanceTrickComponentAddressData,
+  joinIdAddressData,
+  joinStateAddressData,
+  ownJoinIdAddressData,
+  observedPlayerObjectAddressData,
+  observedPlayerObjectOffsets,
+  skaterObjectOffsets,
+  ownSkaterScanningStartAddressData,
+  ownSkaterAddressMatchingParts,
+  bonusBasePointsAddressData
 } from './offsets'
-import { getActiveGameProcessName } from './gameProcessService'
+import { getHookedGameProcessName } from './gameProcessService'
 import { isInMainMenu } from './interGameUtils'
 import { hasSpecialUnicodeCharacter } from '../utils/helpers'
 
@@ -47,6 +57,13 @@ let trickCountAddress
 let trickCountWithNoGarbageAddress
 let currentStanceAddress
 let specialMeterNumericValueAddress
+let balanceTrickComponentAddress
+let joinIdAddress
+let joinStateAddress
+let ownJoinIdAddress
+let observedPlayerObjectAddress
+let ownSkaterScanningStartAddress
+let bonusBasePointsAddress
 
 function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   gameHandle = _gameHandle
@@ -70,6 +87,14 @@ function initAddresses (_gameHandle, _processBaseAddress, gameProcessName) {
   trickCountWithNoGarbageAddress = getAddress(gameHandle, processBaseAddress, trickCountWithNoGarbageAddressData[gameProcessName])
   currentStanceAddress = getAddress(gameHandle, processBaseAddress, currentStanceAddressData[gameProcessName])
   specialMeterNumericValueAddress = getAddress(gameHandle, processBaseAddress, specialMeterNumericValueAddressData[gameProcessName])
+  balanceTrickComponentAddress = getAddress(gameHandle, processBaseAddress, balanceTrickComponentAddressData[gameProcessName])
+  bonusBasePointsAddress = getAddress(gameHandle, processBaseAddress, bonusBasePointsAddressData[gameProcessName])
+
+  // joinIdAddress = getAddress(gameHandle, processBaseAddress, joinIdAddressData[gameProcessName])
+  // joinStateAddress = getAddress(gameHandle, processBaseAddress, joinStateAddressData[gameProcessName])
+  // ownJoinIdAddress = getAddress(gameHandle, processBaseAddress, ownJoinIdAddressData[gameProcessName])
+  // observedPlayerObjectAddress = getAddress(gameHandle, processBaseAddress, observedPlayerObjectAddressData[gameProcessName])
+  // ownSkaterScanningStartAddress = getAddress(gameHandle, processBaseAddress, ownSkaterScanningStartAddressData[gameProcessName])
 }
 
 // It's hard to predict whether this function will always work. Current checks depend only on relations between incorrectly initialized values that I noticed.
@@ -107,6 +132,7 @@ function testInitializedAddresses(gameProcessName) {
     getCurrentMapScript, ${getCurrentMapScript()}
     getMultiplier,  ${getMultiplier()}
     getBasePoints,  ${getBasePoints()}
+    getBonusBasePoints, ${getBonusBasePoints()}
     getGameScore,  ${getGameScore()}
     getStateType,  ${getStateType()}
     getRevertPenalty,  ${getRevertPenalty()}
@@ -131,6 +157,17 @@ function testInitializedAddresses(gameProcessName) {
       RevertPenaltyAddress ${revertPenaltyAddress.toString(16)}
     `
   )
+
+  // unused for now
+  // try {
+  //   console.log(`
+  //     getJoinId(): ${getJoinId()}
+  //     getOwnJoinId(): ${getOwnJoinId()}
+  //     getJoinState(): ${getJoinState()}
+  //   `)
+  // } catch(error) {
+  //   console.error(error)
+  // }
 
   const currentMultiplier = getMultiplier()
   const currentBasePoints = getBasePoints()
@@ -168,7 +205,7 @@ function testInitializedAddresses(gameProcessName) {
     !isInMainMenu(currentMapScript) &&
     !hasSpecialUnicodeCharacter(currentMapScript) // happens for about 0.1 second after launching rethawed
   ) {
-    throw new CustomError('Exit observer mode to start combo tracking.', 1)
+    throw new CustomError('Exit observer mode to initialize Combo Tracker.', 1)
   }
 
   if (
@@ -219,9 +256,18 @@ function getTrickHistoryArrayAddress() {
     throw new Error('Can\'t read memory without gameHandle.')
   }
 
-  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData[getActiveGameProcessName()])
+  const trickHistoryArrayAddress = getAddress(gameHandle, processBaseAddress, trickHistoryArrayAddressData[getHookedGameProcessName()])
 
   return trickHistoryArrayAddress
+}
+
+function getOffset(offsetsObject, property) {
+  const activeGameProcessName = getHookedGameProcessName()
+  if (!activeGameProcessName) {
+    return
+  }
+
+  return offsetsObject[activeGameProcessName][property];
 }
 
 function getTrickDataPointer(index) {
@@ -239,15 +285,21 @@ function getTrickDataPointer(index) {
 }
 
 function getTrickValue(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].value, memoryjs.INT)
+  const valueOffset = getOffset(trickPropertyOffsets, 'value')
+
+  return memoryjs.readMemory(gameHandle, trickDataPointer + valueOffset, memoryjs.INT)
 }
 
 function getTrickName(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].name, memoryjs.STRING);
+  const nameOffset = getOffset(trickPropertyOffsets, 'name')
+
+  return memoryjs.readMemory(gameHandle, trickDataPointer + nameOffset, memoryjs.STRING);
 }
 
 function getTrickFlags(trickDataPointer) {
-  return memoryjs.readMemory(gameHandle, trickDataPointer + trickPropertyOffsets[getActiveGameProcessName()].flags, memoryjs.INT);
+  const flagsOffset = getOffset(trickPropertyOffsets, 'flags')
+
+  return memoryjs.readMemory(gameHandle, trickDataPointer + flagsOffset, memoryjs.INT);
 }
 
 function getGrindTime() {
@@ -306,12 +358,30 @@ function getCurrentStance() {
   return memoryjs.readMemory(gameHandle, currentStanceAddress, memoryjs.INT)
 }
 
+function getBalanceTrickType() {
+  return memoryjs.readMemory(gameHandle, getBalanceComponent() + 0x18, memoryjs.UINT32)
+}
+
+function getBalanceComponent() {
+  return memoryjs.readMemory(gameHandle, balanceTrickComponentAddress, memoryjs.PTR);
+}
+
 function getSpecialMeterNumericValue() {
   return memoryjs.readMemory(gameHandle, specialMeterNumericValueAddress, memoryjs.INT)
 }
 
 function getGrindBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, grindBalanceArrowPositionAddress, memoryjs.FLOAT)
+}
+
+function bounceBalance(value) {
+  if (!isAppInDebugMode()) {
+    return;
+  }
+  memoryjs.writeMemory(gameHandle, grindBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualBalanceArrowPositionAddress + 0x4, value, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, grindTimeAddress, 0, memoryjs.FLOAT)
+  memoryjs.writeMemory(gameHandle, manualTimeAddress, 0, memoryjs.FLOAT)
 }
 
 function getManualBalanceArrowPosition() {
@@ -322,12 +392,132 @@ function getLipBalanceArrowPosition() {
   return memoryjs.readMemory(gameHandle, lipBalanceArrowPositionAddress, memoryjs.FLOAT)
 }
 
+function getBonusBasePoints() {
+  return memoryjs.readMemory(gameHandle, bonusBasePointsAddress, memoryjs.INT)
+}
+
+function getJoinId() {
+  return memoryjs.readMemory(gameHandle, joinIdAddress, memoryjs.UINT32);
+}
+
+function getJoinState() {
+  return memoryjs.readMemory(gameHandle, joinStateAddress, memoryjs.INT);
+}
+
+function getOwnJoinId() {
+  return memoryjs.readMemory(gameHandle, ownJoinIdAddress, memoryjs.UINT32);
+}
+
+function getSkaterId(skaterObject) {
+  if (!skaterObject) {
+    throw new Error('No skater object.')
+  }
+
+  const idOffset = getOffset(skaterObjectOffsets, 'id')
+
+  return memoryjs.readMemory(gameHandle, skaterObject + idOffset, memoryjs.INT)
+}
+
+function isSkaterInWorld(skaterObject) {
+  if (!skaterObject) {
+    throw new Error('No skater object.')
+  }
+
+  const idOffset = getOffset(skaterObjectOffsets, 'isInWorld')
+
+  return !!memoryjs.readMemory(gameHandle, skaterObject + idOffset, memoryjs.BOOL)
+}
+
+function getObservedPlayerName(observedPlayerObjectAddress) {
+  if (!observedPlayerObjectAddress) {
+    throw new Error('No observed player object.')
+  }
+
+  const nameOffset = getOffset(observedPlayerObjectOffsets, 'name')
+
+  return memoryjs.readMemory(gameHandle, observedPlayerObjectAddress + nameOffset, memoryjs.STRING)
+}
+
+function getObservedPlayerFlags(observedPlayerObjectAddress) {
+  if (!observedPlayerObjectAddress) {
+    throw new Error('No observed player object.')
+  }
+
+  const flagsOffset = getOffset(observedPlayerObjectOffsets, 'flags')
+
+  return memoryjs.readMemory(gameHandle, observedPlayerObjectAddress + flagsOffset, memoryjs.INT)
+}
+
+function getObservedPlayerSkaterAddress(observedPlayerObjectAddress) {
+  if (!observedPlayerObjectAddress) {
+    throw new Error('No observed player object.')
+  }
+
+  const skaterOffset = getOffset(observedPlayerObjectOffsets, 'skater');
+
+  return memoryjs.readMemory(gameHandle, observedPlayerObjectAddress + skaterOffset, memoryjs.PTR);
+}
+
+function getObservedPlayerSkaterId(observedPlayerObjectAddress) {
+  if (!observedPlayerObjectAddress) {
+    throw new Error('No observed player object.')
+  }
+
+  const observedPlayerSkaterObjectAddress = getObservedPlayerSkaterAddress(observedPlayerObjectAddress);
+
+  if (!observedPlayerSkaterObjectAddress) {
+    throw new Error('No observed player\'s skater object.')
+  }
+
+  const idOffset = getOffset(skaterObjectOffsets, 'id')
+
+  return memoryjs.readMemory(gameHandle, observedPlayerSkaterObjectAddress + idOffset, memoryjs.INT);
+}
+
+function getObservedPlayerObjectAddress() {
+  return memoryjs.readMemory(gameHandle, observedPlayerObjectAddress, memoryjs.PTR);
+}
+
+function getOwnSkaterAddress() {
+  // TODO: jeżeli nie ma własnego skejta a jest mapa nie będąca main menu to jesteśmy na observie - co w takim wypadku?
+
+  // I ran out of ideas. Own skater is placed in different addresses depending of when you join the server (hosting/joining/joining while game is running/joining as observer)
+  try {
+    for (let i = 0; i < 100; i++) {
+      const addressToScan = ownSkaterScanningStartAddress + 0x4 * i
+      const potentialSkaterAddress = memoryjs.readMemory(gameHandle, addressToScan, memoryjs.INT);
+      const potentialSkaterAddressHex = potentialSkaterAddress.toString(16);
+      
+      if (hasMatchingOwnSkaterAddress(potentialSkaterAddressHex)) {
+        return potentialSkaterAddress;
+      };
+    }
+  } catch(error) {
+    console.error(error);
+  }
+}
+
+function hasMatchingOwnSkaterAddress(hexAddress) {
+  const offsetsToCheck = ownSkaterAddressMatchingParts[getHookedGameProcessName()]
+
+  if (!offsetsToCheck) {
+    return false;
+  }
+
+  const [firstOffset, lastOffset] = offsetsToCheck;
+
+  return hexAddress.startsWith(firstOffset) && hexAddress.endsWith(lastOffset);
+}
+
 export {
   initAddresses,
   testInitializedAddresses,
   getGrindTime,
   getManualTime,
   getLipTime,
+  getGrindBalanceArrowPosition,
+  getManualBalanceArrowPosition,
+  getLipBalanceArrowPosition,
   getCurrentMapScript,
   getMultiplier,
   getBasePoints,
@@ -345,4 +535,19 @@ export {
   getTrickName,
   getTrickFlags,
   getSpecialMeterNumericValue,
+  getBalanceTrickType,
+  getObservedPlayerName,
+  getJoinId,
+  getJoinState,
+  getOwnJoinId,
+  getSkaterId,
+  getObservedPlayerSkaterAddress,
+  getObservedPlayerSkaterId,
+  getObservedPlayerFlags,
+  getOwnSkaterAddress,
+  getObservedPlayerObjectAddress,
+  isSkaterInWorld,
+  getBonusBasePoints,
+  // debug helpers
+  bounceBalance,
 }

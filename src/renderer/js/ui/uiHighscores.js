@@ -11,11 +11,11 @@ import {
   formatSecondsToHours,
 } from '../utils/helpers'
 import * as ComboSaver from '../combo/comboSaver'
-import * as GlobalUI from './uiGlobal'
 import * as SavedCombosService from '../combo/savedCombosService'
 import * as LastComboUI from './lastCombo/uiLastCombo'
 import * as MemoryController from '../game/memory'
-import { getActiveGameProcessName } from '../game/gameProcessService'
+import { getHookedGameProcessName } from '../game/gameProcessService'
+import { colorComboPropertyText, setItemDisplay } from './uiHelpers'
 
 const mapCategoriesMenu = document.getElementById('hs-map-categories-menu')
 const mapNameElement = document.getElementById('hs-map')
@@ -67,7 +67,7 @@ const highscoreStatElementsConfig = {
 }
 
 function initHighscoresPage() {
-  const selectedGame = getActiveGameProcessName() || GAME_PROCESSES.THUGPRO
+  const selectedGame = getHookedGameProcessName() || GAME_PROCESSES.THUGPRO
 
   initGameSelect(selectedGame)
   sideDrawerTrigger.addEventListener('click', changeSideDrawerVisibility)
@@ -87,9 +87,9 @@ function displayMapCategoriesMenuForGame(game) {
   const hasOnlyOneMapCategory = Object.keys(allMapCategories).length === 1
 
   if (hasOnlyOneMapCategory) {
-    GlobalUI.setItemDisplay(allMaps, 'none')
+    setItemDisplay(allMaps, 'none')
   } else {
-    GlobalUI.setItemDisplay(allMaps, 'block')
+    setItemDisplay(allMaps, 'block')
 
     allMaps.addEventListener('click', (e) => {
       activeCategoryElement = allMaps;
@@ -374,7 +374,7 @@ function drawSingleHighscoreStat(parentElement, statName, value) {
         let formattedValue = value
         
         if (statConfig.colorPropertyConfig) {
-          GlobalUI.colorComboPropertyText(
+          colorComboPropertyText(
             statElement,
             value,
             statConfig.colorPropertyConfig.dangerThreshold,
@@ -503,7 +503,7 @@ function changeSideDrawerVisibility() {
 }
 
 function setPulsingBackgroundForActiveGame() {
-  const activeGame = getActiveGameProcessName()
+  const activeGame = getHookedGameProcessName()
 
   Array.from(gameSelect.children).forEach(element => {
     if (activeGame === GAME_PROCESSES[element.attributes['data-game'].value]) {
@@ -515,7 +515,7 @@ function setPulsingBackgroundForActiveGame() {
 }
 
 function updateActiveMapData() {
-  const activeGame = getActiveGameProcessName()
+  const activeGame = getHookedGameProcessName()
   if (!activeGame || activeGame !== displayedGame) {
     setActiveMapData()
     return;

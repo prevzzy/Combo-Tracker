@@ -69,10 +69,11 @@ export function requestSettingValue(key) {
   })
 }
 
-export function requestSettingUpdate(settingsToUpdate) {
+export function requestSettingUpdate(settingsToUpdate, params) {
   ipcRenderer.send('set-setting-request', {
     payload: {
-      settingsToUpdate
+      settingsToUpdate,
+      params
     }
   })
 }
@@ -83,6 +84,10 @@ export function requestSettingsRestart() {
 
 export function requestAppMinimize() {
   ipcRenderer.send('request-app-minimize')
+}
+
+export function requestAppFocus() {
+  ipcRenderer.send('request-app-focus')
 }
 
 export function requestAppFullscreen() {
@@ -108,29 +113,10 @@ export async function requestOpeningDirectoryDialog() {
   return path;
 }
 
-export function requestServerHosting(username) {
-  ipcRenderer.send('host-server-request', { username });
-}
-
-export function requestConnectingToServer(username) {
-  ipcRenderer.send('connect-to-server-request', { username });
-}
-
-export function requestServerShutdown() {
-  ipcRenderer.send('shutdown-server-request');
-}
-
-export function requestDisconnectingFromServer() {
-  ipcRenderer.send('disconnect-from-server-request');
-}
-
-// export function requestShowingOverlay() {
-//   ipcRenderer.send('show-overlay-request');
-// }
-
-export function requestSendingWsMessage(message, isHost) {
-  const event = isHost ? 'send-ws-server-message' : 'send-ws-client-message'
-  ipcRenderer.send(event, message);
+export function requestShowingOverlay() {
+  return;
+  // unused for now
+  ipcRenderer.send('show-overlay-request');
 }
 
 export function sendBalanceToStickyTimers(data) {
@@ -147,4 +133,48 @@ export function minimizeSticky() {
 
 export function requestShowingMainWindow() {
   ipcRenderer.send('show-main-window-request')
+}
+
+export function requestDrawingBalance(balanceData) {
+  ipcRenderer.send('draw-balance-request', balanceData)
+}
+
+export function requestDrawingScoreNumbers(scoreData) {
+  ipcRenderer.send('draw-score-numbers-request', scoreData)
+}
+
+export async function requestCtObserverRegister(id) {
+  const status = await ipcRenderer.invoke('request-ct-observer-register', id)
+
+  return status;
+}
+
+export async function requestCtObserverUnregister() {
+  const status = await ipcRenderer.invoke('request-ct-observer-unregister')
+
+  return status;
+}
+
+export async function requestSubscribingToPlayer(id) {
+  const status = await ipcRenderer.invoke('request-ct-observer-subscribe', id)
+
+  return status;
+}
+
+export async function requestUnsubscribingFromPlayer() {
+  const status = await ipcRenderer.invoke('request-ct-observer-unsubscribe')
+
+  return status;
+}
+
+export function requestCtObserverSendMessage(data) {
+  ipcRenderer.send('request-ct-observer-send-message', data)
+}
+
+export function requestCleaningUpAllShortcuts() {
+  ipcRenderer.send('cleanup-all-shortcuts');
+}
+
+export function requestRegisteringAllShortcuts() {
+  ipcRenderer.send('register-all-shortcuts');
 }

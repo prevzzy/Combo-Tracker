@@ -18,8 +18,10 @@ import * as MemoryController from '../game/memory'
 import * as SavedCombosService from '../combo/savedCombosService'
 import { log } from '../debug/debugHelpers'
 import { setupGlobalError } from '../ui/globalError'
-import { getActiveGameProcessName } from '../game/gameProcessService'
+import { getHookedGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
+import { requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
+import { shouldSendCtObserverMessage } from '../online/ctObserver'
 
 let finalScore = null
 let comboStartTime = 0
@@ -29,6 +31,7 @@ let balance = new Balance()
 let score = new Score()
 let trickHistory = new TrickHistory()
 let datasetsUpdatingInterval = null
+let sendDataToCtObserverInterval = null
 let trackingInterval = null
 let mapScriptName = null
 let comboTrackingNumbers = {
@@ -40,6 +43,7 @@ let comboTrackingNumbers = {
 let isSuspended = true
 let shouldRunIdleDetector = true
 let game = null
+let isTrackerRunning = false
 
 function isComboTrackingSuspended() {
   return isSuspended
@@ -49,10 +53,10 @@ function shouldSuspendComboTracking(value) {
   isSuspended = value
 }
 
-function getFinalNumbersData() {
+function getFinalNumbersData(isLanded) {
   return {
     score: finalScore,
-    basePoints: score.getBasePoints(),
+    basePoints: score.calculateFinalBasePoints(isLanded),
     multiplier: score.getMultiplier(),
     comboTime,
     date: new Date().toLocaleString(),
@@ -81,16 +85,37 @@ function getMiscData() {
     maxRevertPenalty: score.maxRevertPenalty,
     multiplierFromGaps: trickHistory.gapsHit,
     graffitiTags: score.graffitiTags,
+    bonusBasePoints: score.getBonusBasePoints(),
   }
 }
 
-function getComboNumbersData(isIdle) {
+function getOverlayComboData() {
+  const {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    balanceTrickType,
+  } = balance;
+
+  return {
+    manualBalanceArrowPosition,
+    grindBalanceArrowPosition,
+    lipBalanceArrowPosition,
+    balanceTrickType,
+    multiplier: score.getMultiplier(),
+    basePoints: score.getBasePoints(),
+    score: score.getFinalScore(),
+  }
+}
+
+function getComboNumbersData(isIdle, isLanded) {
   const { grindData, manualData } = getFinalBalanceData()
   const miscData = getMiscData()
   const mainComboData = {
     game,
-    ...getFinalNumbersData(),
+    ...getFinalNumbersData(isLanded),
     isIdle,
+    isLanded: isLanded,
     mapName: SavedCombosService.getMapName(game, mapScriptName) || ERROR_STRINGS.UNKNOWN_MAP
   }
 
@@ -150,10 +175,12 @@ function resetTracker() {
   game = null,
   clearInterval(trackingInterval)
   clearInterval(datasetsUpdatingInterval)
+  clearInterval(sendDataToCtObserverInterval)
 }
 
 async function listenForComboStart() {
   if (isComboTrackingSuspended()) {
+    isTrackerRunning = false;
     return
   }
 
@@ -188,13 +215,62 @@ function displayInProgressInfoWithDelay(lastComboStart) {
 async function startTracking(startTime = Date.now()) {
   comboStartTime = startTime
   mapScriptName = MemoryController.getCurrentMapScript()
-  game = getActiveGameProcessName()
+  game = getHookedGameProcessName()
 
   LastComboUI.setNewComboTextDisplay(true)
   displayInProgressInfoWithDelay(comboStartTime)
   startDatasetUpdating()
   runIdleDetector(null, null, null, null, comboStartTime)
   await track()
+
+  return
+
+  // TODO: unused for now
+  sendDataToCtObserver()
+}
+
+function sendDataToCtObserver() {
+  return
+
+  // TODO: unused for now
+  sendDataToCtObserverInterval = setInterval(() => {
+    if (!shouldSendCtObserverMessage()) {
+      return;
+    }
+
+    const {
+      grindBalanceArrowPosition,
+      lipBalanceArrowPosition,
+      manualBalanceArrowPosition,
+      balanceTrickType,
+      score,
+      multiplier,
+      basePoints
+    } = getOverlayComboData();
+
+    let balancePosition
+    switch(balanceTrickType) {
+      case 'GRIND':
+        balancePosition = grindBalanceArrowPosition
+        break;
+      case 'MANUAL':
+        balancePosition = manualBalanceArrowPosition
+        break;
+      case 'LIP':
+        balancePosition = lipBalanceArrowPosition
+        break;
+      default:
+        break;
+    }
+  
+    requestCtObserverSendMessage({
+      score,
+      multiplier,
+      basePoints,
+      balanceTrickType,
+      balancePosition
+    })
+  }, 34)
 }
 
 function startDatasetUpdating() {
@@ -211,6 +287,7 @@ async function track() {
       updateComboValues()
       handleSendingDataToListeners()
     } else {
+      clearInterval(sendDataToCtObserverInterval)
       clearInterval(trackingInterval)
       clearInterval(datasetsUpdatingInterval)
       await finishTrackingCurrentCombo()
@@ -219,12 +296,27 @@ async function track() {
 }
 
 async function finishTrackingCurrentCombo(isIdle) {
+  // TODO: condition for clearing the combo display; unused for now
+  // if (true) {
+  //   cleanOverlayComboDisplay();
+  // }
+
   if (isComboLongEnoughToDisplay() && !isComboTrackingSuspended()) {
     handleSendingDataToListeners()
     await handleComboFinish(isIdle)
   } else {
     restart()
   }
+}
+
+function cleanOverlayComboDisplay() {
+  const { score, multiplier, basePoints } = getOverlayComboData();
+  requestCtObserverSendMessage({
+    score,
+    multiplier,
+    basePoints,
+    isLanded: isComboLanded()
+  })
 }
 
 async function handleComboFinish(isIdle) {
@@ -251,18 +343,19 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
     restart()
     return
   }
-  
-  finalScore = score.getFinalScore()
-  score.scoreDataset[score.scoreDataset.length - 1] = (finalScore / 1000000)
+
+  trickHistory.finishTrickReading();
+  const isLanded = isComboLanded()
+  finalScore = score.finishCombo(isComboLanded())
 
   const comboData = {
-    stats: getComboNumbersData(isIdle),
+    stats: getComboNumbersData(isIdle, isLanded),
     tricks: getTricksData(),
     graphs: getGraphData()
   }
 
   if (!isIdle && shouldSaveCombo && isComboBigEnoughToSave()) {
-    await handleSavingComboData(game, comboData, shouldScreenshotCombo)
+    await handleSavingComboData(game, comboData, shouldScreenshotCombo, isLanded)
   }
 
   LastComboUI.handleLastComboDisplay(
@@ -275,8 +368,8 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
   restart()
 }
 
-async function handleSavingComboData(game, comboData, shouldScreenshotCombo) {
-  const finalNumbersData = getFinalNumbersData()
+async function handleSavingComboData(game, comboData, shouldScreenshotCombo, isLanded) {
+  const finalNumbersData = getFinalNumbersData(isLanded)
 
   try {
     let comboSaverResponse = await ComboSaver.saveNewCombo(
@@ -387,7 +480,7 @@ function isComboBigEnoughToDisplay() {
 }
 
 function isComboLanded() {
-  // Note that this won't work with 'Always special' cheat turned on.
+  // Note that this won't always work with 'Always special' cheat turned on (although it still works most of the time, because bailing a combo resets special combo meter for a few frames anyway)
   const specialMeterNumericValue = MemoryController.getSpecialMeterNumericValue()
   
   return specialMeterNumericValue > 0 && specialMeterNumericValue <= 3000
@@ -412,8 +505,8 @@ function checkComboScreenshotCondition(score, mapBestScoreNumber, generalBestSco
 }
 
 function updateComboValues() {
-  balance.update()
   score.update()
+  balance.update(score)
   trickHistory.update()
 
   updateComboTime(Date.now())
@@ -428,14 +521,17 @@ function updateComboTime(timestamp) {
 }
 
 async function resumeComboTracking() {
-  if (!isSuspended) {
+  if (!isSuspended || isTrackerRunning) {
     return
   }
+
+  log('resuming ComboTracker')
 
   shouldSuspendComboTracking(false)
   await listenForComboStart()
   setupGlobalError(false)
   LastComboUI.displayDefaultComboPageInfo()
+  isTrackerRunning = true;
 }
 
 export function getBalance() {

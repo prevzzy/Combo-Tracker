@@ -18,6 +18,7 @@
   --gradient-top-color-active: #44335e;
   --gradient-top-color-hover: #4f3c6b;
   --muted: #868e96;
+  --secondary-light: #d6d2ef;
 }
 
 * {
@@ -580,8 +581,8 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   cursor: pointer;
 }
 
-#app-version:hover {
-  cursor: pointer;
+.external-link:hover {
+  cursor: pointer !important;
 }
 
 .section-title {
@@ -649,9 +650,9 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: inset 0px 0px 23px -10px var(--secondary);
+    box-shadow: inset 0px 0px 23px -10px var(--gradient-top-color);
   }
   50% {
-    box-shadow: inset 0px 0px 23px -10px var( --gradient-top-color);
+    box-shadow: inset 0px 0px 23px -10px var(--secondary);
   }
 }

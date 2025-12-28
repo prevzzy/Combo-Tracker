@@ -16,7 +16,7 @@ function getLastUpdateCheckDate() {
 
 function shouldCheckForUpdate() {
   const currentDate = new Date().toISOString().split('T')[0];
-  // return true
+
   return (
     hasNewUpdateAvailableNote() ||
     currentDate !== getLastUpdateCheckDate() ||

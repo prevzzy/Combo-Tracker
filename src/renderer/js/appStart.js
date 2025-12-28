@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { initIncomingIpcEventListeners } from './events/incomingIpcEvents'
 import * as HighscoresUI from './ui/uiHighscores'
-import * as GlobalUI from './ui/uiGlobal'
 import * as SettingsUI from './ui/uiSettings'
 import * as GameProcessService from './game/gameProcessService'
 import * as LastComboUI from './ui/lastCombo/uiLastCombo'
@@ -9,8 +8,11 @@ import * as FileService from './files/fileService'
 import { setupGlobalError } from './ui/globalError'
 import { app } from '@electron/remote'
 import { COMBO_PAGE_INFO_MESSAGES } from './utils/constants'
-import { setupAppVersionLink, setupExternalLinks } from './utils/helpers'
+import { setAppVersionText, setupExternalLinks } from './utils/helpers'
 import { setupLatestUpdateInfo } from './patchNotes/patchNotes'
+import { blockHighscoresPage, setupToolbarListeners, showApp } from './ui/uiNavigation'
+import { requestCleaningUpAllShortcuts } from './events/outgoingIpcEvents'
+import { fixIncorrectGapsAmountInSavedCombos } from './files'
 
 let isRunning = false
 
@@ -27,7 +29,7 @@ async function startApp() {
     ipcRenderer.removeAllListeners('user-data-path-request-response')
   })
 
-  setupAppVersionLink(app.getVersion())
+  setAppVersionText(app.getVersion())
   setupExternalLinks()
 }
 
@@ -35,12 +37,13 @@ function runCoreLogic(paths) {
   FileService.setSavingPaths(paths)
   FileService.readAllHighscoreJsons()
     .then(async () => {
+      await fixIncorrectGapsAmountInSavedCombos()
       LastComboUI.displayDefaultComboPageInfo()
 
       isRunning = true
 
       LastComboUI.init()
-      GlobalUI.setupToolbarListeners()
+      setupToolbarListeners()
       await GameProcessService.mainLoop()
       HighscoresUI.initHighscoresPage()
 
@@ -48,7 +51,11 @@ function runCoreLogic(paths) {
     })
     .catch((error) => {
       console.error(error)
-      setupGlobalError(true, 'Failed to read highscores data. Try resetting your highscores in the settings.', 1)
+      setupGlobalError(
+        true,
+        `${error}`,
+        1
+      )
 
       LastComboUI.setLastComboPageInfo(
         true,
@@ -57,10 +64,11 @@ function runCoreLogic(paths) {
         false
       )
 
-      GlobalUI.blockHighscoresPage()
+      requestCleaningUpAllShortcuts()
+      blockHighscoresPage()
     })
     .finally(() => {
-      GlobalUI.showApp()
+      showApp()
     })
 }
 

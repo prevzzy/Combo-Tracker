@@ -6,7 +6,35 @@ import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
 const TRICK_CONSTANTS = {
   SWITCH: 'Switch',
   GRIND_GARBAGE_SUFFIXES: ['bonk', 'ding', 'tap', 'kiss', 'clip'],
-  BONK_TRICKS: ['Tapped The Rail', 'Clipped The Rail', 'Dinged The Rail', 'Bonked The Rail', 'Kissed The Rail']
+  BONK_TRICKS: [
+    'Tapped The Rail',
+    'Clipped The Rail',
+    'Dinged The Rail',
+    'Bonked The Rail',
+    'Kissed The Rail'
+  ],
+  TRANSFERS: [
+    'Spine Transfer',
+    'Acid Drop',
+    'Hip Transfer',
+    'Acid Bomb',
+    'Bank Drop'
+  ],
+  FLIPS_AND_ROLLS: [
+    'Backflip',
+    'Frontflip',
+    'FS Roll',
+    'BS Roll',
+    'Double Roll',
+    'Double Backflip',
+    'Double Frontflip'
+  ]
+}
+
+const FLAGS = {
+  SWITCH: 4,
+  GAP: 16,
+  SPECIAL: 32,
 }
 
 const spacesRe = /\\_/g // spaces in trick names are represented by \_
@@ -15,9 +43,12 @@ const allowedNameSymbolsRe = /[a-zA-Z0-9-!().'\s]/g
 
 class Trick {
   constructor(name = '', flags = 0, timesUsed = 0) {
-    this.timesUsed = timesUsed
     this.flags = flags
-    this.name = this.parseTrickName(name)
+    this.timesUsed = timesUsed
+    
+    const trickName = this.parseTrickName(name)
+    this.id = `${trickName}_${flags}`
+    this.name = trickName
   }
 
   parseTrickName(name) {
@@ -33,24 +64,46 @@ class Trick {
     return parsedName
   }
 
+  getStancelessTrickName() {
+    return `${this.name}`.replace(`${TRICK_CONSTANTS.SWITCH} `, '');
+  }
+
   isSwitch() {
-    return this.flags & 4
+    return this.flags & FLAGS.SWITCH
   }
 
   isGap() {
-    return this.flags & 16
+    return this.flags & FLAGS.GAP
   }
 
   isSpecial() {
-    return this.flags & 32
+    // In THUG2 and THAW doing special tricks in combination with transfer or flips/rolls often results in marking the wrong trick as a special.
+    if (this.flags & FLAGS.SPECIAL) {
+      const nonSpecialTricks = [
+        ...TRICK_CONSTANTS.FLIPS_AND_ROLLS,
+        ...TRICK_CONSTANTS.TRANSFERS,
+        ...TRICK_CONSTANTS.BONK_TRICKS
+      ];
+      
+      const trickName = this.getStancelessTrickName();
+      
+      return !nonSpecialTricks.some(trick => trick === trickName);
+    }
+
+    return false;
   }
   
   incrementTimesUsedCounter() {
     this.timesUsed++
   }
 
+  isTransferTrick() {
+    const trickName = this.getStancelessTrickName();
+    return TRICK_CONSTANTS.TRANSFERS.some(transferTrickName => transferTrickName === trickName)
+  }
+
   isDegradeable() {
-    return !(this.isGap() || this.isNonMultiTrick())
+    return !(this.isGap() || this.isNonMultiTrick() || this.isTransferTrick())
   }
 
   isNonMultiTrick() {
@@ -73,9 +126,7 @@ class Trick {
   
   To avoid really complex logic and dealing with many edge cases, TrickHistory class mimicks the in-game trick history array. Given that there is quite a lot of logic based just on observations, saved trick history might not be 100% the same as the in-game trick history, although the differences should be rare and minimal.
 
-  trickCountNoGarbage is needed for failover THAW trick reading. This value tracks trick count differently from "normal" trickCount as it skips "empty" tricks (ollies, sketchy/clean landings and maybe some other stuff). F.e. if in THAW you are doing three tricks in a row mid-air, the "normal" trickCount gets updated after the second trick is made instead of the first one. The trickCountNoGarbage value however gets updated immediately for every trick. This means that the new trick might not always increment trickCount but will still overwrite the last trick in trick history array (always(?) an "empty" trick). Checking this value assures that no tricks are skipped in trick reading.
-    
-  This value can't be used to directly index the trickPointerArray though, as its value can go higher than 250 (the hardcoded in-game trickCount limit). I'm not sure what is this used for in-game, but it resets on combo bail and persists on combo land.
+  trickCountNoGarbage is needed for failover THAW trick reading. This value tracks trick count differently from "normal" trickCount as it skips "empty" tricks (ollies, sketchy/clean landings and maybe some other stuff). F.e. if in THAW you are doing three tricks in a row mid-air, the "normal" trickCount gets updated after the second trick is made instead of the first one. The trickCountNoGarbage value however gets updated immediately for every trick. This means that the new trick might not always increment trickCount but will still overwrite the last trick in trick history array (always(?) an "empty" trick). Checking this value assures that no tricks are skipped in trick reading. This value can't be used to directly index the trickPointerArray though, as its value can go higher than 250 (the hardcoded in-game trickCount limit). I'm not sure what is this used for in-game, but it resets on combo bail and persists on combo land.
 */
 class TrickHistory {
   constructor() {
@@ -88,16 +139,29 @@ class TrickHistory {
     this.hasHitTrickCountLimit = false
   }
 
+  compareTricks(trickOne = {}, trickTwo = {}) {
+    return trickOne.name === trickTwo.name &&
+    trickOne.flags === trickTwo.flags
+  }
+
+  addTrickToHistory(trickObject) {
+    const existingTrickInCombo = this.tricksInCombo.get(trickObject.id)
+      
+    if (existingTrickInCombo && this.compareTricks(trickObject, existingTrickInCombo)) {
+      existingTrickInCombo.incrementTimesUsedCounter()
+    } else {
+      this.tricksInCombo.set(trickObject.id, trickObject)
+      trickObject.incrementTimesUsedCounter()
+    }
+  }
+  
   updateTricksInCombo(newTricksArray) {
     newTricksArray.forEach((trickObject) => {
-      const existingTrickInCombo = this.tricksInCombo.get(trickObject.name)
-
-      if (existingTrickInCombo) {
-        existingTrickInCombo.incrementTimesUsedCounter()
-      } else {
-        this.tricksInCombo.set(trickObject.name, trickObject)
-        trickObject.incrementTimesUsedCounter()
+      if (trickObject.isGap()) {
+        this.gapsHit++;
       }
+
+      this.addTrickToHistory(trickObject);
     })
   }
 
@@ -201,7 +265,7 @@ class TrickHistory {
 
       const newTrick = this.readSingleTrick(trickToReadPointer)
       if (newTrick) {
-        this.processNewTrick(newTricksArray, newTrick)
+        newTricksArray.push(newTrick);
       }
       
       this.trickPointerArray[trickToReadIndex] = trickToReadPointer
@@ -217,14 +281,6 @@ class TrickHistory {
     }
 
     return newTricksArray
-  }
-
-  processNewTrick(newTricksArray, newTrick) {
-    newTricksArray.push(newTrick);
-
-    if (newTrick.isGap()) {
-      this.gapsHit++;
-    }
   }
 
   isTrickPointerScanned(index, pointer) {
@@ -289,6 +345,47 @@ class TrickHistory {
     })
   
     return trickStringHTML
+  }
+
+  fixUnmarkedSpecials() {
+    const trickArray = Array.from(this.tricksInCombo.values());
+
+    trickArray.forEach((currentTrick, i) => {
+      if (!currentTrick.isSpecial()) {
+        return;
+      }
+
+      trickArray.find((trickToCheck, j) => {
+        if (
+          i === j ||
+          currentTrick.name !== trickToCheck.name ||
+          trickToCheck.isSpecial()
+        ) {
+          return;
+        }
+        log('Found unmarked special:', trickToCheck.id)
+        
+        const markedSpecial = new Trick(
+          trickToCheck.name,
+          trickToCheck.flags + FLAGS.SPECIAL,
+          trickToCheck.timesUsed
+        );
+        
+        const existingTrickInCombo = this.tricksInCombo.get(markedSpecial.id);
+
+        if (existingTrickInCombo) {
+          existingTrickInCombo.timesUsed += markedSpecial.timesUsed
+        } else {
+          this.tricksInCombo.set(markedSpecial.id, markedSpecial)
+        }
+
+        this.tricksInCombo.delete(trickToCheck.id)
+      })
+    })
+  }
+
+  finishTrickReading() {
+    this.fixUnmarkedSpecials();
   }
 }
 
