@@ -1,5 +1,5 @@
 import { log } from '../debug/debugHelpers'
-import { isTrackingRethawed, isTrackingThaw } from '../game/interGameUtils'
+import { isTrackingRethawed, isTrackingThaw, isTrackingThug } from '../game/interGameUtils'
 import * as MemoryController from '../game/memory'
 import { GAME_CONSTANTS } from '../utils/constants'
 
@@ -100,6 +100,7 @@ class Balance {
     this.grindBalanceArrowPosition = 0
     this.lipBalanceArrowPosition = 0
     this.balanceTrickType = undefined
+    this.grindResetCount = 0
   }
 
   assumePenaltyRange(balancePenaltyRangeObject, timeDiff) {
@@ -112,6 +113,8 @@ class Balance {
   }
 
   update(scoreObject) {
+    const prevBalanceTime = this.grindTime;
+  
     this.score = scoreObject
     this.updateGrindTime()
     this.updateManualTime()
@@ -121,6 +124,17 @@ class Balance {
     this.lipTime = MemoryController.getLipTime()
     this.stateType = MemoryController.getStateType()
     this.updateBalanceTrickType()
+
+    if (isTrackingThug()) {
+      this.checkForDoubleTapGrindReset(prevBalanceTime);
+    }
+  }
+
+  checkForDoubleTapGrindReset(prevGrindTime) {
+    if (prevGrindTime - this.grindTime >= 0.66) {
+      log('GRIND RESET HIT - time diff:', prevGrindTime - this.grindTime)
+      this.grindResetCount++;
+    }
   }
 
   updateDatasets() {

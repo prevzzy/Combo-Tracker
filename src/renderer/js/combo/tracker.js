@@ -22,6 +22,7 @@ import { getHookedGameProcessName } from '../game/gameProcessService'
 import { handleSendingDataToListeners } from './trackerBridge/trackerBridgeEvents'
 import { requestCtObserverSendMessage } from '../events/outgoingIpcEvents'
 import { shouldSendCtObserverMessage } from '../online/ctObserver'
+import { isTrackingThug } from '../game/interGameUtils'
 
 let finalScore = null
 let comboStartTime = 0
@@ -69,7 +70,8 @@ function getFinalBalanceData() {
       grindTime: balance.grindTime,
       newGrindsSavedTime: balance.newGrindsAmount * BALANCE_TIME_VALUES.NEW_GRIND_TIME_AWARD,
       doubleGrindsAddedTime: balance.doubleGrindsAmount * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY,
-      tagLimitAddedTime: balance.tagLimitAddedTime
+      tagLimitAddedTime: balance.tagLimitAddedTime,
+      grindResetCount: balance.grindResetCount,
     },
     manualData: {
       manualTime: balance.manualTime,
@@ -85,7 +87,7 @@ function getMiscData() {
     maxRevertPenalty: score.maxRevertPenalty,
     multiplierFromGaps: trickHistory.gapsHit,
     graffitiTags: score.graffitiTags,
-    bonusBasePoints: score.getBonusBasePoints(),
+    bonusBasePoints: isTrackingThug() ? 0 : score.getBonusBasePoints(),
   }
 }
 
@@ -359,6 +361,7 @@ async function handlePostComboLogic(game, isIdle, shouldSaveCombo, shouldScreens
   }
 
   LastComboUI.handleLastComboDisplay(
+    game,
     comboData.stats,
     comboData.tricks,
     comboData.graphs,

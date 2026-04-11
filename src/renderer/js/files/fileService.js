@@ -21,16 +21,18 @@ function setSavingPaths(paths) {
   const folderPathToUse = process.env.APP_MODE === 'DEBUG' ? appFolderPath : appDataPath;
 
   highscoresJsonPaths = {
-    [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'highscores.json'),
-    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'highscores-reTHAWed.json'),
+    [GAME_PROCESSES.THUG]: path.join(folderPathToUse, 'highscores-THUG.json'),
     [GAME_PROCESSES.THUG2]: path.join(folderPathToUse, 'highscores-THUG2.json'),
+    [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'highscores.json'),
     [GAME_PROCESSES.THAW]: path.join(folderPathToUse, 'highscores-THAW.json'),
+    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'highscores-reTHAWed.json'),
   }
   savedCombosFolderPaths = {
-    [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'combos'),
-    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'combos-reTHAWed'),
+    [GAME_PROCESSES.THUG]: path.join(folderPathToUse, 'combos-THUG.json'),
     [GAME_PROCESSES.THUG2]: path.join(folderPathToUse, 'combos-THUG2'),
+    [GAME_PROCESSES.THUGPRO]: path.join(folderPathToUse, 'combos'),
     [GAME_PROCESSES.THAW]: path.join(folderPathToUse, 'combos-THAW'),
+    [GAME_PROCESSES.RETHAWED]: path.join(folderPathToUse, 'combos-reTHAWed'),
   }
 }
 

@@ -592,7 +592,6 @@ function initGameSelect(selectedGame) {
       const selectedGameElement = document.getElementById('selected-game-img')
       const imgElement = element.querySelector('img');
       selectedGameElement.src = imgElement.src;
-      selectedGameElement.style.marginTop = imgElement.style.marginTop;
       onGameClick(game)
     })
 

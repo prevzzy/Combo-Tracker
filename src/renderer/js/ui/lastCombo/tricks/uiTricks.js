@@ -1,7 +1,9 @@
 import { TRICK_FILTERS, TrickFilteringService } from './trickFiltering'
 import { initNavigation } from '../../uiNavigation'
+import { GAME_PROCESSES } from '../../../utils/constants';
 
 let tricksInComboArray = []
+let displayedComboGame;
 
 let trickHistoryClickListener;
 let trickUsageClickListener;
@@ -40,7 +42,7 @@ function initFilters() {
   sortingRadioButtons.forEach(radio => {
     radio.addEventListener('change', (e) => {
       displayTrickUsage(
-        trickFilteringService.sortTricks(e.target.value, tricksInComboArray, trickSearchInput.value)
+        trickFilteringService.sortTricks(e.target.value, tricksInComboArray, trickSearchInput.value),
       )
     })
   })
@@ -48,14 +50,14 @@ function initFilters() {
   filteringCheckBoxes.forEach(checkbox => {
     checkbox.addEventListener('change', (e) => {
       displayTrickUsage(
-        trickFilteringService.filterTricks(e.target.value, tricksInComboArray, trickSearchInput.value)
+        trickFilteringService.filterTricks(e.target.value, tricksInComboArray, trickSearchInput.value),
       )
     })
   })
 
   trickSearchInput.addEventListener('input', (e) => {
     displayTrickUsage(
-      trickFilteringService.applyFilters(tricksInComboArray, e.target.value)
+      trickFilteringService.applyFilters(tricksInComboArray, e.target.value),
     )
   })
 }
@@ -83,8 +85,10 @@ function setupDisplayingTricksTotalOnSubPageSwitch(buttonElement, oldListener, t
   return newListener;
 }
 
-function displayTricks(tricksInCombo, comboHistoryHtml) {
-  tricksInComboArray = [...tricksInCombo]
+function displayTricks(game, tricksInCombo, comboHistoryHtml) {
+  displayedComboGame = game;
+  tricksInComboArray = [...tricksInCombo];
+  
   const filteredTricks = trickFilteringService.filterTricks(undefined, tricksInComboArray);
 
   displayTrickUsage(filteredTricks)
@@ -113,7 +117,10 @@ function displayTrickUsage(tricksInCombo) {
 
   trickUsageContainer.innerHTML = ''
   const template = document.getElementById('trick-usage-entry-template')
-  const shouldColorTrickUsage = trickFilteringService.activeFilters[TRICK_FILTERS.SHOW_SWITCH]
+  const shouldColorTrickUsage = !!(
+    displayedComboGame !== GAME_PROCESSES.THUG &&
+    trickFilteringService.activeFilters[TRICK_FILTERS.SHOW_SWITCH]
+  );
 
   tricksInCombo && tricksInCombo.forEach((trickObject) => {
     if (trickObject.isNonMultiTrick()) {

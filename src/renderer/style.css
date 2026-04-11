@@ -10,10 +10,11 @@
   --transparent: rgba(0, 0, 0, 0);
   --scrollbar-color: #322b3f;
   --scrollbar-color-hover: #433a54;
-  --rethawed-color: #f700b5;
-  --thugpro-color: #ffd21a;
+  --thug-color: #df2a0a;
   --thug2-color: #ff9624;
+  --thugpro-color: #ffd21a;
   --thaw-color: #ec008b;
+  --rethawed-color: #f700b5;
   --gradient-top-color: #362b4a;
   --gradient-top-color-active: #44335e;
   --gradient-top-color-hover: #4f3c6b;
@@ -548,20 +549,24 @@ a.text-danger.no-hover-color:hover, a.text-danger.no-hover-color:focus {
   user-select: text;
 }
 
-.text-thugpro {
-  color: var(--thugpro-color);
-}
-
-.text-rethawed {
-  color: var(--rethawed-color);
+.text-thug {
+  color: var(--thug-color);
 }
 
 .text-thug2 {
   color: var(--thug2-color);
 }
 
+.text-thugpro {
+  color: var(--thugpro-color);
+}
+
 .text-thaw {
   color: var(--thaw-color);
+}
+
+.text-rethawed {
+  color: var(--rethawed-color);
 }
 
 .font-weight-semibold {

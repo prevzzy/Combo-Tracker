@@ -31,6 +31,8 @@ const tagLimitElement = document.getElementById('combo-tag-limit')
 const tagLimitStatElement = document.getElementById('combo-tag-limit-stat')
 const doubleGrindsElement = document.getElementById('combo-double-grinds')
 const newGrindsElement = document.getElementById('combo-new-grinds')
+const grindResetStatElement = document.getElementById('combo-grind-reset-count-stat')
+const grindResetCountElement = document.getElementById('combo-grind-reset-count')
 
 const manualTimeElement = document.getElementById('combo-manual-time')
 const cheesePenaltyElement = document.getElementById('combo-cheese-penalty')
@@ -117,6 +119,10 @@ function displayGameName(game) {
         gameElement.classList.add('text-thaw')
         gameElement.textContent = GAMES.THAW
         break;
+      case GAME_PROCESSES.THUG:
+        gameElement.classList.add('text-thug')
+        gameElement.textContent = GAMES.THUG
+        break;
       default:
         gameElement.classList.add('text-thugpro')
         gameElement.textContent = GAMES.THUGPRO
@@ -167,16 +173,19 @@ function displayComboDate(date) {
   document.getElementById('new-combo-date').textContent = date ? ` Done on ${date}` : ''
 }
 
-function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, tagLimitAddedTime }, game) {
+function displayGrind({ grindTime, newGrindsSavedTime, doubleGrindsAddedTime, tagLimitAddedTime, grindResetCount }, game) {
   colorComboPropertyText(tagLimitElement, tagLimitAddedTime, 6)
   colorComboPropertyText(doubleGrindsElement, doubleGrindsAddedTime, 3 * BALANCE_TIME_VALUES.DOUBLE_GRIND_TIME_PENALTY)
   colorComboPropertyText(newGrindsElement, newGrindsSavedTime, 1, -0.0001)
+  colorComboPropertyText(grindResetCountElement, grindResetCount, 0.1, 1)
 
   grindTimeElement.textContent = formatBalancePropertyTime(grindTime)
   newGrindsElement.textContent = formatBalancePropertyTime(newGrindsSavedTime)
   doubleGrindsElement.textContent = formatBalancePropertyTime(doubleGrindsAddedTime, true)
   tagLimitElement.textContent = formatBalancePropertyTime(tagLimitAddedTime.toFixed(2), true)
+  grindResetCountElement.textContent = grindResetCount;
 
+  setGrindResetCountDisplay(game);
   setTagLimitStatDisplay(game)
 }
 
@@ -185,6 +194,14 @@ function setTagLimitStatDisplay(game) {
     setItemDisplay(tagLimitStatElement, 'none')
   } else {
     setItemDisplay(tagLimitStatElement, 'block')
+  }
+}
+
+function setGrindResetCountDisplay(game) {
+  if (game === GAME_PROCESSES.THUG) {
+    setItemDisplay(grindResetStatElement, 'block')
+  } else {
+    setItemDisplay(grindResetStatElement, 'none')
   }
 }
 

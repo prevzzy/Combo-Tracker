@@ -94,8 +94,10 @@ combos/
 combos-reTHAWed/
 combos-THUG2/
 combos-THAW/
+combos-THUG.json
 highscores.json
 highscores-reTHAWed.json
 highscores-THUG2.json
+highscores-THUG.json
 highscores-THAW.json
 src/main/api/auth.js

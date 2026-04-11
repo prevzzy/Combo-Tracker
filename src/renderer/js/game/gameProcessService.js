@@ -11,6 +11,7 @@ import { runCtObserver, stopCtObserver } from '../online/ctObserver'
 import { requestRegisteringAllShortcuts, requestCleaningUpAllShortcuts } from '../events/outgoingIpcEvents'
 
 const supportedGames = [
+  GAME_PROCESSES.THUG,
   GAME_PROCESSES.THUGPRO,
   GAME_PROCESSES.RETHAWED,
   GAME_PROCESSES.THUG2,

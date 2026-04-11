@@ -10,6 +10,14 @@ export function isTrackingThugPro(game) {
   return game === GAME_PROCESSES.THUGPRO
 }
 
+export function isTrackingThug(game) {
+  if (!game) {
+    game = getHookedGameProcessName()
+  }
+
+  return game === GAME_PROCESSES.THUG
+}
+
 export function isTrackingRethawed(game) {
   if (!game) {
     game = getHookedGameProcessName()

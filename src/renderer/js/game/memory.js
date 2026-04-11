@@ -34,7 +34,7 @@ import {
   bonusBasePointsAddressData
 } from './offsets'
 import { getHookedGameProcessName } from './gameProcessService'
-import { isInMainMenu } from './interGameUtils'
+import { isInMainMenu, isTrackingThug } from './interGameUtils'
 import { hasSpecialUnicodeCharacter } from '../utils/helpers'
 
 let gameHandle
@@ -319,7 +319,11 @@ function getCurrentMapScript() {
 }
 
 function getMultiplier() {
-  return memoryjs.readMemory(gameHandle, multiplierAddress, memoryjs.FLOAT)
+  let type = memoryjs.FLOAT;
+  if (isTrackingThug()) {
+    type = memoryjs.INT;
+  }
+  return memoryjs.readMemory(gameHandle, multiplierAddress, type)
 }
 
 function getBasePoints() {
