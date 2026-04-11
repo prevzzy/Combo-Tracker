@@ -232,6 +232,12 @@
                             <span id="combo-tag-limit"></span>
                           </div>
                         </div>
+                        <div id="combo-grind-reset-count-stat" >
+                          <div class="d-flex justify-content-between">
+                            <p class="mb-1">Grind balance resets </p>
+                            <span id="combo-grind-reset-count"></span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="col-md-6 col-xs-12 align-items-center justify-content-between mb-3">
@@ -423,11 +429,14 @@
                 <li id="rethawed-game-select" class="hs-game-select-item" data-game="RETHAWED">
                   <img src='../rethawed.png' alt="reTHAWed" width="75" height="auto" style="margin-top: -4px"/>
                 </li>
+                <li id="thaw-game-select" class="hs-game-select-item" data-game="THAW">
+                  <img src='../thaw.png' alt="thaw" width="75" height="auto" />
+                </li>
                 <li id="thug2-game-select" class="hs-game-select-item" data-game="THUG2">
                   <img src='../thug2.png' alt="thug2" width="75" height="auto" style="margin-top: -4px"/>
                 </li>
-                <li id="thaw-game-select" class="hs-game-select-item" data-game="THAW">
-                  <img src='../thaw.png' alt="thaw" width="75" height="auto" />
+                <li id="thug-game-select" class="hs-game-select-item" data-game="THUG">
+                  <img src='../thug.png' alt="thug" width="75" height="auto" style="margin-top: -3px" />
                 </li>
               </ul>
             </div>
@@ -672,22 +681,22 @@
             <div class="text-secondary display-6">About</div>
             <div class="row align-items-center mt-2">
               <div class="col col-12 row no-gutters flex-column">
-                <div class="mb-3">Combo Tracker is an app that gathers and presents data about combos made in THUG Pro, reTHAWed, Tony Hawk's American Wasteland and Tony Hawk's Underground 2. Its purpose is to significantly simplify analyzing combos, and help players improve and achieve their score goals faster. It is also destined to serve as an individual highscores list, that allows the user to have all of the data of their best combos available at all times.</div>
+                <div class="mb-3">Combo Tracker is an app that gathers and presents data about combos made in THUG Pro, reTHAWed, Tony Hawk's Underground, Tony Hawk's Underground 2 and Tony Hawk's American Wasteland. Its purpose is to significantly simplify analyzing combos, and help players improve and achieve their score goals faster. It is also destined to serve as an individual highscores list, that allows the user to have all of the data of their best combos available at all times.</div>
                 <div>It's worth noting, that although the combo data is almost completely obtained from inside the game, either directly or by mimicking the game engine's logic, the application only keeps track of the values. At no point does it modify any of the in-game values in any way.</div>
               </div>
             </div>
             <div class="text-secondary display-6 mt-4">Supported Games</div>
             <div class="row align-items-center mt-2">
               <div class="col col-12 row no-gutters flex-column">
-                Combo Tracker currently supports THUG Pro, reTHAWed, Tony Hawk's Underground 2 and Tony Hawk's American Wasteland.
+                Combo Tracker currently supports THUG Pro, reTHAWed, Tony Hawk's Underground, Tony Hawk's Underground 2 and Tony Hawk's American Wasteland.
               </div>
             </div>
             <div class="text-secondary display-6 mt-4">Troubleshooting</div>
             <div class="row align-items-center mt-2">
               <div class="col col-12 row no-gutters flex-column">
-                <div class="mb-3"><span class="font-weight-semibold">Make sure that the games' executable filenames match THUGPro.exe, reTHAWed.exe, THUG2.exe and THAW.exe.</span> If you're using any modifications for these games, you may need to change the filename accordingly.</div>
+                <div class="mb-3"><span class="font-weight-semibold">Make sure that the games' executable filenames match THUGPro.exe, reTHAWed.exe, THUG.exe, THUG2.exe and THAW.exe.</span> If you're using any modifications for these games, you may need to change the filename accordingly.</div>
                 <div>
-                  Depending on the game version installed on your PC, you might experience issues with Combo Tracker failing to detect THUG2 and THAW games. The application has been tested to run with the executables provided at the bottom of <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases/tag/v1.2.0" class="btn-link text-secondary external-link">this page</a>. If your game is running but you're still encountering the error messages "Could not find any active supported game process." or "Reinitializing addresses. Restart the game if the problem persists.", then try swapping your .exe files with the ones found inside the link. If this doesn't help, try running Combo Tracker as an administrator.
+                  Depending on the game version installed on your PC, you might experience issues with Combo Tracker failing to failing to detect THUG, THUG2 and THAW games. The application has been tested to run with the executables provided at the bottom of <a target="_blank" href="https://github.com/prevzzy/Combo-Tracker/releases/tag/v1.3.0" class="btn-link text-secondary external-link">this page</a>. If your game is running but you're still encountering the error messages "Could not find any active supported game process." or "Reinitializing addresses. Restart the game if the problem persists.", then try swapping your .exe files with the ones found inside the link. If this doesn't help, try running Combo Tracker as an administrator.
                 </div>
               </div>
             </div>
@@ -717,6 +726,8 @@
                 <div class="text-muted display-8 mt-2">The regular and switch variations of the same trick are distinguished and counted as different tricks - e.g. Kickflip and Switch Kickflip.</div>
                 <div class="mt-3">Bonus base points</div>
                 <div class="text-muted display-8">Points awarded for certain actions - e.g. for breaking glass. These points are added to your final base points pool only if you land your combo. If you bail, they will not be added.</div>
+                <div class="mt-3">Grind balance reset</div>
+                <div class="text-muted display-8">Exclusive to THUG only. Performing double-tap grind tricks such as Darkslide, Crail Slide, Hurricane, etc. will usually reset the grind balance timer to 0 seconds.</div>
               </div>
             </div>
             <div class="row align-items-center my-3">

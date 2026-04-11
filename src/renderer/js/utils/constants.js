@@ -1,17 +1,19 @@
 import { isAppInDebugMode } from "../debug/debugHelpers"
 
 export const GAME_PROCESSES = {
-  THUGPRO: 'THUGPro.exe',
-  RETHAWED: 'reTHAWed.exe',
+  THUG: 'THUG.exe',
   THUG2: 'THUG2.exe',
+  THUGPRO: 'THUGPro.exe',
   THAW: 'THAW.exe',
+  RETHAWED: 'reTHAWed.exe',
 }
 
 export const GAMES = {
-  THUGPRO: 'THUG Pro',
-  RETHAWED: 'reTHAWed',
+  THUG: 'THUG',
   THUG2: 'THUG2',
+  THUGPRO: 'THUG Pro',
   THAW: 'THAW',
+  RETHAWED: 'reTHAWed',
 }
 
 export const GAMES_BY_PROCESS_NAME = {
@@ -19,6 +21,7 @@ export const GAMES_BY_PROCESS_NAME = {
   [GAME_PROCESSES.RETHAWED]: GAMES.RETHAWED,
   [GAME_PROCESSES.THUG2]: GAMES.THUG2,
   [GAME_PROCESSES.THAW]: GAMES.THAW,
+  [GAME_PROCESSES.THUG]: GAMES.THUG,
 }
 
 export const GAME_CONSTANTS = {

@@ -1,3 +1,4 @@
+import { isTrackingThug } from '../game/interGameUtils'
 import * as MemoryController from '../game/memory'
 import { GAME_CONSTANTS } from '../utils/constants'
 
@@ -43,6 +44,10 @@ export class Score {
   }
 
   getBonusBasePoints() {
+    if (isTrackingThug()) {
+      return 0;
+    }
+
     if (this.bonusBasePoints !== 0 || !this.bonusBasePointsDataset.length) {
       return this.bonusBasePoints
     }
@@ -56,7 +61,10 @@ export class Score {
     this.score = this.getComboScore(false)
     this.maxRevertPenalty = this.getMaxRevertPenalty()
     this.graffitiTags = MemoryController.getGraffitiTagsCount()
-    this.bonusBasePoints = MemoryController.getBonusBasePoints()
+
+    if (!isTrackingThug()) {
+      this.bonusBasePoints = MemoryController.getBonusBasePoints()
+    }
   }
 
   getMaxRevertPenalty() {
@@ -78,7 +86,12 @@ export class Score {
     this.multiplierDataset.push(MemoryController.getMultiplier())
     this.scoreDataset.push(this.formatScoreForDataset(this.getComboScore(false)))
     this.revertPenaltyDataset.push(MemoryController.getRevertPenalty())
-    this.bonusBasePointsDataset.push(this.formatBasePointsForDataset(MemoryController.getBonusBasePoints()))
+
+    if (!isTrackingThug()) {
+      this.bonusBasePointsDataset.push(
+          this.formatBasePointsForDataset(MemoryController.getBonusBasePoints()
+      ));
+    }
   }
 
   hasNewComboStartedUnnoticed() {
@@ -104,6 +117,11 @@ export class Score {
 
   calculateFinalBasePoints(isComboLanded = false) {
     const basePoints = this.getBasePoints();
+
+    if (isTrackingThug()) {
+      return basePoints;
+    }
+    
     const bonusBasePoints = this.getBonusBasePoints();
     return isComboLanded ? basePoints + bonusBasePoints : basePoints;
   }

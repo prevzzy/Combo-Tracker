@@ -17,9 +17,11 @@ export const maps = {
       sc2: 'SCHOOL II',
       MS: 'MARSEILLE',
       nyc: 'NEW YORK',
+      ven: 'VENICE',
       Skatestreet: 'SKATESTREET VENTURA',
       phl: "PHILADELPHIA",
       Bullring: "THE BULLRING",
+      hvn: "SKATE HEAVEN",
       chopper: 'CHOPPER DROP',
     },
     THPS3: {
@@ -201,6 +203,22 @@ export const maps = {
       toystory_bedroom: "ANDY'S ROOM"
     },
     "CUSTOM LEVELS": {}
+  },
+  [GAME_PROCESSES.THUG]: {
+    [GAMES.THUG]: {
+      NJ: 'NEW JERSEY',
+      NY: 'MANHATTAN',
+      FL: 'TAMPA',
+      SD: 'SAN DIEGO',
+      HI: 'HAWAII',
+      VC: 'VANCOUVER',
+      SJ: 'SLAM CITY JAM',
+      RU: 'MOSCOW',
+      SE: 'HOTTER THAN HELL',
+      SC2: 'SCHOOL II',
+      VN: 'VENICE',
+      HN: 'HANGAR',
+    }
   },
   [GAME_PROCESSES.THUG2]: {
     [GAMES.THUG2]: {

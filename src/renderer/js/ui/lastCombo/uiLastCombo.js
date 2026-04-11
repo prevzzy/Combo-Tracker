@@ -128,6 +128,7 @@ function setLastComboPageInfo(isVisible, message = COMBO_PAGE_INFO_MESSAGES.GENE
 }
 
 function handleLastComboDisplay(
+  game,
   comboNumbersData,
   tricksData,
   graphData,
@@ -148,7 +149,7 @@ function handleLastComboDisplay(
   restoreDefaultUI(shouldDisplayActions)
 
   ComboNumbersUI.displayComboNumbers(comboNumbersData, shouldDisplayDate)
-  TricksUI.displayTricks(tricksData.tricksInCombo, tricksData.comboHistoryHtml)
+  TricksUI.displayTricks(game, tricksData.tricksInCombo, tricksData.comboHistoryHtml)
   GraphsUI.drawComboCharts(graphData.datasets, graphData.timestampArray)
 
   setHasDisplayedComboDetails(true)
@@ -191,7 +192,7 @@ async function displayComboFromFile(game, fileName) {
     )
 
     setupHighscoreActions(game, fileName)
-    handleLastComboDisplay(stats, tricks, graphs, true, true)
+    handleLastComboDisplay(game, stats, tricks, graphs, true, true)
     setLastComboPageInfo(false);
   } catch (error) {
     console.error(error)
